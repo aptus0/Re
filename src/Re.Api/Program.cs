@@ -10,6 +10,28 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     Args = args,
     ContentRootPath = AppContext.BaseDirectory
 });
+
+// Portable installations get a stable, per-user signing key automatically.
+// Production environments can still override it with JwtSettings__SecretKey.
+if (string.IsNullOrWhiteSpace(builder.Configuration["JwtSettings:SecretKey"]))
+{
+    var securityDirectory = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "ReSoft", "Re", "Security");
+    Directory.CreateDirectory(securityDirectory);
+    var keyPath = Path.Combine(securityDirectory, "jwt-signing.key");
+    var signingKey = File.Exists(keyPath)
+        ? File.ReadAllText(keyPath)
+        : Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64));
+
+    if (!File.Exists(keyPath))
+    {
+        File.WriteAllText(keyPath, signingKey);
+        File.SetAttributes(keyPath, File.GetAttributes(keyPath) | FileAttributes.Hidden);
+    }
+
+    builder.Configuration["JwtSettings:SecretKey"] = signingKey;
+}
 builder.Host.UseWindowsService(options =>
 {
     options.ServiceName = "Re.Api";

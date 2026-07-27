@@ -141,13 +141,14 @@ public class ReDbContext : DbContext
 
         ConfigureIdentity(modelBuilder);
         ConfigureCompany(modelBuilder);
-        ConfigureInventory(modelBuilder);
-        ConfigureSales(modelBuilder);
-          ConfigureAccounting(modelBuilder);
-          ConfigureSalesforce(modelBuilder);
+        var supportsTemporalTables = Database.IsSqlServer();
+        ConfigureInventory(modelBuilder, supportsTemporalTables);
+        ConfigureSales(modelBuilder, supportsTemporalTables);
+          ConfigureAccounting(modelBuilder, supportsTemporalTables);
+          ConfigureSalesforce(modelBuilder, supportsTemporalTables);
       }
 
-    private static void ConfigureSalesforce(ModelBuilder m)
+    private static void ConfigureSalesforce(ModelBuilder m, bool isSqlServer)
     {
         m.Entity<SalesforceTenant>(e =>
         {
@@ -168,7 +169,8 @@ public class ReDbContext : DbContext
         {
             e.ToTable("SalesforceOrgDiscoveries");
             e.Property(x => x.Status).HasConversion<string>().HasMaxLength(30);
-            e.Property(x => x.FindingsJson).HasColumnType("nvarchar(max)");
+            var findings = e.Property(x => x.FindingsJson);
+            if (isSqlServer) findings.HasColumnType("nvarchar(max)");
             e.HasOne(x => x.Tenant).WithMany(x => x.Discoveries).HasForeignKey(x => x.TenantId);
         });
         m.Entity<SalesforceBlueprint>(e =>
@@ -318,7 +320,7 @@ public class ReDbContext : DbContext
     }
 
     // ── Inventory ─────────────────────────────────────────────────────────
-    private static void ConfigureInventory(ModelBuilder m)
+    private static void ConfigureInventory(ModelBuilder m, bool supportsTemporalTables)
     {
         m.Entity<Product>(e =>
         {
@@ -369,7 +371,8 @@ public class ReDbContext : DbContext
 
         m.Entity<StockMovement>(e =>
         {
-            e.ToTable("StockMovements", t => t.IsTemporal());
+            if (supportsTemporalTables) e.ToTable("StockMovements", t => t.IsTemporal());
+            else e.ToTable("StockMovements");
             e.HasKey(x => x.Id);
             e.Property(x => x.Quantity).HasPrecision(18, 4);
             e.Property(x => x.UnitCost).HasPrecision(18, 4);
@@ -413,11 +416,12 @@ public class ReDbContext : DbContext
     }
 
     // ── Sales ─────────────────────────────────────────────────────────────
-    private static void ConfigureSales(ModelBuilder m)
+    private static void ConfigureSales(ModelBuilder m, bool supportsTemporalTables)
     {
         m.Entity<Invoice>(e =>
         {
-            e.ToTable("Invoices", t => t.IsTemporal());
+            if (supportsTemporalTables) e.ToTable("Invoices", t => t.IsTemporal());
+            else e.ToTable("Invoices");
             e.HasKey(x => x.Id);
             e.Property(x => x.DocumentNumber).HasMaxLength(50).IsRequired();
             e.Property(x => x.SubTotal).HasPrecision(18, 4);
@@ -451,7 +455,7 @@ public class ReDbContext : DbContext
     }
 
     // ── Accounting ────────────────────────────────────────────────────────
-    private static void ConfigureAccounting(ModelBuilder m)
+    private static void ConfigureAccounting(ModelBuilder m, bool supportsTemporalTables)
     {
         m.Entity<Account>(e =>
         {
@@ -468,7 +472,8 @@ public class ReDbContext : DbContext
 
         m.Entity<AccountMovement>(e =>
         {
-            e.ToTable("AccountMovements", t => t.IsTemporal());
+            if (supportsTemporalTables) e.ToTable("AccountMovements", t => t.IsTemporal());
+            else e.ToTable("AccountMovements");
             e.HasKey(x => x.Id);
             e.Property(x => x.Amount).HasPrecision(18, 4);
             e.Property(x => x.RunningBalance).HasPrecision(18, 4);
@@ -489,7 +494,8 @@ public class ReDbContext : DbContext
 
         m.Entity<CashRegisterMovement>(e =>
         {
-            e.ToTable("CashRegisterMovements", t => t.IsTemporal());
+            if (supportsTemporalTables) e.ToTable("CashRegisterMovements", t => t.IsTemporal());
+            else e.ToTable("CashRegisterMovements");
             e.HasKey(x => x.Id);
             e.Property(x => x.Amount).HasPrecision(18, 4);
             e.Property(x => x.RunningBalance).HasPrecision(18, 4);
@@ -513,7 +519,8 @@ public class ReDbContext : DbContext
 
         m.Entity<BankAccountMovement>(e =>
         {
-            e.ToTable("BankAccountMovements", t => t.IsTemporal());
+            if (supportsTemporalTables) e.ToTable("BankAccountMovements", t => t.IsTemporal());
+            else e.ToTable("BankAccountMovements");
             e.HasKey(x => x.Id);
             e.Property(x => x.Amount).HasPrecision(18, 4);
             e.Property(x => x.RunningBalance).HasPrecision(18, 4);

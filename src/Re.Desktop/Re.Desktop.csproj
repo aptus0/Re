@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>Re.Desktop</AssemblyName>
+    <AssemblyName>Re</AssemblyName>
     <RootNamespace>Re.Desktop</RootNamespace>
     <AssemblyTitle>Re Kobi Cözümleri Desktop</AssemblyTitle>
     <Company>Re</Company>

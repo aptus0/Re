@@ -14,20 +14,35 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException("'DefaultConnection' bağlantı dizisi yapılandırılmamış.");
+        var provider = configuration["Database:Provider"] ?? "Sqlite";
 
         services.AddDbContext<ReDbContext>(options =>
         {
-            options.UseSqlServer(connectionString, sql =>
+            if (provider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
             {
-                sql.MigrationsAssembly(typeof(DependencyInjection).Assembly.FullName);
-                sql.CommandTimeout(120);
-                sql.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null);
-            });
+                var connectionString = configuration.GetConnectionString("DefaultConnection")
+                    ?? throw new InvalidOperationException("'DefaultConnection' connection string is missing.");
+                options.UseSqlServer(connectionString, sql =>
+                {
+                    sql.MigrationsAssembly(typeof(DependencyInjection).Assembly.FullName);
+                    sql.CommandTimeout(120);
+                    sql.EnableRetryOnFailure(5, TimeSpan.FromSeconds(30), null);
+                });
+            }
+            else
+            {
+                var sqlitePath = configuration["Database:SqlitePath"];
+                if (string.IsNullOrWhiteSpace(sqlitePath))
+                {
+                    sqlitePath = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "ReSoft", "Re", "Data", "Re.db");
+                }
+
+                sqlitePath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(sqlitePath));
+                Directory.CreateDirectory(Path.GetDirectoryName(sqlitePath)!);
+                options.UseSqlite($"Data Source={sqlitePath};Cache=Shared;Foreign Keys=True");
+            }
 
 #if DEBUG
             options.EnableSensitiveDataLogging();
@@ -47,7 +62,10 @@ public static class DependencyInjection
         var dbContext = scope.ServiceProvider.GetRequiredService<ReDbContext>();
         var hasher = scope.ServiceProvider.GetRequiredService<Re.Application.Common.Interfaces.IPasswordHasher>();
 
-        await dbContext.Database.MigrateAsync();
+        if (dbContext.Database.IsSqlite())
+            await dbContext.Database.EnsureCreatedAsync();
+        else
+            await dbContext.Database.MigrateAsync();
         await SeedDefaultDataAsync(dbContext, hasher);
     }
 

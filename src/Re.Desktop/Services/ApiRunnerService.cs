@@ -46,7 +46,13 @@ public static class ApiRunnerService
     {
         var baseDir = AppDomain.CurrentDomain.BaseDirectory;
         var apiExeName = "Re.Api.exe";
-        var apiPath = Path.Combine(baseDir, apiExeName);
+        var apiPath = Path.Combine(baseDir, "Api", apiExeName);
+
+        // Compatibility fallback for older portable builds.
+        if (!File.Exists(apiPath))
+        {
+            apiPath = Path.Combine(baseDir, apiExeName);
+        }
 
         // Fallback for development environment
         if (!File.Exists(apiPath))
