@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_ERP_Sync_On_Closed_Won</fullName>
+    <active>true</active>
+    <description>Kazanıldı (Closed Won) aşamasına geçen fırsatların Re ERP sistemine senkronize edilmiş olmasını zorunlu kılar.</description>
+    <errorConditionFormula>ISPICKVAL(StageName, "Closed Won") &amp;&amp; ISBLANK(ERP_Sync_Id__c)</errorConditionFormula>
+    <errorMessage>Bu fırsat Re ERP sistemine aktarılmadan 'Closed Won' aşamasına getirilemez. Lütfen önce ERP entegrasyonunu tamamlayın.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,406 @@
+<UserControl x:Class="Re.Desktop.Views.Sales.InvoicePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sales="clr-namespace:Re.Desktop.ViewModels.Sales"
+             mc:Ignorable="d" 
+             d:DesignHeight="720" d:DesignWidth="1100"
+             d:DataContext="{d:DesignInstance Type=sales:InvoiceListViewModel, IsDesignTimeCreatable=False}"
+             Background="#F5F6F8">
+
+    <Grid>
+        <!-- Ana Liste Görünümü -->
+        <Grid Visibility="{Binding IsFormOpen, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Üst Araç Çubuğu (Ribbon Tarzı) -->
+            <Border Grid.Row="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="20,15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Satış Faturaları" FontSize="24" FontWeight="SemiBold" Foreground="#111827" VerticalAlignment="Center" Margin="0,0,30,0"/>
+                        
+                        <!-- Arama Kutusu -->
+                        <Border Background="#F3F4F6" CornerRadius="6" BorderBrush="#E5E7EB" BorderThickness="1" Width="300" Height="36">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Path Data="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                                      Stroke="#9CA3AF" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Width="16" Height="16" Stretch="Uniform" Margin="10,0" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                         Background="Transparent" BorderThickness="0" VerticalAlignment="Center" FontSize="14" Foreground="#374151"
+                                         VerticalContentAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock Grid.Column="1" Text="Fatura No veya Cari Ara..." Foreground="#9CA3AF" FontSize="14" 
+                                           VerticalAlignment="Center" IsHitTestVisible="False" Margin="2,0,0,0"
+                                           Visibility="{Binding IsSearchEmpty, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Aksiyon Butonları -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button Command="{Binding NewInvoiceCommand}" 
+                                Background="#0078D4" Foreground="White" BorderThickness="0" Padding="16,8" 
+                                FontSize="14" FontWeight="Medium" Cursor="Hand">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Data="M12 4v16m8-8H4" Stroke="White" StrokeThickness="2" Stretch="Uniform" Width="14" Height="14" Margin="0,0,8,0"/>
+                                            <TextBlock Text="Yeni Fatura" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#C62828"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- İçerik Alanı -->
+            <Grid Grid.Row="1" Margin="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="320"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Sol Taraf: Liste -->
+                <Border Background="White" CornerRadius="8" BorderBrush="#E5E7EB" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Tablo Başlığı -->
+                        <Border BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="15">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Fatura No" FontWeight="SemiBold" Foreground="#6B7280" FontSize="13"/>
+                                <TextBlock Grid.Column="1" Text="Cari / Müşteri" FontWeight="SemiBold" Foreground="#6B7280" FontSize="13"/>
+                                <TextBlock Grid.Column="2" Text="Tarih" FontWeight="SemiBold" Foreground="#6B7280" FontSize="13"/>
+                                <TextBlock Grid.Column="3" Text="Genel Toplam" FontWeight="SemiBold" Foreground="#6B7280" FontSize="13" TextAlignment="Right"/>
+                                <TextBlock Grid.Column="4" Text="Durum" FontWeight="SemiBold" Foreground="#6B7280" FontSize="13" TextAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Fatura Listesi -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Invoices}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#F3F4F6" BorderThickness="0,0,0,1" Background="Transparent">
+                                            <Border.InputBindings>
+                                                <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.SelectedInvoice, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                            </Border.InputBindings>
+                                            <!-- Satır Hover Stili -->
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="#F9FAFB"/>
+                                                            <Setter Property="Cursor" Value="Hand"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            
+                                            <Grid Margin="15">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="150"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="120"/>
+                                                    <ColumnDefinition Width="150"/>
+                                                    <ColumnDefinition Width="100"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Text="{Binding DocumentNumber}" Foreground="#111827" FontWeight="Medium" FontSize="14" VerticalAlignment="Center"/>
+                                                
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                    <Border Background="#E0F2FE" CornerRadius="16" Width="32" Height="32" Margin="0,0,12,0">
+                                                        <TextBlock Text="{Binding Initials}" Foreground="#0284C7" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <TextBlock Text="{Binding CustomerName}" Foreground="#374151" FontSize="14" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                
+                                                <TextBlock Grid.Column="2" Text="{Binding DocumentDate, StringFormat=dd.MM.yyyy}" Foreground="#6B7280" FontSize="14" VerticalAlignment="Center"/>
+                                                
+                                                <TextBlock Grid.Column="3" Text="{Binding TotalAmount, StringFormat=N2 ₺}" Foreground="#111827" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" TextAlignment="Right"/>
+                                                
+                                                <Border Grid.Column="4" CornerRadius="12" Padding="8,4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#DEF7EC"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Status}" Value="İptal Edildi">
+                                                                    <Setter Property="Background" Value="#FDE8E8"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Taslak">
+                                                                    <Setter Property="Background" Value="#FEF3C7"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding Status}" FontSize="12" FontWeight="Medium">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground" Value="#03543F"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Status}" Value="İptal Edildi">
+                                                                        <Setter Property="Foreground" Value="#9B1C1C"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Status}" Value="Taslak">
+                                                                        <Setter Property="Foreground" Value="#92400E"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <!-- Paging / Özet Footer -->
+                        <Border Grid.Row="2" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0" Padding="15" Background="#F9FAFB">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <TextBlock Foreground="#6B7280" FontSize="13">
+                                    <Run Text="Toplam "/>
+                                    <Run Text="{Binding TotalCount}" FontWeight="SemiBold" Foreground="#111827"/>
+                                    <Run Text=" fatura listeleniyor."/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Sağ Taraf: Fatura Detay / Dashboard Özet -->
+                <Grid Grid.Column="1" Margin="20,0,0,0">
+                    <!-- Sağ panel henüz boş veya özet kartları konabilir -->
+                    <Border Background="White" CornerRadius="8" BorderBrush="#E5E7EB" BorderThickness="1" Padding="20" VerticalAlignment="Top">
+                        <StackPanel>
+                            <TextBlock Text="Satış Özeti" FontSize="16" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,15"/>
+                            <TextBlock Text="Toplam Satış Hacmi" FontSize="13" Foreground="#6B7280" Margin="0,0,0,5"/>
+                            <TextBlock Text="{Binding TotalSales}" FontSize="24" FontWeight="Bold" Foreground="#0078D4" Margin="0,0,0,20"/>
+                            
+                            <Border Background="#F3F4F6" Height="1" Margin="0,0,0,15"/>
+                            
+                            <TextBlock Text="Son İşlem Yapan: Admin" FontSize="12" Foreground="#9CA3AF"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- Ekleme / Düzenleme Formu (Master-Detail) -->
+        <Border Background="White" Visibility="{Binding IsFormOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Form Başlığı -->
+                <Border Grid.Row="0" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="20,15">
+                    <Grid>
+                        <TextBlock Text="{Binding FormTitle}" FontSize="20" FontWeight="SemiBold" Foreground="#111827" VerticalAlignment="Center"/>
+                        
+                        <Button Command="{Binding CloseFormCommand}" HorizontalAlignment="Right" Background="Transparent" BorderThickness="0" Cursor="Hand">
+                            <Path Data="M6 18L18 6M6 6l12 12" Stroke="#6B7280" StrokeThickness="2" Stretch="Uniform" Width="16" Height="16"/>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Form İçeriği -->
+                <ScrollViewer Grid.Row="1" Padding="20" IsEnabled="{Binding FormModel.IsDraft}">
+                    <StackPanel>
+                        <!-- MASTER: Fatura Üst Bilgileri -->
+                        <Border Background="#F9FAFB" CornerRadius="6" BorderBrush="#E5E7EB" BorderThickness="1" Padding="20" Margin="0,0,0,20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                                    <TextBlock Text="Fatura No" FontWeight="Medium" Foreground="#374151" Margin="0,0,0,5"/>
+                                    <TextBox Text="{Binding FormModel.DocumentNumber}" Style="{StaticResource ModernTextBox}" Height="36"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1" Margin="0,0,20,0">
+                                    <TextBlock Text="Cari / Müşteri ID" FontWeight="Medium" Foreground="#374151" Margin="0,0,0,5"/>
+                                    <!-- Cari Seçimi (Normalde Combobox veya Dialog) - Şimdilik Guid yazmak için TextBox -->
+                                    <TextBox Text="{Binding FormModel.CustomerId}" Style="{StaticResource ModernTextBox}" Height="36"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Fatura Tarihi" FontWeight="Medium" Foreground="#374151" Margin="0,0,0,5"/>
+                                    <TextBox Text="{Binding FormModel.DocumentDate, StringFormat=dd.MM.yyyy}" Style="{StaticResource ModernTextBox}" Height="36"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- DETAIL: Fatura Kalemleri -->
+                        <TextBlock Text="Fatura Kalemleri" FontSize="16" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,10"/>
+                        
+                        <Border CornerRadius="8" BorderBrush="#E5E7EB" BorderThickness="1" Background="White">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Kalem Tablosu Başlığı -->
+                                <Border BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="10" Background="#F9FAFB" CornerRadius="8,8,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="120"/>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="120"/>
+                                            <ColumnDefinition Width="40"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Ürün Adı" FontWeight="SemiBold" Foreground="#6B7280" FontSize="13"/>
+                                        <TextBlock Grid.Column="1" Text="Miktar" FontWeight="SemiBold" Foreground="#6B7280" FontSize="13" TextAlignment="Right"/>
+                                        <TextBlock Grid.Column="2" Text="Birim Fiyat" FontWeight="SemiBold" Foreground="#6B7280" FontSize="13" TextAlignment="Right"/>
+                                        <TextBlock Grid.Column="3" Text="KDV(%)" FontWeight="SemiBold" Foreground="#6B7280" FontSize="13" TextAlignment="Right"/>
+                                        <TextBlock Grid.Column="4" Text="Toplam" FontWeight="SemiBold" Foreground="#6B7280" FontSize="13" TextAlignment="Right"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Kalemler Listesi -->
+                                <ItemsControl Grid.Row="1" ItemsSource="{Binding FormModel.Lines}" Margin="0,5">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="10,5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="120"/>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="120"/>
+                                                    <ColumnDefinition Width="40"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBox Text="{Binding ProductName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" Margin="0,0,5,0" Height="32"/>
+                                                <TextBox Grid.Column="1" Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" TextAlignment="Right" Margin="0,0,5,0" Height="32"/>
+                                                <TextBox Grid.Column="2" Text="{Binding UnitPrice, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" TextAlignment="Right" Margin="0,0,5,0" Height="32"/>
+                                                <TextBox Grid.Column="3" Text="{Binding VatRate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBox}" TextAlignment="Right" Margin="0,0,5,0" Height="32"/>
+                                                <TextBlock Grid.Column="4" Text="{Binding LineTotalWithTax, StringFormat=N2}" TextAlignment="Right" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#111827"/>
+                                                
+                                                <Button Grid.Column="5" Command="{Binding DataContext.RemoveLineCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                                        Background="Transparent" BorderThickness="0" Cursor="Hand" Foreground="#EF4444" Margin="5,0,0,0">
+                                                    <Path Data="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" Stroke="#EF4444" StrokeThickness="1.5" Stretch="Uniform" Width="16" Height="16"/>
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- Yeni Kalem Ekle Butonu -->
+                                <Border Grid.Row="2" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0" Padding="10">
+                                    <Button Command="{Binding AddLineCommand}" Content="+ Yeni Kalem Ekle" 
+                                            Background="Transparent" Foreground="#0078D4" BorderThickness="0" 
+                                            FontWeight="SemiBold" Cursor="Hand" HorizontalAlignment="Left"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Form Alt Alanı (Toplamlar ve Kaydet) -->
+                <Border Grid.Row="2" Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0" Padding="20">
+                    <Grid>
+                        <!-- Toplamlar -->
+                        <StackPanel HorizontalAlignment="Right" Margin="0,0,200,0">
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Ara Toplam:" Foreground="#6B7280" TextAlignment="Right"/>
+                                <TextBlock Grid.Column="1" Text="{Binding FormModel.SubTotal, StringFormat=N2 ₺}" Foreground="#111827" FontWeight="Medium" TextAlignment="Right"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="KDV Toplamı:" Foreground="#6B7280" TextAlignment="Right"/>
+                                <TextBlock Grid.Column="1" Text="{Binding FormModel.TaxAmount, StringFormat=N2 ₺}" Foreground="#111827" FontWeight="Medium" TextAlignment="Right"/>
+                            </Grid>
+                            <Grid Margin="0,5,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Genel Toplam:" FontSize="16" FontWeight="Bold" Foreground="#111827" TextAlignment="Right"/>
+                                <TextBlock Grid.Column="1" Text="{Binding FormModel.TotalAmount, StringFormat=N2 ₺}" FontSize="16" FontWeight="Bold" Foreground="#0078D4" TextAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Kaydet / İptal -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                            
+                            <!-- Sadece Draft faturalarda gösterilecek Butonlar -->
+                            <StackPanel Orientation="Horizontal" Visibility="{Binding FormModel.IsDraft, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Button Command="{Binding ApproveInvoiceCommand}" Content="Faturayı Onayla" 
+                                        Background="#10B981" Foreground="White" BorderThickness="0" 
+                                        Padding="20,10" Margin="0,0,10,0"
+                                        FontWeight="Medium" Cursor="Hand"
+                                        ToolTip="Faturayı onaylar. Stok çıkışları ve cari hareketleri oluşturur."/>
+
+                                <Button Command="{Binding SaveInvoiceCommand}" Content="Taslak Olarak Kaydet" 
+                                        Background="#0078D4" Foreground="White" BorderThickness="0" 
+                                        Padding="30,10" Margin="0,0,10,0" FontWeight="Medium" Cursor="Hand"/>
+                            </StackPanel>
+
+                            <Button Command="{Binding CloseFormCommand}" Content="Vazgeç / Kapat" 
+                                    Background="White" BorderBrush="#D1D5DB" BorderThickness="1" 
+                                    Foreground="#374151" Padding="20,10"
+                                    FontWeight="Medium" Cursor="Hand"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+        
+        <!-- Yükleniyor Göstergesi -->
+        <Border Background="#80FFFFFF" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="İşleniyor..." FontSize="16" FontWeight="Medium" Foreground="#0078D4"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

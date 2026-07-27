@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <assignments>
+        <name>Set_Approval_Status</name><label>Onay Durumunu Belirle</label>
+        <locationX>176</locationX><locationY>296</locationY>
+        <assignmentItems><assignToReference>$Record.ERP_Approval_Status__c</assignToReference><operator>Assign</operator>
+            <value><elementReference>CalculatedApprovalStatus</elementReference></value>
+        </assignmentItems>
+    </assignments>
+    <description>Yüksek tutarlı fırsatlarda ERP onay durumunu otomatik olarak başlatır.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>CalculatedApprovalStatus</name><dataType>String</dataType>
+        <expression>IF(BLANKVALUE({!$Record.Amount}, 0) &gt;= 100000, "Bekliyor", "Gerekli_Degil")</expression>
+    </formulas>
+    <interviewLabel>Opportunity ERP Approval {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity ERP Approval Flow</label><processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX><locationY>0</locationY>
+        <connector><targetReference>Set_Approval_Status</targetReference></connector>
+        <object>Opportunity</object><recordTriggerType>CreateAndUpdate</recordTriggerType><triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

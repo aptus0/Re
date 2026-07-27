@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand><headerColor>#0176D3</headerColor><shouldOverrideOrgTheme>true</shouldOverrideOrgTheme></brand>
+    <description>CRM, stok, depo ve fatura sÃ¼reÃ§leri iÃ§in ReSoft ERP Ã§alÄ±ÅŸma alanÄ±.</description>
+    <formFactors>Large</formFactors><formFactors>Small</formFactors>
+    <label>ReSoft ERP</label>
+    <navType>Standard</navType>
+    <tabs>standard-Home</tabs><tabs>standard-Account</tabs><tabs>standard-Opportunity</tabs>
+    <tabs>ERP_Stock_Item__c</tabs><tabs>ERP_Stock_Movement__c</tabs><tabs>ERP_Warehouse__c</tabs><tabs>ERP_Invoice__c</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>

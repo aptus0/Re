@@ -1,0 +1,68 @@
+<template>
+    <template lwc:if={error}><div class="error">{error}</div></template>
+    <template lwc:elseif={workspace}>
+        <section class="workspace">
+            <header class="record-header">
+                <div class="title-wrap">
+                    <lightning-icon icon-name="standard:orders" size="medium"></lightning-icon>
+                    <div><p class="eyebrow">Fatura</p><h1>{workspace.invoice.Document_Number__c}</h1><p>{workspace.invoice.Account__r.Name}</p></div>
+                </div>
+                <div class="header-actions">
+                    <lightning-button label="Düzenle"></lightning-button>
+                    <lightning-button label="Tahsilat Gir"></lightning-button>
+                    <lightning-button label="e-Fatura Gönder" variant="brand"></lightning-button>
+                </div>
+            </header>
+
+            <div class="meta-bar">
+                <div><span>Durum</span><strong class={workspace.invoice.statusClass}>{workspace.invoice.Status__c}</strong></div>
+                <div><span>Fatura Tarihi</span><lightning-formatted-date-time value={workspace.invoice.Document_Date__c}></lightning-formatted-date-time></div>
+                <div><span>Vade Tarihi</span><lightning-formatted-date-time value={workspace.invoice.Due_Date__c}></lightning-formatted-date-time></div>
+                <div><span>Depo</span><strong>{workspace.invoice.Warehouse__r.Name}</strong></div>
+                <div><span>Sahip</span><strong class="link">{workspace.invoice.Owner.Name}</strong></div>
+            </div>
+
+            <div class="metric-grid">
+                <article><span>Ara Toplam</span><strong>{workspace.invoice.subTotalLabel}</strong></article>
+                <article><span>KDV</span><strong>{workspace.invoice.taxLabel}</strong></article>
+                <article><span>Toplam Tutar</span><strong>{workspace.invoice.totalLabel}</strong></article>
+                <article class="balance"><span>Açık Bakiye</span><strong>{workspace.invoice.remainingLabel}</strong><small>{workspace.dueLabel}</small></article>
+            </div>
+
+            <div class="content-grid">
+                <article class="panel lines">
+                    <div class="panel-head"><div><h2>Fatura Kalemleri ({workspace.lines.length})</h2><p>Ürün, miktar, fiyat ve vergi kırılımı</p></div><lightning-button label="Kalem Ekle" icon-name="utility:add"></lightning-button></div>
+                    <div class="table-wrap"><table><thead><tr><th>#</th><th>Ürün / Hizmet</th><th>Miktar</th><th>Birim Fiyat</th><th>İndirim</th><th>KDV</th><th>Net Tutar</th></tr></thead>
+                        <tbody><template for:each={workspace.lines} for:item="line"><tr key={line.Id}>
+                            <td>{line.rowNumber}</td><td><a href={line.Id}>{line.Product_Name__c}</a><small>{line.Product_Code__c}</small></td>
+                            <td>{line.Quantity__c} {line.Unit__c}</td><td>{line.unitPriceLabel}</td>
+                            <td>%{line.Discount_Percent__c}</td><td>%{line.Vat_Rate__c}</td><td><strong>{line.lineTotalLabel}</strong></td>
+                        </tr></template></tbody>
+                    </table></div>
+                </article>
+
+                <aside>
+                    <article class="panel totals">
+                        <h2>Tutar Özeti</h2>
+                        <p><span>Ara Toplam</span><b>{workspace.invoice.subTotalLabel}</b></p>
+                        <p><span>İndirim</span><b class="red">-{workspace.invoice.discountLabel}</b></p>
+                        <p><span>KDV</span><b>{workspace.invoice.taxLabel}</b></p>
+                        <p class="grand"><span>Toplam</span><b>{workspace.invoice.totalLabel}</b></p>
+                    </article>
+                    <article class="panel collection">
+                        <h2>Tahsilat Durumu</h2><strong>{workspace.invoice.paidLabel}</strong><span> tahsil edildi</span>
+                        <div class="progress"><i style={workspace.progressStyle}></i></div>
+                        <p><span>Kalan</span><b>{workspace.invoice.remainingLabel}</b></p>
+                    </article>
+                    <article class="panel integration">
+                        <h2>ERP Entegrasyonu</h2>
+                        <p><span>e-Fatura</span><b>{workspace.invoice.E_Invoice_Status__c}</b></p>
+                        <p><span>Onay</span><b>{workspace.invoice.Approval_Status__c}</b></p>
+                        <p><span>Son Senkronizasyon</span><lightning-formatted-date-time value={workspace.invoice.Last_Sync_At__c}></lightning-formatted-date-time></p>
+                    </article>
+                </aside>
+            </div>
+        </section>
+    </template>
+    <template lwc:else><lightning-spinner alternative-text="Fatura yükleniyor"></lightning-spinner></template>
+</template>

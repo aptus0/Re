@@ -1,0 +1,54 @@
+<UserControl x:Class="Re.Desktop.Views.Products.ProductDashboardPage"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="#EEF1F4">
+ <UserControl.Resources>
+  <BooleanToVisibilityConverter x:Key="BoolVisibility"/>
+  <Style x:Key="Card" TargetType="Border"><Setter Property="Background" Value="White"/><Setter Property="BorderBrush" Value="#AEB8C4"/><Setter Property="BorderThickness" Value="1"/><Setter Property="Padding" Value="13"/></Style>
+  <Style x:Key="KpiTitle" TargetType="TextBlock"><Setter Property="FontSize" Value="10"/><Setter Property="Foreground" Value="#667085"/><Setter Property="FontWeight" Value="SemiBold"/></Style>
+  <Style x:Key="KpiValue" TargetType="TextBlock"><Setter Property="FontSize" Value="20"/><Setter Property="Foreground" Value="#202328"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Margin" Value="0,4,0,1"/></Style>
+  <Style x:Key="Command" TargetType="Button"><Setter Property="Height" Value="32"/><Setter Property="Padding" Value="12,0"/><Setter Property="Background" Value="White"/><Setter Property="Foreground" Value="#202328"/><Setter Property="BorderBrush" Value="#98A5B4"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Cursor" Value="Hand"/></Style>
+ </UserControl.Resources>
+ <Grid Margin="18">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="12"/><RowDefinition Height="Auto"/><RowDefinition Height="10"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+  <Grid>
+   <StackPanel><StackPanel Orientation="Horizontal"><Border Background="#B5121B" Width="5" Margin="0,1,10,1"/><TextBlock Text="Stok Kontrol Merkezi" FontSize="23" FontWeight="SemiBold" Foreground="#202328"/></StackPanel><TextBlock Text="Gerçek stok bakiyesi, maliyet değeri, kritik seviyeler ve operasyon hareketleri" FontSize="12" Foreground="#667085" Margin="15,3,0,0"/></StackPanel>
+   <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"><TextBlock Text="{Binding LastUpdated, StringFormat='Son güncelleme: {0}'}" FontSize="11" Foreground="#667085" VerticalAlignment="Center" Margin="0,0,12,0"/><Button Content="Yenile" Command="{Binding LoadCommand}" Style="{StaticResource Command}" Margin="0,0,7,0"/><Button Content="Ürün Listesi" Command="{Binding NavigateToProductsCommand}" Style="{StaticResource Command}" Margin="0,0,7,0"/><Button Content="Stok Hareketleri" Command="{Binding NavigateToMovementsCommand}" Style="{StaticResource Command}" Background="#B5121B" Foreground="White" BorderBrush="#8F1017"/></StackPanel>
+  </Grid>
+  <UniformGrid Grid.Row="2" Columns="8">
+   <Border Style="{StaticResource Card}" Margin="0,0,6,0"><StackPanel><TextBlock Text="TOPLAM ÜRÜN" Style="{StaticResource KpiTitle}"/><TextBlock Text="{Binding TotalProducts, StringFormat='{}{0:N0}'}" Style="{StaticResource KpiValue}"/><TextBlock Text="{Binding ActiveProducts, StringFormat='Aktif: {0:N0}'}" FontSize="10" Foreground="#667085"/></StackPanel></Border>
+   <Border Style="{StaticResource Card}" Margin="0,0,6,0"><StackPanel><TextBlock Text="TOPLAM STOK" Style="{StaticResource KpiTitle}"/><TextBlock Text="{Binding TotalStockQuantity, StringFormat='{}{0:N2}'}" Style="{StaticResource KpiValue}"/><TextBlock Text="Tüm hareketlerin neti" FontSize="10" Foreground="#667085"/></StackPanel></Border>
+   <Border Style="{StaticResource Card}" Margin="0,0,6,0"><StackPanel><TextBlock Text="MALİYET DEĞERİ" Style="{StaticResource KpiTitle}"/><TextBlock Text="{Binding TotalStockValue, StringFormat='{}{0:N2} ₺'}" Style="{StaticResource KpiValue}" FontSize="16"/><TextBlock Text="Alış fiyatı üzerinden" FontSize="10" Foreground="#667085"/></StackPanel></Border>
+   <Border Style="{StaticResource Card}" Margin="0,0,6,0" BorderBrush="#DFA2A5"><StackPanel><TextBlock Text="KRİTİK STOK" Style="{StaticResource KpiTitle}" Foreground="#B5121B"/><TextBlock Text="{Binding CriticalStockCount}" Style="{StaticResource KpiValue}" Foreground="#B5121B"/><TextBlock Text="Minimum seviyenin altında" FontSize="10" Foreground="#8F1017"/></StackPanel></Border>
+   <Border Style="{StaticResource Card}" Margin="0,0,6,0" BorderBrush="#DFA2A5"><StackPanel><TextBlock Text="STOKU TÜKENEN" Style="{StaticResource KpiTitle}" Foreground="#B5121B"/><TextBlock Text="{Binding OutOfStockCount}" Style="{StaticResource KpiValue}" Foreground="#B5121B"/><TextBlock Text="Bakiye sıfır" FontSize="10" Foreground="#8F1017"/></StackPanel></Border>
+   <Border Style="{StaticResource Card}" Margin="0,0,6,0"><StackPanel><TextBlock Text="NEGATİF STOK" Style="{StaticResource KpiTitle}"/><TextBlock Text="{Binding NegativeStockCount}" Style="{StaticResource KpiValue}"/><TextBlock Text="Düzeltme gerekli" FontSize="10" Foreground="#667085"/></StackPanel></Border>
+   <Border Style="{StaticResource Card}" Margin="0,0,6,0"><StackPanel><TextBlock Text="30 GÜN HAREKETSİZ" Style="{StaticResource KpiTitle}"/><TextBlock Text="{Binding Inactive30DaysCount}" Style="{StaticResource KpiValue}"/><TextBlock Text="Hareket görmeyen ürün" FontSize="10" Foreground="#667085"/></StackPanel></Border>
+   <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="BUGÜN GİRİŞ / ÇIKIŞ" Style="{StaticResource KpiTitle}"/><TextBlock Text="{Binding TodayInbound, StringFormat='{}{0:N0} G'}" Style="{StaticResource KpiValue}" FontSize="16"/><TextBlock Text="{Binding TodayOutbound, StringFormat='Çıkış: {0:N0}'}" FontSize="10" Foreground="#B5121B"/></StackPanel></Border>
+  </UniformGrid>
+  <Grid Grid.Row="4">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="1.65*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="1.2*"/></Grid.ColumnDefinitions>
+   <Border Style="{StaticResource Card}" Padding="0">
+    <Grid><Grid.RowDefinitions><RowDefinition Height="42"/><RowDefinition Height="*"/><RowDefinition Height="28"/></Grid.RowDefinitions>
+     <Grid Margin="12,0"><TextBlock Text="Son Stok Hareketleri" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/><Button Content="Tümünü Gör" Command="{Binding NavigateToMovementsCommand}" Style="{StaticResource Command}" Height="27" Padding="10,0" HorizontalAlignment="Right" VerticalAlignment="Center"/></Grid>
+     <DataGrid Grid.Row="1" ItemsSource="{Binding RecentMovements}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" RowHeaderWidth="0" RowHeight="36" AlternatingRowBackground="#F3F5F7" GridLinesVisibility="All" HorizontalGridLinesBrush="#D1D5DB" VerticalGridLinesBrush="#D1D5DB">
+      <DataGrid.ColumnHeaderStyle><Style TargetType="DataGridColumnHeader"><Setter Property="Background" Value="#202328"/><Setter Property="Foreground" Value="White"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Padding" Value="8"/></Style></DataGrid.ColumnHeaderStyle>
+      <DataGrid.Columns><DataGridTextColumn Header="Tarih / Saat" Binding="{Binding MovementDate, StringFormat='dd.MM HH:mm'}" Width="100"/><DataGridTextColumn Header="İşlem" Binding="{Binding TypeName}" Width="115"/><DataGridTextColumn Header="Ürün Kodu" Binding="{Binding ProductCode}" Width="95"/><DataGridTextColumn Header="Ürün" Binding="{Binding ProductName}" Width="*"/><DataGridTextColumn Header="Depo" Binding="{Binding WarehouseName}" Width="110"/><DataGridTextColumn Header="Miktar" Binding="{Binding Quantity, StringFormat='{}{0:N2}'}" Width="75"/><DataGridTextColumn Header="Bakiye" Binding="{Binding StockAfterMovement, StringFormat='{}{0:N2}'}" Width="75"/></DataGrid.Columns>
+     </DataGrid>
+     <TextBlock Grid.Row="1" Text="Henüz gerçek stok hareketi bulunmuyor." Visibility="{Binding HasNoMovements, Converter={StaticResource BoolVisibility}}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#667085"/>
+     <Border Grid.Row="2" Background="#E5E7EB" BorderBrush="#AEB8C4" BorderThickness="0,1,0,0"><TextBlock Text="{Binding RecentMovements.Count, StringFormat='Son {0} hareket gösteriliyor'}" FontSize="10" Foreground="#4B5563" Margin="9,0" VerticalAlignment="Center"/></Border>
+    </Grid>
+   </Border>
+   <Border Grid.Column="2" Style="{StaticResource Card}" Padding="0">
+    <Grid><Grid.RowDefinitions><RowDefinition Height="42"/><RowDefinition Height="*"/><RowDefinition Height="28"/></Grid.RowDefinitions>
+     <Grid Margin="12,0"><TextBlock Text="Kritik Stok ve Tedarik İhtiyacı" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/><TextBlock Text="{Binding CriticalProducts.Count, StringFormat='{}{0} kayıt'}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#B5121B" FontWeight="SemiBold"/></Grid>
+     <DataGrid Grid.Row="1" ItemsSource="{Binding CriticalProducts}" SelectedItem="{Binding SelectedCriticalProduct}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" RowHeaderWidth="0" RowHeight="38" AlternatingRowBackground="#F3F5F7" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#D1D5DB">
+      <DataGrid.ColumnHeaderStyle><Style TargetType="DataGridColumnHeader"><Setter Property="Background" Value="#202328"/><Setter Property="Foreground" Value="White"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Padding" Value="8"/></Style></DataGrid.ColumnHeaderStyle>
+      <DataGrid.Columns><DataGridTextColumn Header="Kod" Binding="{Binding Code}" Width="90"/><DataGridTextColumn Header="Ürün" Binding="{Binding Name}" Width="*"/><DataGridTextColumn Header="Stok" Binding="{Binding Stock, StringFormat='{}{0:N2}'}" Width="65"/><DataGridTextColumn Header="Min." Binding="{Binding MinStock, StringFormat='{}{0:N2}'}" Width="65"/><DataGridTextColumn Header="Eksik" Binding="{Binding Shortage, StringFormat='{}{0:N2}'}" Width="65"/><DataGridTextColumn Header="Durum" Binding="{Binding Status}" Width="70"/></DataGrid.Columns>
+     </DataGrid>
+     <TextBlock Grid.Row="1" Text="Kritik stokta ürün bulunmuyor." Visibility="{Binding HasNoCriticalProducts, Converter={StaticResource BoolVisibility}}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#166534" FontWeight="SemiBold"/>
+     <Border Grid.Row="2" Background="#FDE8E8" BorderBrush="#DFA2A5" BorderThickness="0,1,0,0"><TextBlock Text="Minimum stok seviyeleri ürün kartlarından yönetilir." FontSize="10" Foreground="#8F1017" Margin="9,0" VerticalAlignment="Center"/></Border>
+    </Grid>
+   </Border>
+   <Border Grid.ColumnSpan="3" Visibility="{Binding IsLoading, Converter={StaticResource BoolVisibility}}" Background="#DDFFFFFF"><TextBlock Text="Gerçek stok verileri hesaplanıyor..." Foreground="#B5121B" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+  </Grid>
+ </Grid>
+</UserControl>

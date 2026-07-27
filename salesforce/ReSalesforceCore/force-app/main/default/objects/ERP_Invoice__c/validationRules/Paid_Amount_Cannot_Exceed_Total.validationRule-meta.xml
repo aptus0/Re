@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Paid_Amount_Cannot_Exceed_Total</fullName><active>true</active>
+    <errorConditionFormula>Paid_Amount__c &gt; Total_Amount__c</errorConditionFormula>
+    <errorDisplayField>Paid_Amount__c</errorDisplayField><errorMessage>Tahsil edilen tutar fatura toplamÄ±nÄ± aÅŸamaz.</errorMessage>
+</ValidationRule>

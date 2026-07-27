@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    
+    <label>Durum</label>
+    
+    <type>Picklist</type>
+    <valueSet><restricted>true</restricted><valueSetDefinition><sorted>false</sorted><value><fullName>Taslak</fullName><default>false</default><label>Taslak</label></value><value><fullName>Onay_Bekliyor</fullName><default>false</default><label>Onay Bekliyor</label></value><value><fullName>Onaylandi</fullName><default>false</default><label>OnaylandÄ±</label></value><value><fullName>Kismi_Odendi</fullName><default>false</default><label>KÄ±smi Ã–dendi</label></value><value><fullName>Odendi</fullName><default>false</default><label>Ã–dendi</label></value><value><fullName>Iptal</fullName><default>false</default><label>Ä°ptal</label></value></valueSetDefinition></valueSet>
+</CustomField>

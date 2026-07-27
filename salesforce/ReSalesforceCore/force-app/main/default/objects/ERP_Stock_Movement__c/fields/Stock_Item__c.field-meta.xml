@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stock_Item__c</fullName>
+    
+    <label>Stok KartÄ±</label>
+    
+    <type>MasterDetail</type>
+    <referenceTo>ERP_Stock_Item__c</referenceTo><relationshipLabel>Stok Hareketleri</relationshipLabel><relationshipName>Stock_Movements</relationshipName><reparentableMasterDetail>false</reparentableMasterDetail><writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

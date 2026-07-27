@@ -1,0 +1,14 @@
+<Window x:Class="Re.Desktop.Views.Common.AlertWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Width="440" SizeToContent="Height" WindowStyle="None" ResizeMode="NoResize"
+ WindowStartupLocation="CenterOwner" Background="Transparent" AllowsTransparency="True">
+ <Border Background="White" BorderBrush="#8F1017" BorderThickness="1">
+  <Grid>
+   <Grid.RowDefinitions><RowDefinition Height="44"/><RowDefinition Height="Auto"/><RowDefinition Height="52"/></Grid.RowDefinitions>
+   <Border Background="#B5121B"><Grid Margin="14,0"><TextBlock Text="{Binding Title}" Foreground="White" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/><Button Content="×" HorizontalAlignment="Right" Width="34" Height="30" Background="Transparent" Foreground="White" BorderThickness="0" FontSize="18" Click="Cancel_Click"/></Grid></Border>
+   <Grid Grid.Row="1" Margin="18"><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Border Width="32" Height="32" Background="#FDE8E8" BorderBrush="#B5121B" BorderThickness="1" CornerRadius="16"><TextBlock Text="{Binding Symbol}" Foreground="#B5121B" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><TextBlock Grid.Column="1" Text="{Binding Message}" TextWrapping="Wrap" Foreground="#202328" FontSize="13" LineHeight="20" VerticalAlignment="Center"/></Grid>
+   <Border Grid.Row="2" Background="#F3F4F6" BorderBrush="#D1D5DB" BorderThickness="0,1,0,0"><StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="12,8"><Button x:Name="CancelButton" Content="Vazgeç" Width="90" Margin="0,0,8,0" Background="White" Foreground="#202328" BorderBrush="#9CA3AF" Click="Cancel_Click"/><Button Content="{Binding AcceptText}" Width="100" Background="#B5121B" Foreground="White" BorderThickness="0" Click="Accept_Click"/></StackPanel></Border>
+  </Grid>
+ </Border>
+</Window>

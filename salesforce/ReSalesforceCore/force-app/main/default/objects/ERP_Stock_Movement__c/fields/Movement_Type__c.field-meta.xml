@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Movement_Type__c</fullName>
+    
+    <label>Hareket TÃ¼rÃ¼</label>
+    
+    <type>Picklist</type>
+    <valueSet><restricted>true</restricted><valueSetDefinition><sorted>false</sorted><value><fullName>Alis</fullName><default>false</default><label>AlÄ±ÅŸ</label></value><value><fullName>Satis</fullName><default>false</default><label>SatÄ±ÅŸ</label></value><value><fullName>Alis_Iade</fullName><default>false</default><label>AlÄ±ÅŸ Ä°ade</label></value><value><fullName>Satis_Iade</fullName><default>false</default><label>SatÄ±ÅŸ Ä°ade</label></value><value><fullName>Depo_Transferi</fullName><default>false</default><label>Depo Transferi</label></value><value><fullName>Stok_Sayimi</fullName><default>false</default><label>Stok SayÄ±mÄ±</label></value><value><fullName>Fire_Zayiat</fullName><default>false</default><label>Fire / Zayiat</label></value><value><fullName>Uretim_Girisi</fullName><default>false</default><label>Ãœretim GiriÅŸi</label></value></valueSetDefinition></valueSet>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>E_Invoice_Status__c</fullName>
+    
+    <label>e-Fatura Durumu</label>
+    
+    <type>Picklist</type>
+    <valueSet><restricted>true</restricted><valueSetDefinition><sorted>false</sorted><value><fullName>Bekliyor</fullName><default>false</default><label>Bekliyor</label></value><value><fullName>Gonderildi</fullName><default>false</default><label>GÃ¶nderildi</label></value><value><fullName>Kabul_Edildi</fullName><default>false</default><label>Kabul Edildi</label></value><value><fullName>Reddedildi</fullName><default>false</default><label>Reddedildi</label></value></valueSetDefinition></valueSet>
+</CustomField>

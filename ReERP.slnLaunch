@@ -1,0 +1,16 @@
+[
+  {
+    "Name": "Re",
+    "Projects": [
+      {
+        "Path": "src\\Re.Api\\Re.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "src\\Re.Desktop\\Re.Desktop.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

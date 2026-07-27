@@ -1,0 +1,269 @@
+<template>
+    <div class="slds-card slds-p-around_medium bg-container">
+        <!-- Header -->
+        <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_medium header-row">
+            <div class="slds-col slds-has-flexi-truncate">
+                <div class="slds-media slds-no-space slds-grow">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-quotes" title="Teklif">
+                            <lightning-icon icon-name="standard:quotes" size="medium"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <p class="slds-line-height_reset slds-text-title_caps">Teklif</p>
+                        <h1 class="slds-page-header__title slds-m-right_small slds-align-middle slds-truncate title-text">
+                            {proposal.name} <lightning-icon icon-name="utility:lock" size="x-small" class="slds-m-left_xx-small"></lightning-icon>
+                        </h1>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-no-flex slds-grid slds-align-top">
+                <lightning-button label="+ Takip Et" class="slds-m-right_x-small"></lightning-button>
+                <lightning-button label="Düzenle" class="slds-m-right_x-small"></lightning-button>
+                <lightning-button label="Yeni Sürüm" class="slds-m-right_x-small"></lightning-button>
+                <lightning-button label="PDF Olarak Oluştur" variant="neutral"></lightning-button>
+            </div>
+        </div>
+
+        <!-- Meta Summary Row -->
+        <div class="slds-grid slds-wrap slds-m-bottom_large summary-box slds-p-around_small">
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Teklif Adı</div>
+                <div class="slds-text-body_regular slds-font-weight_bold text-link">{proposal.opportunityName}</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Fırsat</div>
+                <div class="slds-text-body_regular text-link">{proposal.opportunityName}</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Hesap</div>
+                <div class="slds-text-body_regular text-link">{proposal.accountName}</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Teklif Tarihi</div>
+                <div class="slds-text-body_regular">{proposal.proposalDate}</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Geçerlilik Tarihi</div>
+                <div class="slds-text-body_regular">{proposal.validityDate}</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Sahip</div>
+                <div class="slds-text-body_regular text-link">{proposal.ownerName}</div>
+            </div>
+        </div>
+
+        <!-- KPI Cards Row -->
+        <div class="slds-grid slds-gutters slds-m-bottom_large">
+            <div class="slds-col slds-size_1-of-5">
+                <div class="kpi-card">
+                    <span class="kpi-label">Teklif Durumu</span>
+                    <span class="badge status-badge">{proposal.status}</span>
+                    <span class="version-tag">Sürüm {proposal.version}</span>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-5">
+                <div class="kpi-card">
+                    <span class="kpi-label">Toplam Tutar</span>
+                    <span class="kpi-value text-primary">{proposal.totalAmount}</span>
+                    <span class="kpi-sub">KDV Dahil</span>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-5">
+                <div class="kpi-card">
+                    <span class="kpi-label">Net Tutar</span>
+                    <span class="kpi-value">{proposal.netAmount}</span>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-5">
+                <div class="kpi-card">
+                    <span class="kpi-label">İndirim Oranı</span>
+                    <span class="kpi-value text-warning">{proposal.discountRate}</span>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-5">
+                <div class="kpi-card">
+                    <span class="kpi-label">Geçerlilik</span>
+                    <span class="kpi-value">{proposal.daysRemaining} gün kaldı</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area: Left Grid (8 cols) & Right Sidebar (4 cols) -->
+        <div class="slds-grid slds-gutters">
+            <!-- Left Side -->
+            <div class="slds-col slds-size_9-of-12">
+                <!-- Onay Akışı -->
+                <div class="content-card slds-m-bottom_medium">
+                    <h3 class="card-title">Onay Akışı</h3>
+                    <div class="approval-stepper slds-m-top_small">
+                        <div class="step completed">
+                            <div class="step-icon">✓</div>
+                            <div class="step-title">Taslak</div>
+                            <div class="step-date">15.05.2025</div>
+                        </div>
+                        <div class="step-line active"></div>
+                        <div class="step completed">
+                            <div class="step-icon">✓</div>
+                            <div class="step-title">İndirim Onayı</div>
+                            <div class="step-date">16.05.2025</div>
+                        </div>
+                        <div class="step-line active"></div>
+                        <div class="step current">
+                            <div class="step-icon">●</div>
+                            <div class="step-title">Bölge Müdürü Onayı</div>
+                            <div class="step-date">17.05.2025</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step pending">
+                            <div class="step-icon">○</div>
+                            <div class="step-title">Finans Onayı</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step pending">
+                            <div class="step-icon">○</div>
+                            <div class="step-title">Genel Müdür Onayı</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step pending">
+                            <div class="step-icon">○</div>
+                            <div class="step-title">Tamamlandı</div>
+                        </div>
+                    </div>
+                    <div class="current-step-info slds-m-top_small">
+                        <span><strong>Mevcut Adım:</strong> {proposal.currentApprovalStage}</span>
+                        <span class="slds-m-left_large"><strong>Atanan Kişi:</strong> {proposal.assignedApprover}</span>
+                        <span class="slds-m-left_large"><strong>Son Tarih:</strong> {proposal.approvalDueDate}</span>
+                    </div>
+                </div>
+
+                <!-- Teklif Kalemleri Table -->
+                <div class="content-card slds-m-bottom_medium">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                        <h3 class="card-title slds-col">Teklif Kalemleri ({lineItemsCount})</h3>
+                        <lightning-button label="+ Ürün Ekle" variant="neutral" class="slds-col_bump-left"></lightning-button>
+                    </div>
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Ürün / Hizmet</th>
+                                <th>Açıklama</th>
+                                <th>Miktar</th>
+                                <th>Birim</th>
+                                <th>Birim Fiyatı</th>
+                                <th>İndirim (%)</th>
+                                <th>Net Tutar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={proposal.lineItems} for:item="item">
+                                <tr key={item.id}>
+                                    <td>{item.id}</td>
+                                    <td class="text-link">{item.name}</td>
+                                    <td>{item.description}</td>
+                                    <td>{item.quantity}</td>
+                                    <td>{item.unit}</td>
+                                    <td>₺{item.unitPrice}</td>
+                                    <td>%{item.discountPercent}</td>
+                                    <td class="font-bold">₺{item.netTotal}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tutar Özeti & İndirim Onayı & ERP Status Grid -->
+                <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                    <!-- İndirim Onayı -->
+                    <div class="slds-col slds-size_1-of-3">
+                        <div class="content-card">
+                            <h3 class="card-title">İndirim Onayı</h3>
+                            <div class="info-row slds-m-top_small">
+                                <span>Talep Edilen İndirim</span>
+                                <span class="badge warning-badge">%12,50 (-₺184.125,00)</span>
+                            </div>
+                            <div class="info-row slds-m-top_small">
+                                <span>Onay Durumu</span>
+                                <span class="badge success-badge">Kısmi Onaylandı</span>
+                            </div>
+                            <div class="info-row slds-m-top_small">
+                                <span>Onaylanan İndirim</span>
+                                <span class="font-bold">%10,00 (-₺119.050,00)</span>
+                            </div>
+                            <div class="info-row slds-m-top_small">
+                                <span>Onaylayan: Murat Demir</span>
+                                <span>16.05.2025</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ERP Entegrasyon Durumu (ReSoft ERP) -->
+                    <div class="slds-col slds-size_1-of-3">
+                        <div class="content-card">
+                            <h3 class="card-title">ERP Entegrasyon Durumu (ReSoft ERP)</h3>
+                            <div class="info-row slds-m-top_small">
+                                <span>Entegrasyon Durumu</span>
+                                <span class="badge success-badge">{proposal.erpStatus}</span>
+                            </div>
+                            <div class="info-row slds-m-top_small">
+                                <span>Son Senkronizasyon</span>
+                                <span>{proposal.erpLastSync}</span>
+                            </div>
+                            <div class="info-row slds-m-top_small">
+                                <span>ERP Teklif Kodu</span>
+                                <span class="font-bold">{proposal.erpCode}</span>
+                            </div>
+                            <div class="info-row slds-m-top_small">
+                                <span>ERP Durumu</span>
+                                <span>{proposal.erpState}</span>
+                            </div>
+                            <div class="slds-m-top_medium text-center">
+                                <lightning-button label="ERP'de Görüntüle ↗" variant="brand-outline" onclick={handleOpenErp}></lightning-button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tutar Özeti -->
+                    <div class="slds-col slds-size_1-of-3">
+                        <div class="content-card">
+                            <h3 class="card-title">Tutar Özeti</h3>
+                            <div class="info-row slds-m-top_small"><span>Ara Toplam</span><span>₺1.190.500,00</span></div>
+                            <div class="info-row slds-m-top_small text-danger"><span>Toplam İndirim</span><span>-₺184.125,00</span></div>
+                            <div class="info-row slds-m-top_small font-bold"><span>Net Tutar</span><span>₺1.006.375,00</span></div>
+                            <div class="info-row slds-m-top_small"><span>KDV (%20)</span><span>₺201.275,00</span></div>
+                            <hr/>
+                            <div class="info-row font-bold text-primary slds-text-title_caps"><span>Toplam Tutar</span><span>₺1.207.650,00</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar: Agentforce Assistant & Comments -->
+            <div class="slds-col slds-size_3-of-12">
+                <!-- Agentforce Asistanı -->
+                <div class="agentforce-card slds-m-bottom_medium">
+                    <div class="agentforce-header">
+                        <lightning-icon icon-name="utility:ai" size="small" class="slds-m-right_x-small"></lightning-icon>
+                        <span class="font-bold">Agentforce Asistanı</span>
+                    </div>
+                    <div class="agentforce-item warning">
+                        <p class="font-bold text-warning">⚠️ Marj Uyarısı</p>
+                        <p class="text-small">Teklifinizin tahmini marjı %18,7 ile hedeflenen %25'in altında.</p>
+                        <lightning-button label="Detayları Gör" variant="neutral" size="x-small" class="slds-m-top_x-small"></lightning-button>
+                    </div>
+                    <div class="agentforce-item info">
+                        <p class="font-bold text-primary">💡 Yükseltme Önerisi</p>
+                        <p class="text-small">ReSoft Analytics Module eklendiğinde ortalama satış tutarı %22 artıyor.</p>
+                        <lightning-button label="Ürünü Ekle" variant="neutral" size="x-small" class="slds-m-top_x-small"></lightning-button>
+                    </div>
+                    <div class="agentforce-item action">
+                        <p class="font-bold text-purple">⭐ Sonraki En İyi Aksiyon</p>
+                        <p class="text-small">Teklifiniz 30 gün içinde geçerliliğini yitiriyor. Müşteriye hatırlatma e-postası gönderin.</p>
+                        <lightning-button label="E-posta Gönder" variant="neutral" size="x-small" class="slds-m-top_x-small"></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

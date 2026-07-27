@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Correlation_Id__c</fullName><externalId>true</externalId><label>Korelasyon Kimliği</label>
+    <length>64</length><required>true</required><trackHistory>true</trackHistory><type>Text</type><unique>true</unique>
+</CustomField>

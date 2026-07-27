@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>External_Id__c</fullName>
+    <externalId>true</externalId><unique>true</unique>
+    <label>ERP Harici Kimlik</label>
+    
+    <type>Text</type>
+    <length>36</length>
+</CustomField>

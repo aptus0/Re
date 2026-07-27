@@ -1,0 +1,405 @@
+<UserControl x:Class="Re.Desktop.Views.Settings.SettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#F3F3F5">
+    <UserControl.Resources>
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#3E3E3C"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#16325C"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D8DDE6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CaretBrush" Value="#16325C"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#16325C"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D8DDE6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#3E3E3C"/>
+            <Setter Property="Margin" Value="0,6"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style x:Key="SectionBox" TargetType="GroupBox">
+            <Setter Property="Foreground" Value="#16325C"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D8DDE6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+        </Style>
+        <Style x:Key="CommandButton" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="Background" Value="#F4F6F9"/>
+            <Setter Property="Foreground" Value="#16325C"/>
+            <Setter Property="BorderBrush" Value="#D8DDE6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style x:Key="PrimaryCommandButton" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="24,0"/>
+            <Setter Property="Background" Value="#0070D2"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#005FB2"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="16"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Page Header -->
+        <Grid>
+            <StackPanel>
+                <TextBlock Text="Settings" FontSize="26" FontWeight="Bold" Foreground="#16325C"/>
+                <TextBlock Text="Manage company, inventory, finance, security, and integration preferences."
+                           FontSize="13" Foreground="#54698D" Margin="0,4,0,0"/>
+            </StackPanel>
+            <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="#F4F6F9"
+                    BorderBrush="#D8DDE6" BorderThickness="1" Padding="14,7" CornerRadius="4">
+                <TextBlock x:Name="StatusText" Text="No changes" Foreground="#54698D" FontSize="12"/>
+            </Border>
+        </Grid>
+
+        <!-- Settings Tab Control -->
+        <Border Grid.Row="2" Background="White" BorderBrush="#D8DDE6" BorderThickness="1">
+            <TabControl Background="White" BorderThickness="0">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Foreground" Value="#54698D"/>
+                        <Setter Property="Background" Value="#F4F6F9"/>
+                        <Setter Property="BorderBrush" Value="#D8DDE6"/>
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                        <Setter Property="Padding" Value="20,11"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="FontSize" Value="13"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Background" Value="#0070D2"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TabControl.Resources>
+
+                <!-- Company & Branch -->
+                <TabItem Header="Company">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24">
+                            <GroupBox Header="Company Identity" Style="{StaticResource SectionBox}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/><RowDefinition Height="16"/><RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Company Name" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Tax Number" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2">
+                                        <TextBlock Text="Tax Office" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="2">
+                                        <TextBlock Text="Default Currency" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox SelectedIndex="0"><ComboBoxItem Content="TRY - Turkish Lira"/><ComboBoxItem Content="USD"/><ComboBoxItem Content="EUR"/></ComboBox>
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Language &amp; Region" Style="{StaticResource SectionBox}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Interface Language" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox SelectedIndex="1" Padding="10,6">
+                                            <ComboBoxItem Content="Türkçe 🇹🇷 (Turkish)"/>
+                                            <ComboBoxItem Content="English 🇬🇧 (English)"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Date &amp; Time Format" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox SelectedIndex="0" Padding="10,6">
+                                            <ComboBoxItem Content="tr-TR (DD.MM.YYYY)"/>
+                                            <ComboBoxItem Content="en-US (MM/DD/YYYY)"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Branch &amp; Operations" Style="{StaticResource SectionBox}">
+                                <StackPanel>
+                                    <CheckBox Content="Require branch selection on transactions" IsChecked="True"/>
+                                    <CheckBox Content="Restrict users to authorized branches only" IsChecked="True"/>
+                                    <CheckBox Content="Track document numbers separately per branch"/>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Inventory & Warehouse -->
+                <TabItem Header="Inventory">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24">
+                            <GroupBox Header="Stock Business Rules" Style="{StaticResource SectionBox}">
+                                <StackPanel>
+                                    <CheckBox Content="Allow negative stock levels"/>
+                                    <CheckBox Content="Create stock reservation on sales orders" IsChecked="True"/>
+                                    <CheckBox Content="Require manager approval for below-cost sales" IsChecked="True"/>
+                                    <CheckBox Content="Send manual stock adjustments for approval" IsChecked="True"/>
+                                </StackPanel>
+                            </GroupBox>
+                            <GroupBox Header="Defaults" Style="{StaticResource SectionBox}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Primary Warehouse" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox ToolTip="Warehouse definitions will be loaded from company records."/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Inventory Valuation Method" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox SelectedIndex="0"><ComboBoxItem Content="Moving Average"/><ComboBoxItem Content="FIFO"/></ComboBox>
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Documents & Finance -->
+                <TabItem Header="Documents">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24">
+                            <GroupBox Header="Document Numbering" Style="{StaticResource SectionBox}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Sales Invoice Prefix" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox Text="SF"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Stock Movement Prefix" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox Text="SM"/>
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Finance Rules" Style="{StaticResource SectionBox}">
+                                <StackPanel>
+                                    <CheckBox Content="Route orders for approval when risk limit is exceeded" IsChecked="True"/>
+                                    <CheckBox Content="Warn user on overdue accounts" IsChecked="True"/>
+                                    <CheckBox Content="Auto-create reversal entry on payment cancellation" IsChecked="True"/>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Security -->
+                <TabItem Header="Security">
+                    <StackPanel Margin="24">
+                        <GroupBox Header="Session &amp; Password" Style="{StaticResource SectionBox}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Session Timeout (minutes)" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox Text="30"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Minimum Password Length" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox Text="8"/>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Header="Audit &amp; Logging" Style="{StaticResource SectionBox}">
+                            <StackPanel>
+                                <CheckBox Content="Create audit log for critical operations" IsChecked="True"/>
+                                <CheckBox Content="Log failed login attempts" IsChecked="True"/>
+                                <CheckBox Content="Temporarily lock account after 3 failed attempts" IsChecked="True"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </TabItem>
+
+                <!-- Barcode & Printer -->
+                <TabItem Header="Barcode">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24">
+                            <GroupBox Header="Barcode Printer Setup" Style="{StaticResource SectionBox}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="16"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                                    <StackPanel><TextBlock Text="Printer Name / Windows Queue" Style="{StaticResource LabelStyle}"/><TextBox x:Name="BarcodePrinterName" ToolTip="Enter the printer name as shown in Windows."/></StackPanel>
+                                    <StackPanel Grid.Column="2"><TextBlock Text="Printer Language" Style="{StaticResource LabelStyle}"/><ComboBox x:Name="PrinterLanguage" SelectedIndex="0"><ComboBoxItem Content="Windows / GDI"/><ComboBoxItem Content="ZPL"/><ComboBoxItem Content="TSPL"/><ComboBoxItem Content="EPL"/></ComboBox></StackPanel>
+                                    <StackPanel Grid.Row="2"><TextBlock Text="Resolution (DPI)" Style="{StaticResource LabelStyle}"/><ComboBox x:Name="PrinterDpi" SelectedIndex="0"><ComboBoxItem Content="203"/><ComboBoxItem Content="300"/><ComboBoxItem Content="600"/></ComboBox></StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="2"><TextBlock Text="Default Copies" Style="{StaticResource LabelStyle}"/><TextBox x:Name="DefaultBarcodeCopies" Text="1"/></StackPanel>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Label Template" Style="{StaticResource SectionBox}">
+                                <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                    <StackPanel><TextBlock Text="Label Size" Style="{StaticResource LabelStyle}"/><ComboBox x:Name="LabelSize" SelectedIndex="0"><ComboBoxItem Content="40 x 30 mm"/><ComboBoxItem Content="50 x 30 mm"/><ComboBoxItem Content="60 x 40 mm"/><ComboBoxItem Content="100 x 50 mm"/></ComboBox></StackPanel>
+                                    <StackPanel Grid.Column="2"><TextBlock Text="Barcode Standard" Style="{StaticResource LabelStyle}"/><ComboBox x:Name="BarcodeStandard" SelectedIndex="0"><ComboBoxItem Content="EAN-13"/><ComboBoxItem Content="Code 128"/><ComboBoxItem Content="QR Code"/></ComboBox></StackPanel>
+                                </Grid>
+                                <StackPanel Margin="0,14,0,0">
+                                    <CheckBox x:Name="EnableBatchPrint" Content="Allow batch barcode printing with multi-product selection" IsChecked="True"/>
+                                    <CheckBox x:Name="ShowProductNameOnLabel" Content="Show product name on label" IsChecked="True"/>
+                                    <CheckBox x:Name="ShowPriceOnLabel" Content="Show sale price on label" IsChecked="True"/>
+                                    <CheckBox x:Name="ConfirmBeforePrinting" Content="Show preview and confirmation before printing" IsChecked="True"/>
+                                </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- System -->
+                <TabItem Header="System">
+                    <StackPanel Margin="24">
+                        <GroupBox Header="Server &amp; Backup" Style="{StaticResource SectionBox}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="API Address" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox Text="http://localhost:5188"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Auto Backup Time" Style="{StaticResource LabelStyle}"/>
+                                    <TextBox Text="02:00"/>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Header="Application" Style="{StaticResource SectionBox}">
+                            <StackPanel>
+                                <CheckBox Content="Start local API service on launch" IsChecked="True"/>
+                                <CheckBox Content="Automatically check for updates" IsChecked="True"/>
+                                <CheckBox Content="Write error logs to file" IsChecked="True"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </TabItem>
+
+                <!-- Salesforce Integration -->
+                <TabItem Header="Salesforce">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24">
+                            <!-- OAuth Connected App -->
+                            <GroupBox Header="OAuth &amp; Connected App" Style="{StaticResource SectionBox}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="16"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Consumer Key (Client ID)" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox x:Name="SfConsumerKey" ToolTip="Salesforce Connected App Consumer Key"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Consumer Secret" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox x:Name="SfConsumerSecret" ToolTip="Salesforce Connected App Consumer Secret"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2">
+                                        <TextBlock Text="Username" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox x:Name="SfUsername" Text="admin@re-erp.salesforce.com"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="2">
+                                        <TextBlock Text="Password + Security Token" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox x:Name="SfPasswordToken" ToolTip="Combine password and Salesforce Security Token."/>
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+                            
+                            <!-- SOAP & Endpoint -->
+                            <GroupBox Header="SOAP Endpoint Configuration" Style="{StaticResource SectionBox}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="16"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="SOAP Enterprise Endpoint URL" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox x:Name="SfSoapEndpoint" Text="https://login.salesforce.com/services/Soap/c/60.0"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Environment Type" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="SfEnvironment" SelectedIndex="0">
+                                            <ComboBoxItem Content="Developer Org (Developer Edition)"/>
+                                            <ComboBoxItem Content="Production (Live)"/>
+                                            <ComboBoxItem Content="Sandbox (Test)"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2">
+                                        <TextBlock Text="API Version" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox x:Name="SfApiVersion" Text="60.0"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="2" VerticalAlignment="Bottom">
+                                        <Button Content="Test SOAP Connection" Style="{StaticResource CommandButton}" Height="36"/>
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+
+                            <!-- Auto Sync -->
+                            <GroupBox Header="ERP → Salesforce Auto Sync" Style="{StaticResource SectionBox}">
+                                <StackPanel>
+                                    <CheckBox Content="Auto-sync Accounts to Salesforce" IsChecked="True"/>
+                                    <CheckBox Content="Auto-sync Products &amp; Pricebooks to Salesforce" IsChecked="True"/>
+                                    <CheckBox Content="Auto-sync Invoices (Opportunities) to Salesforce" IsChecked="True"/>
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Sync Interval" Style="{StaticResource LabelStyle}"/>
+                                            <ComboBox SelectedIndex="0">
+                                                <ComboBoxItem Content="Every 15 Minutes (Recommended)"/>
+                                                <ComboBoxItem Content="Every 5 Minutes (Real-time)"/>
+                                                <ComboBoxItem Content="Every Hour"/>
+                                                <ComboBoxItem Content="Once Daily"/>
+                                            </ComboBox>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
+                                            <Button Content="Sync All Data Now" Style="{StaticResource PrimaryCommandButton}" Height="36"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </Border>
+
+        <!-- Bottom Action Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Reset to Defaults" Style="{StaticResource CommandButton}" Margin="0,0,10,0"
+                    Click="ResetButton_Click"/>
+            <Button Content="Save Changes" Style="{StaticResource PrimaryCommandButton}"
+                    Click="SaveButton_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

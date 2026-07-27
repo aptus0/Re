@@ -1,0 +1,237 @@
+<Window x:Class="Re.Desktop.Views.Auth.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Re ERP - Kullanıcı Girişi"
+        Width="780" Height="470"
+        MinWidth="780" MinHeight="470"
+        MaxWidth="780" MaxHeight="470"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="#F4F4F4"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+    <Window.Resources>
+        <Style x:Key="TitleButton" TargetType="Button">
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Background" Value="#EEEEEE"/>
+            <Setter Property="Foreground" Value="#202124"/>
+            <Setter Property="BorderBrush" Value="#BBBBBB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+        <Style x:Key="LoginTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="9,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#111111"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#AAAAAA"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CaretBrush" Value="#111111"/>
+            <Setter Property="SelectionBrush" Value="#F1B8B8"/>
+        </Style>
+        <Style x:Key="LoginPasswordBox" TargetType="PasswordBox">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="9,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#111111"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#AAAAAA"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CaretBrush" Value="#111111"/>
+        </Style>
+        <Style x:Key="PrimaryLoginButton" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Background" Value="#C62828"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#8E1717"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#A91F1F"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#C8C8C8"/>
+                    <Setter Property="BorderBrush" Value="#B0B0B0"/>
+                    <Setter Property="Foreground" Value="#666666"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Border BorderBrush="#777777" BorderThickness="1" Background="White">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="38"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Background="#202124" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0">
+                    <Border Width="22" Height="22" Background="#C62828" Margin="0,0,8,0">
+                        <TextBlock Text="R" Foreground="White" FontWeight="Bold" FontSize="13"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="RE ERP · Kurumsal Yönetim Sistemi" Foreground="White"
+                               FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0">
+                    <Button Content="Sunucuyu Başlat" Width="112" Margin="0,0,5,0"
+                            Style="{StaticResource TitleButton}" Command="{Binding StartLocalApiCommand}"/>
+                    <Button Content="Sunucu Ayarları" Width="108" Margin="0,0,5,0"
+                            Style="{StaticResource TitleButton}" Click="SettingsButton_Click"/>
+                    <Button Content="X" Width="32" Padding="0" Style="{StaticResource TitleButton}"
+                            Background="#C62828" BorderBrush="#8E1717" Foreground="White"
+                            FontWeight="Bold" Click="CloseButton_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="285"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Background="#181818" BorderBrush="#C62828" BorderThickness="0,0,5,0">
+                    <Grid Margin="28,30">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel>
+                            <Border Width="104" Height="74" Background="White" BorderBrush="#333333"
+                                    BorderThickness="1" HorizontalAlignment="Left" Padding="5">
+                                <Image Source="/Re.png" Stretch="Uniform"
+                                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                            </Border>
+                            <TextBlock Text="Re Business Platform" Foreground="White"
+                                       FontSize="20" FontWeight="SemiBold" Margin="0,16,0,0"/>
+                            <TextBlock Text="İşletmenizin tüm operasyonları tek merkezde."
+                                       Foreground="#C7C7C7" FontSize="12" TextWrapping="Wrap"
+                                       LineHeight="18" Margin="0,7,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                            <Grid Margin="0,0,0,13">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="✓" Foreground="#E45A5A" FontWeight="Bold"/>
+                                <TextBlock Grid.Column="1" Text="Güvenli kullanıcı ve rol yönetimi" Foreground="#E0E0E0" FontSize="11"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,13">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="✓" Foreground="#E45A5A" FontWeight="Bold"/>
+                                <TextBlock Grid.Column="1" Text="Stok, cari ve finans kontrolü" Foreground="#E0E0E0" FontSize="11"/>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="✓" Foreground="#E45A5A" FontWeight="Bold"/>
+                                <TextBlock Grid.Column="1" Text="Şube ve mağaza bazlı çalışma" Foreground="#E0E0E0" FontSize="11"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2">
+                            <TextBlock Text="RE KOBİ ÇÖZÜMLERİ" Foreground="#B8B8B8" FontSize="9" FontWeight="Bold"/>
+                            <TextBlock Text="v1.0 · Lisanslı kurumsal kullanım" Foreground="#777777" FontSize="9" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Column="1" Margin="34,25,34,24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="18"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel>
+                        <TextBlock Text="Oturum Açın" FontSize="22" FontWeight="SemiBold" Foreground="#171717"/>
+                        <TextBlock Text="Yetkili kullanıcı bilgilerinizle devam edin."
+                                   FontSize="11" Foreground="#707070" Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Kullanıcı adı" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource LoginTextBox}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Şifre" Style="{StaticResource FieldLabel}"/>
+                            <PasswordBox x:Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged"
+                                         Style="{StaticResource LoginPasswordBox}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="3" Margin="0,13,0,0">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Şube kodu" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding BranchCode, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource LoginTextBox}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Mağaza kodu" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding StoreCode, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource LoginTextBox}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Grid.Row="4" Margin="0,12,0,0">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="8" Height="8" Fill="{Binding ApiStatusColor}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding ApiStatusMessage}" Foreground="{Binding ApiStatusColor}"
+                                           FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock Text="Şifremi unuttum" HorizontalAlignment="Right" Foreground="#C62828"
+                                       FontSize="10" Cursor="Hand">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick" Command="{Binding ForgotPasswordCommand}"/>
+                                </TextBlock.InputBindings>
+                            </TextBlock>
+                        </Grid>
+                        <Border Background="#FDECEC" BorderBrush="#E6B2B2" BorderThickness="1"
+                                Padding="9,6" Margin="0,9,0,0"
+                                Visibility="{Binding HasError, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock Text="{Binding ErrorMessage}" Foreground="#9E1F1F" FontSize="10"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="5">
+                        <Button Content="{Binding LoginButtonText}" Command="{Binding LoginCommand}"
+                                IsEnabled="{Binding CanLogin}" IsDefault="True"
+                                Style="{StaticResource PrimaryLoginButton}"/>
+                        <TextBlock Text="Giriş yaparak kurum güvenlik ve kullanım politikalarını kabul etmiş olursunuz."
+                                   Foreground="#888888" FontSize="9" TextAlignment="Center" Margin="0,8,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

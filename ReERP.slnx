@@ -1,0 +1,20 @@
+﻿<Solution>
+  <Folder Name="/src/">
+    <Project Path="src\Re.Domain\Re.Domain.csproj" />
+    <Project Path="src\Re.Application\Re.Application.csproj" />
+    <Project Path="src\Re.Contracts\Re.Contracts.csproj" />
+    <Project Path="src\Re.Persistence\Re.Persistence.csproj" />
+    <Project Path="src\Re.Infrastructure\Re.Infrastructure.csproj" />
+    <Project Path="src\Re.Api\Re.Api.csproj" />
+    <Project Path="src\Re.Desktop\Re.Desktop.csproj" />
+    <Project Path="src\Re.DeviceService\Re.DeviceService.csproj" />
+    <Project Path="src\Re.Integrations\Re.Integrations.csproj" />
+    <Project Path="src\Re.Updater\Re.Updater.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests\Re.UnitTests\Re.UnitTests.csproj" />
+    <Project Path="tests\Re.IntegrationTests\Re.IntegrationTests.csproj" />
+    <Project Path="tests\Re.ArchitectureTests\Re.ArchitectureTests.csproj" />
+  </Folder>
+</Solution>
+

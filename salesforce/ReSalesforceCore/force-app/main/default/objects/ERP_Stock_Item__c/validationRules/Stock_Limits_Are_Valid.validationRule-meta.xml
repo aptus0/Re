@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stock_Limits_Are_Valid</fullName><active>true</active>
+    <errorConditionFormula>AND(Maximum_Stock__c &gt; 0, Minimum_Stock__c &gt; Maximum_Stock__c)</errorConditionFormula>
+    <errorMessage>Minimum stok, maksimum stoktan bÃ¼yÃ¼k olamaz.</errorMessage>
+</ValidationRule>

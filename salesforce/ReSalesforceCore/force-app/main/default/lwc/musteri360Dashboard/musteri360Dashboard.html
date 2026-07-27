@@ -1,0 +1,220 @@
+<template>
+    <div class="slds-card slds-p-around_medium bg-container">
+        <!-- Header Row -->
+        <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_medium header-row">
+            <div class="slds-col slds-has-flexi-truncate">
+                <div class="slds-media slds-no-space slds-grow">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-account">
+                            <lightning-icon icon-name="standard:account" size="medium"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <p class="slds-line-height_reset slds-text-title_caps">Müşteriler ➔ {account.name}</p>
+                        <h1 class="slds-page-header__title slds-truncate title-text">
+                            {account.name}
+                        </h1>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-no-flex slds-grid slds-align-top">
+                <lightning-button label="+ Takip Et" class="slds-m-right_x-small"></lightning-button>
+                <lightning-button label="Düzenle" class="slds-m-right_x-small"></lightning-button>
+                <lightning-button label="Yeni Fırsat" class="slds-m-right_x-small"></lightning-button>
+                <lightning-button label="Yeni Sipariş" variant="brand-outline"></lightning-button>
+            </div>
+        </div>
+
+        <!-- Meta Bar -->
+        <div class="slds-grid slds-wrap slds-m-bottom_medium summary-box slds-p-around_small">
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Hesap Türü</div>
+                <div class="slds-text-body_regular font-bold">{account.type}</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Sektör</div>
+                <div class="slds-text-body_regular">{account.sector}</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Çalışan Sayısı</div>
+                <div class="slds-text-body_regular">{account.employees}</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Yıllık Ciro</div>
+                <div class="slds-text-body_regular font-bold">{account.annualRevenue}</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Müşteri Segmenti</div>
+                <div class="slds-text-body_regular">{account.segment}</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+                <div class="slds-text-title slds-text-color_weak">Hesap Sahibi</div>
+                <div class="slds-text-body_regular text-link">{account.ownerName}</div>
+            </div>
+        </div>
+
+        <!-- Tabs Row -->
+        <div class="sub-nav slds-m-bottom_medium">
+            <span class="nav-tab active">Müşteri 360</span>
+            <span class="nav-tab">Detay</span>
+            <span class="nav-tab">İlgili</span>
+            <span class="nav-tab">Fırsatlar</span>
+            <span class="nav-tab">Siparişler</span>
+            <span class="nav-tab">Faturalar</span>
+            <span class="nav-tab">Hizmet Vakaları</span>
+            <span class="nav-tab">Etkinlikler</span>
+            <span class="nav-tab">Notlar</span>
+            <span class="nav-tab">Dosyalar</span>
+            <span class="nav-tab">Chatter</span>
+        </div>
+
+        <!-- 360 Dashboard Grid: Left Cards & Right Cards -->
+        <div class="slds-grid slds-gutters">
+            <!-- Col 1: Hesap Özeti & Son Etkinlikler -->
+            <div class="slds-col slds-size_3-of-12">
+                <!-- Hesap Özeti -->
+                <div class="content-card slds-m-bottom_medium">
+                    <h3 class="card-title">Hesap Özeti</h3>
+                    <div class="info-block slds-m-top_small">
+                        <p class="font-bold">📍 Adres</p>
+                        <p class="text-sub">{account.address}</p>
+                    </div>
+                    <div class="info-block slds-m-top_small">
+                        <p class="font-bold">📞 Telefon</p>
+                        <p class="text-sub">{account.phone}</p>
+                    </div>
+                    <div class="info-block slds-m-top_small">
+                        <p class="font-bold">✉️ E-posta</p>
+                        <p class="text-sub text-link">{account.email}</p>
+                    </div>
+                    <div class="info-block slds-m-top_small">
+                        <p class="font-bold">🌐 Web Sitesi</p>
+                        <p class="text-sub text-link">{account.website}</p>
+                    </div>
+                </div>
+
+                <!-- Son Etkinlikler -->
+                <div class="content-card">
+                    <h3 class="card-title">Son Etkinlikler</h3>
+                    <div class="activity-item slds-m-top_small">
+                        <div class="act-icon">🟢</div>
+                        <div>
+                            <p class="font-bold">Toplantı - Yeni CNC Projesi</p>
+                            <p class="text-sub">Ayşe Yılmaz ile Mehmet Ekinci • Bugün 10:30</p>
+                        </div>
+                    </div>
+                    <div class="activity-item slds-m-top_small">
+                        <div class="act-icon">✉️</div>
+                        <div>
+                            <p class="font-bold">E-posta - Teklif Revizyonu</p>
+                            <p class="text-sub">Kime: info@abcmakina.com.tr • Dün 16:42</p>
+                        </div>
+                    </div>
+                    <div class="activity-item slds-m-top_small">
+                        <div class="act-icon">📞</div>
+                        <div>
+                            <p class="font-bold">Telefon Görüşmesi</p>
+                            <p class="text-sub">Ayşe Yılmaz ile Seda Aydın • 28 Nis 2025</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Col 2: Sağlık/Risk & Açık Siparişler & Fatura Özeti -->
+            <div class="slds-col slds-size_6-of-12">
+                <!-- Sağlık / Kredi Riski Gauge Card -->
+                <div class="content-card slds-m-bottom_medium">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <h3 class="card-title slds-col">Müşteri Sağlığı / Kredi Riski</h3>
+                        <span class="text-sub slds-col_bump-left">Yenilendi</span>
+                    </div>
+                    <div class="slds-grid slds-m-top_small slds-grid_vertical-align-center">
+                        <!-- Gauge Visual -->
+                        <div class="gauge-container slds-col slds-size_1-of-2 text-center">
+                            <div class="gauge-circle">
+                                <span class="gauge-score">{account.riskScore}</span>
+                                <span class="gauge-label text-danger">{account.riskLevel}</span>
+                            </div>
+                        </div>
+                        <!-- Risk Stats -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="info-row"><span>Kredi Limiti</span><span class="font-bold">{account.creditLimit}</span></div>
+                            <div class="info-row slds-m-top_x-small"><span>Kullanılan Limit</span><span class="font-bold">{account.usedLimit}</span></div>
+                            <div class="info-row slds-m-top_x-small"><span>Ödeme Performansı</span><span class="badge warning-badge">{account.paymentPerformance}</span></div>
+                            <div class="info-row slds-m-top_x-small"><span>Dönemsel Gecikme</span><span class="text-danger font-bold">{account.overdueDays} gün</span></div>
+                            <div class="info-row slds-m-top_x-small"><span>Sağlık Trendi</span><span class="text-danger font-bold">↘ {account.healthTrend}</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Açık Siparişler -->
+                <div class="content-card slds-m-bottom_medium">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                        <h3 class="card-title slds-col">🛒 Açık Siparişler (4 Açık Sipariş)</h3>
+                        <span class="font-bold text-primary slds-col_bump-left">Toplam: ₺4.120.000</span>
+                    </div>
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Sipariş No</th>
+                                <th>Sipariş Tarihi</th>
+                                <th>Durum</th>
+                                <th>Tutar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="text-link">SO-2025-00124</td><td>24.04.2025</td><td><span class="badge success-badge">Onaylandı</span></td><td class="font-bold">₺1.250.000</td></tr>
+                            <tr><td class="text-link">SO-2025-00118</td><td>15.04.2025</td><td><span class="badge warning-badge">Kısmi Sevkiyat</span></td><td class="font-bold">₺980.000</td></tr>
+                            <tr><td class="text-link">SO-2025-00110</td><td>08.04.2025</td><td><span class="badge info-badge">Hazırlanıyor</span></td><td class="font-bold">₺1.190.000</td></tr>
+                            <tr><td class="text-link">SO-2025-00098</td><td>27.03.2025</td><td><span class="badge success-badge">Onaylandı</span></td><td class="font-bold">₺700.000</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Fatura Özeti -->
+                <div class="content-card">
+                    <h3 class="card-title">🧾 Fatura Özeti</h3>
+                    <div class="slds-grid slds-gutters slds-m-top_small text-center">
+                        <div class="slds-col"><div class="kpi-mini"><p class="text-sub">Toplam Fatura (YTD)</p><p class="font-bold">₺6.350.000</p></div></div>
+                        <div class="slds-col"><div class="kpi-mini"><p class="text-sub">Tahsil Edilen (YTD)</p><p class="font-bold text-success">₺3.980.000</p></div></div>
+                        <div class="slds-col"><div class="kpi-mini"><p class="text-sub">Açık Bakiye</p><p class="font-bold text-danger">₺2.370.000</p></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Col 3: Açık Fırsatlar, İlgili Kişiler & Agentforce -->
+            <div class="slds-col slds-size_3-of-12">
+                <!-- Açık Fırsatlar -->
+                <div class="content-card slds-m-bottom_medium">
+                    <h3 class="card-title">👑 Açık Fırsatlar (3)</h3>
+                    <div class="opp-item slds-m-top_small">
+                        <p class="font-bold text-link">Yeni CNC Projesi</p>
+                        <div class="info-row"><span>Teklif</span><span class="font-bold">₺2.450.000</span></div>
+                    </div>
+                    <div class="opp-item slds-m-top_small">
+                        <p class="font-bold text-link">Otomasyon Hattı Yatırımı</p>
+                        <div class="info-row"><span>İhtiyaç Analizi</span><span class="font-bold">₺3.750.000</span></div>
+                    </div>
+                    <div class="opp-item slds-m-top_small">
+                        <p class="font-bold text-link">Yedek Parça Tedariki</p>
+                        <div class="info-row"><span>Teklif</span><span class="font-bold">₺620.000</span></div>
+                    </div>
+                </div>
+
+                <!-- Agentforce Önerisi Card -->
+                <div class="agentforce-card">
+                    <div class="agentforce-header">
+                        <lightning-icon icon-name="utility:ai" size="small" class="slds-m-right_x-small"></lightning-icon>
+                        <span class="font-bold">Agentforce Önerisi</span>
+                    </div>
+                    <p class="text-small">Bu hesabın ödeme gecikmeleri artıyor ve risk skoru yükseliyor. Önerilen aksiyonlar:</p>
+                    <ul class="bullet-list slds-m-top_x-small">
+                        <li>Finans ekibine ödeme hatırlatma görevi oluştur</li>
+                        <li>Kredi limitinin gözden geçirilmesi önerilir</li>
+                    </ul>
+                    <lightning-button label="Aksiyon Planı Oluştur" variant="neutral" class="slds-m-top_small full-width"></lightning-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

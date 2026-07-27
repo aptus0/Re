@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Line_Amounts_Are_Valid</fullName><active>true</active>
+    <errorConditionFormula>OR(Quantity__c &lt;= 0, Unit_Price__c &lt; 0, Discount_Percent__c &lt; 0, Discount_Percent__c &gt; 100)</errorConditionFormula>
+    <errorMessage>Miktar pozitif, fiyat negatif olmayan ve indirim %0-%100 arasÄ±nda olmalÄ±dÄ±r.</errorMessage>
+</ValidationRule>

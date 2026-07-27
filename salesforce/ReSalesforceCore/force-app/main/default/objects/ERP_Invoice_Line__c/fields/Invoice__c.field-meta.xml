@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Invoice__c</fullName>
+    
+    <label>Fatura</label>
+    
+    <type>MasterDetail</type>
+    <referenceTo>ERP_Invoice__c</referenceTo><relationshipLabel>Fatura Kalemleri</relationshipLabel><relationshipName>Invoice_Lines</relationshipName><reparentableMasterDetail>false</reparentableMasterDetail><writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

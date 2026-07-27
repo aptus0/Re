@@ -1,0 +1,72 @@
+<template>
+    <section class="workspace">
+        <header class="hero">
+            <div class="hero-title">
+                <lightning-icon icon-name="standard:product" size="medium"></lightning-icon>
+                <div>
+                    <p class="eyebrow">ReSoft ERP · Stok Yönetimi</p>
+                    <h1>Stok 360</h1>
+                    <p class="muted">Depo bakiyeleri, kritik seviyeler ve son hareketler</p>
+                </div>
+            </div>
+            <div class="actions">
+                <lightning-button label="Yeni Stok Kartı" icon-name="utility:add"></lightning-button>
+                <lightning-button label="Yeni Hareket" variant="brand"></lightning-button>
+            </div>
+        </header>
+
+        <template lwc:if={error}>
+            <div class="error">{error}</div>
+        </template>
+        <template lwc:elseif={data}>
+            <div class="metric-grid">
+                <article class="metric"><span>Aktif Stok Kartı</span><strong>{data.itemCount}</strong><small>ürün / varyant</small></article>
+                <article class="metric"><span>Toplam Miktar</span><strong>{data.totalQuantityLabel}</strong><small>tüm birimler</small></article>
+                <article class="metric"><span>Stok Değeri</span><strong>{data.totalValueLabel}</strong><small>maliyet bazında</small></article>
+                <article class="metric critical"><span>Kritik Seviye</span><strong>{data.lowStockCount}</strong><small>aksiyon bekliyor</small></article>
+            </div>
+
+            <div class="layout">
+                <article class="panel inventory">
+                    <div class="panel-head"><div><h2>Stok Durumu</h2><p>Mevcut ve kullanılabilir bakiye</p></div><lightning-button label="Tümünü Gör" variant="base"></lightning-button></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Ürün</th><th>Depo</th><th>Mevcut</th><th>Kullanılabilir</th><th>Stok Değeri</th><th>Durum</th></tr></thead>
+                            <tbody>
+                                <template for:each={data.items} for:item="item">
+                                    <tr key={item.Id}>
+                                        <td><a href={item.Id}>{item.Name}</a><small>{item.Product_Code__c} · {item.Barcode__c}</small></td>
+                                        <td>{item.Warehouse__r.Name}</td><td>{item.stockLabel} {item.Unit__c}</td>
+                                        <td>{item.availableLabel}</td><td>{item.valueLabel}</td>
+                                        <td><span class={item.stateClass}>{item.stateLabel}</span></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    <template lwc:if={hasItems}></template>
+                </article>
+
+                <aside class="right-column">
+                    <article class="panel">
+                        <div class="panel-head"><div><h2>Son Stok Hareketleri</h2><p>ERP senkronizasyon akışı</p></div></div>
+                        <div class="movement-list">
+                            <template for:each={data.movements} for:item="movement">
+                                <div class="movement" key={movement.Id}>
+                                    <span class={movement.directionClass}>{movement.quantityLabel}</span>
+                                    <div><b>{movement.Stock_Item__r.Name}</b><small>{movement.Movement_Type__c} · {movement.Reference_Document__c}</small></div>
+                                    <lightning-formatted-date-time value={movement.Movement_Date__c} day="2-digit" month="2-digit"></lightning-formatted-date-time>
+                                </div>
+                            </template>
+                        </div>
+                    </article>
+                    <article class="panel alert-card">
+                        <lightning-icon icon-name="utility:warning" size="small"></lightning-icon>
+                        <div><h2>Satın Alma Önerisi</h2><p>{data.lowStockCount} stok kartı minimum seviyede. Tedarik planı oluşturabilirsiniz.</p></div>
+                    </article>
+                </aside>
+            </div>
+        </template>
+        <template lwc:else><lightning-spinner alternative-text="Stok verileri yükleniyor"></lightning-spinner></template>
+    </section>
+</template>
