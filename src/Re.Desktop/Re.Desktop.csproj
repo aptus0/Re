@@ -10,7 +10,10 @@
     <RootNamespace>Re.Desktop</RootNamespace>
     <AssemblyTitle>Re Kobi Cözümleri Desktop</AssemblyTitle>
     <Company>Re</Company>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
+    <FileVersion>1.0.1.0</FileVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <StartupObject>Re.Desktop.App</StartupObject>
     <ApplicationIcon>..\..\Re_ERP_Logo.ico</ApplicationIcon>
   </PropertyGroup>

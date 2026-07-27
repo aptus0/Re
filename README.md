@@ -2,14 +2,14 @@
 
 ## Download for Windows
 
-[![Download Re for Windows](https://img.shields.io/badge/Download-Re%20for%20Windows-0176D3?style=for-the-badge&logo=windows)](https://github.com/aptus0/Re/releases/latest/download/Re-Windows-x64-SQLite.zip)
+[![Download Re for Windows](https://img.shields.io/badge/Download-Re%20for%20Windows-0176D3?style=for-the-badge&logo=windows)](https://github.com/aptus0/Re/releases/latest/download/Re-Setup-Windows-x64.exe)
 
-The portable Windows edition is self-contained and uses **SQLite 3**, so it does
-not require SQL Server or a separate .NET installation.
+The Windows installer is self-contained and uses **SQLite 3**, so it does not
+require SQL Server, administrator privileges, or a separate .NET installation.
 
-1. Download `Re-Windows-x64-SQLite.zip` from the button above.
-2. Extract the ZIP file to a writable folder.
-3. Run `Re.exe`.
+1. Download `Re-Setup-Windows-x64.exe` from the button above.
+2. Open the installer and select **Install**.
+3. Launch Re from the Start menu or desktop shortcut.
 4. Sign in with the initial local account: `admin` / `123456`.
 5. Change the initial password after the first sign-in.
 
