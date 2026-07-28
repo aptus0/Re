@@ -42,7 +42,7 @@
                                 <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                          Background="Transparent" BorderThickness="0" VerticalAlignment="Center" FontSize="14" Foreground="#374151"
                                          VerticalContentAlignment="Center" Margin="0,0,10,0"/>
-                                <TextBlock Grid.Column="1" Text="Search invoice number or account..." Foreground="#9CA3AF" FontSize="14"
+                                <TextBlock Grid.Column="1" Text="Fatura numarası veya cari ünvan ara..." Foreground="#9CA3AF" FontSize="13"
                                            VerticalAlignment="Center" IsHitTestVisible="False" Margin="2,0,0,0"
                                            Visibility="{Binding IsSearchEmpty, Converter={StaticResource BoolToVisibilityConverter}}"/>
                             </Grid>
