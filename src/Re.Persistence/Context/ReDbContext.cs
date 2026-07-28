@@ -6,6 +6,8 @@ using Re.Domain.Entities.Identity;
 using Re.Domain.Entities.Inventory;
 using Re.Domain.Entities.Sales;
 using Re.Domain.Entities.Salesforce;
+using Re.Domain.Entities.Purchasing;
+using Re.Domain.Entities.Orders;
 using Microsoft.EntityFrameworkCore;
 
 namespace Re.Persistence.Context;
@@ -51,6 +53,10 @@ public class ReDbContext : DbContext
     // Sales
     public DbSet<Invoice>     Invoices     => Set<Invoice>();
     public DbSet<InvoiceLine> InvoiceLines => Set<InvoiceLine>();
+    public DbSet<PurchaseInvoice> PurchaseInvoices => Set<PurchaseInvoice>();
+    public DbSet<PurchaseInvoiceLine> PurchaseInvoiceLines => Set<PurchaseInvoiceLine>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderLine> OrderLines => Set<OrderLine>();
 
     // Accounting
     public DbSet<Account>            Accounts            => Set<Account>();
@@ -81,6 +87,8 @@ public class ReDbContext : DbContext
             typeof(RefreshToken),
             typeof(ProductBarcode),
             typeof(InvoiceLine),
+            typeof(PurchaseInvoiceLine),
+            typeof(OrderLine),
             typeof(AccountMovement)
         };
 
@@ -451,6 +459,37 @@ public class ReDbContext : DbContext
              .WithMany(i => i.Lines)
              .HasForeignKey(x => x.InvoiceId)
              .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        m.Entity<Order>(e =>
+        {
+            if (supportsTemporalTables) e.ToTable("Orders", t => t.IsTemporal());
+            else e.ToTable("Orders");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.OrderNumber).HasMaxLength(50).IsRequired();
+            e.Property(x => x.CustomerReference).HasMaxLength(100);
+            e.Property(x => x.Currency).HasMaxLength(3);
+            e.Property(x => x.ExchangeRate).HasPrecision(18, 6);
+            e.Property(x => x.SubTotal).HasPrecision(18, 4);
+            e.Property(x => x.TaxAmount).HasPrecision(18, 4);
+            e.Property(x => x.TotalAmount).HasPrecision(18, 4);
+            e.Property(x => x.Notes).HasMaxLength(2000);
+            e.HasIndex(x => new { x.CompanyId, x.OrderNumber }).IsUnique();
+        });
+
+        m.Entity<OrderLine>(e =>
+        {
+            e.ToTable("OrderLines");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.ProductCode).HasMaxLength(50);
+            e.Property(x => x.ProductName).HasMaxLength(300);
+            e.Property(x => x.Quantity).HasPrecision(18, 4);
+            e.Property(x => x.FulfilledQuantity).HasPrecision(18, 4);
+            e.Property(x => x.UnitPrice).HasPrecision(18, 4);
+            e.Property(x => x.DiscountPercent).HasPrecision(5, 2);
+            e.Property(x => x.VatRate).HasPrecision(5, 2);
+            e.HasOne(x => x.Order).WithMany(x => x.Lines).HasForeignKey(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 
