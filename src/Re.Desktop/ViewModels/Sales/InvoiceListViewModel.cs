@@ -26,6 +26,9 @@ public partial class InvoiceListViewModel : ObservableObject
     [ObservableProperty] private string _totalCount = "0";
     [ObservableProperty] private string _totalSales = "0,00 ₺";
     [ObservableProperty] private bool _isLoading;
+    [ObservableProperty] private string _workspaceMode = "Sales";
+    [ObservableProperty] private string _workspaceTitle = "Satış Faturaları Yönetimi";
+    [ObservableProperty] private string _newButtonText = "+ Yeni Satış Faturası";
 
     // Panel Kontrolü (Görüntüleme)
     [ObservableProperty] private bool _isPanelOpen;
@@ -34,7 +37,7 @@ public partial class InvoiceListViewModel : ObservableObject
     // Form Kontrolü (Ekleme/Editme)
     [ObservableProperty] private bool _isFormOpen;
     [ObservableProperty] private InvoiceFormModel _formModel = new();
-    [ObservableProperty] private string _formTitle = "New Invoice";
+    [ObservableProperty] private string _formTitle = "Yeni Fatura Oluştur";
 
     public ObservableCollection<InvoiceItem> Invoices { get; } = new();
     public ObservableCollection<AccountListResponse> Customers { get; } = new();
@@ -42,7 +45,7 @@ public partial class InvoiceListViewModel : ObservableObject
     public ObservableCollection<WarehouseLookupItem> Warehouses { get; } = new();
     [ObservableProperty] private ProductListResponse? _selectedNewProduct;
     [ObservableProperty] private string _barcodeInput = string.Empty;
-    [ObservableProperty] private string _barcodeStatus = "Scanner ready · Focus this field and scan a product";
+    [ObservableProperty] private string _barcodeStatus = "Barkod okuyucu hazır · Ürün barkodunu okutun veya seçin";
     [ObservableProperty] private bool _lastScanSucceeded;
 
     public InvoiceListViewModel() { } // Design-time
