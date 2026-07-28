@@ -1,4 +1,4 @@
-﻿namespace Re.Domain.Enums;
+namespace Re.Domain.Enums;
 
 /// <summary>
 /// Belge (fatura, sipariş, teklif vb.) yaşam döngüsü durumları.
@@ -13,6 +13,12 @@ public enum DocumentStatus
     Reversed = 4,       // Ters kayıt oluşturuldu
     PartiallyPaid = 5,  // Kısmen tahsil edildi
     FullyPaid = 6       // Tamamen tahsil edildi
+}
+
+public enum InvoiceCategory
+{
+    Sales = 1,
+    SalesReturn = 2
 }
 
 public enum StockMovementType
@@ -90,3 +96,30 @@ public enum ChequeNoteStatus
     Cancelled = 6
 }
 
+public enum AuditEventType
+{
+    UserLogin = 1,
+    UserLogout = 2,
+    EntityCreate = 3,
+    EntityUpdate = 4,
+    EntityDelete = 5,
+    StockAdjustment = 6,
+    InvoiceApproved = 7,
+    SalesforceSynced = 8
+}
+
+public static class EnumExtensions
+{
+    public static string ToTurkishString(this AuditEventType eventType) => eventType switch
+    {
+        AuditEventType.UserLogin => "Kullanıcı Girişi",
+        AuditEventType.UserLogout => "Kullanıcı Çıkışı",
+        AuditEventType.EntityCreate => "Kayıt Oluşturma",
+        AuditEventType.EntityUpdate => "Kayıt Güncelleme",
+        AuditEventType.EntityDelete => "Kayıt Silme",
+        AuditEventType.StockAdjustment => "Stok Düzeltme İşlemi",
+        AuditEventType.InvoiceApproved => "Fatura Onayı",
+        AuditEventType.SalesforceSynced => "Salesforce Senkronizasyonu",
+        _ => "Genel Sistem İşlemi"
+    };
+}
