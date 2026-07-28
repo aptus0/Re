@@ -16,16 +16,16 @@ public partial class SalesforceMetadataStudioWindow : Window
 
     private void DeployObject_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show($"Özel Obje ({TxtObjectLabel.Text} - {TxtObjectApiName.Text}) Salesforce Org'una başarıyla deploy edildi.", "Metadata Studio", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show($"Custom Object ({TxtObjectLabel.Text} - {TxtObjectApiName.Text}) was deployed successfully to the Salesforce org.", "Metadata Studio", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void DeployRule_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show($"Doğrulama Kuralı ({TxtRuleName.Text}) [{TxtRuleObject.Text}] nesnesine başarıyla eklendi.", "Metadata Studio", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show($"Validation Rule ({TxtRuleName.Text}) [{TxtRuleObject.Text}] was added successfully.", "Metadata Studio", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void DeployFlow_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show($"Flow Otomasyonu ({TxtFlowName.Text}) yayına alındı ve aktifleştirildi.", "Metadata Studio", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show($"Flow Automation ({TxtFlowName.Text}) was published and activated.", "Metadata Studio", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 }

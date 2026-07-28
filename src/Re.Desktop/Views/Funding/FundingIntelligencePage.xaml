@@ -1,0 +1,214 @@
+<UserControl x:Class="Re.Desktop.Views.Funding.FundingIntelligencePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#F4F6F9">
+    <UserControl.Resources>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D8DDE6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+        <Style x:Key="MetricLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#5F6B7A"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style x:Key="MetricValue" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#181818"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+        </Style>
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="Background" Value="#0176D3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style x:Key="OutlineButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#0176D3"/>
+            <Setter Property="BorderBrush" Value="#B9C3CF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Border Background="#E8F3FF" CornerRadius="5" Padding="8,4" Margin="0,0,10,0">
+                            <TextBlock Text="RE FINANCE INTELLIGENCE" Foreground="#014486" FontSize="10" FontWeight="Bold"/>
+                        </Border>
+                        <TextBlock Text="Explainable decisions • ERP verified" Foreground="#66788A" VerticalAlignment="Center" FontSize="11"/>
+                    </StackPanel>
+                    <TextBlock Text="Funding Decision Workspace" FontSize="24" FontWeight="Bold" Foreground="#181818" Margin="0,8,0,0"/>
+                    <TextBlock Text="Applications, verified operating signals, policy findings and offers in one controlled workflow."
+                               Foreground="#5F6B7A" FontSize="12" Margin="0,3,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <Button Content="Export review" Style="{StaticResource OutlineButton}" Margin="0,0,8,0"/>
+                    <Button Content="+ New application" Style="{StaticResource ActionButton}"/>
+                </StackPanel>
+            </Grid>
+
+            <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,14">
+                <Border Style="{StaticResource Card}" Margin="0,0,8,0">
+                    <StackPanel><TextBlock Text="OPEN APPLICATIONS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding OpenApplicationCount}" Style="{StaticResource MetricValue}"/><TextBlock Text="Across all active stages" Foreground="#60758A" FontSize="11" Margin="0,5,0,0"/></StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Margin="0,0,8,0">
+                    <StackPanel><TextBlock Text="ANALYST REVIEW" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding ReviewCount}" Style="{StaticResource MetricValue}"/><TextBlock Text="1 policy exception requires action" Foreground="#B75D00" FontSize="11" Margin="0,5,0,0"/></StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Margin="0,0,8,0">
+                    <StackPanel><TextBlock Text="REQUESTED VOLUME" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding RequestedTotal, StringFormat=₺{0:N0}}" Style="{StaticResource MetricValue}"/><TextBlock Text="Current workspace pipeline" Foreground="#60758A" FontSize="11" Margin="0,5,0,0"/></StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel><TextBlock Text="PROPOSED OFFERS" Style="{StaticResource MetricLabel}"/><TextBlock Text="{Binding OfferTotal, StringFormat=₺{0:N0}}" Style="{StaticResource MetricValue}"/><TextBlock Text="68% weighted conversion" Foreground="#198754" FontSize="11" Margin="0,5,0,0"/></StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0" Margin="0,0,0,14">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="230"/></Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="14,10">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Application pipeline" FontSize="15" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                            <Button Content="All" Command="{Binding SetFilterCommand}" CommandParameter="All" Style="{StaticResource OutlineButton}" Padding="10,5" Margin="0,0,6,0"/>
+                            <Button Content="Review" Command="{Binding SetFilterCommand}" CommandParameter="Review" Style="{StaticResource OutlineButton}" Padding="10,5" Margin="0,0,6,0"/>
+                            <Button Content="Exceptions" Command="{Binding SetFilterCommand}" CommandParameter="Exceptions" Style="{StaticResource OutlineButton}" Padding="10,5"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Width="220" Padding="8,5" Text="Search merchant or application"/>
+                    </Grid>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Applications}" SelectedItem="{Binding SelectedApplication}"
+                              AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal" BorderThickness="0" RowHeaderWidth="0"
+                              Background="White" AlternatingRowBackground="#FAFBFC" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Application" Binding="{Binding Number}" Width="110"/>
+                            <DataGridTextColumn Header="Merchant" Binding="{Binding Merchant}" Width="*"/>
+                            <DataGridTextColumn Header="Sector" Binding="{Binding Sector}" Width="135"/>
+                            <DataGridTextColumn Header="Requested" Binding="{Binding RequestedAmount, StringFormat=₺{0:N0}}" Width="115"/>
+                            <DataGridTextColumn Header="Offer" Binding="{Binding ProposedOffer, StringFormat=₺{0:N0}}" Width="110"/>
+                            <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="65"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="125"/>
+                            <DataGridTextColumn Header="SLA" Binding="{Binding Sla}" Width="90"/>
+                            <DataGridTextColumn Header="Owner" Binding="{Binding Owner}" Width="105"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.1*"/>
+                    <ColumnDefinition Width="0.9*"/>
+                    <ColumnDefinition Width="0.9*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,10,0">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="{Binding SelectedApplication.Merchant}" FontSize="17" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding SelectedApplication.Number}" Foreground="#0176D3" FontSize="11" Margin="0,3,0,0"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Background="#E8F5E9" CornerRadius="14" Padding="12,5">
+                                <TextBlock Text="{Binding SelectedApplication.Status}" Foreground="#2E7D32" FontSize="11" FontWeight="SemiBold"/>
+                            </Border>
+                        </Grid>
+                        <Separator Margin="0,14"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="120"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="RISK SCORE" Style="{StaticResource MetricLabel}"/>
+                                <TextBlock Text="{Binding SelectedScoreLabel}" FontSize="30" FontWeight="Bold" Foreground="#0176D3" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding SelectedRiskLabel}" Foreground="#198754" FontWeight="SemiBold" FontSize="11"/>
+                            </StackPanel>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <TextBlock Text="Verified monthly revenue" Foreground="#5F6B7A" FontSize="11"/>
+                                <TextBlock Grid.Row="0" Text="₺3,840,000" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="1" Text="Average collection cycle" Foreground="#5F6B7A" FontSize="11"/>
+                                <TextBlock Grid.Row="1" Text="18 days" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="2" Text="ERP data confidence" Foreground="#5F6B7A" FontSize="11"/>
+                                <TextBlock Grid.Row="2" Text="98.6%" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#198754"/>
+                            </Grid>
+                        </Grid>
+                        <TextBlock Text="POLICY FINDINGS" Style="{StaticResource MetricLabel}" Margin="0,16,0,6"/>
+                        <ItemsControl ItemsSource="{Binding PolicyFindings}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,5">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <StackPanel><TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="12"/><TextBlock Text="{Binding Detail}" Foreground="#64748B" FontSize="10"/></StackPanel>
+                                        <Border Grid.Column="1" Background="#F1F5F9" CornerRadius="10" Padding="8,3"><TextBlock Text="{Binding Severity}" FontSize="10"/></Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource Card}" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="Document verification" FontSize="15" FontWeight="Bold"/>
+                        <TextBlock Text="Evidence is reviewed separately from the final decision." Foreground="#64748B" FontSize="10" TextWrapping="Wrap" Margin="0,4,0,12"/>
+                        <ItemsControl ItemsSource="{Binding Documents}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#E5E9F0" BorderThickness="0,0,0,1" Padding="0,9">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <StackPanel><TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="12"/><TextBlock Text="{Binding Detail}" Foreground="#64748B" FontSize="10"/></StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding Status}" Foreground="#0176D3" FontWeight="SemiBold" FontSize="10" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Border Background="#FFF8E7" BorderBrush="#F2C96D" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,12,0,0">
+                            <TextBlock Text="AI extraction is advisory. Identity and material exceptions require analyst confirmation." Foreground="#745000" FontSize="10" TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Offer &amp; decision" FontSize="15" FontWeight="Bold"/>
+                        <TextBlock Text="Suggested structure" Style="{StaticResource MetricLabel}" Margin="0,12,0,5"/>
+                        <TextBlock Text="{Binding SelectedApplication.ProposedOffer, StringFormat=₺{0:N0}}" FontSize="26" FontWeight="Bold" Foreground="#181818"/>
+                        <Grid Margin="0,12,0,0">
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Text="Term" Foreground="#64748B" FontSize="11"/><TextBlock Text="9 months" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Row="1" Text="Revenue share cap" Foreground="#64748B" FontSize="11"/><TextBlock Grid.Row="1" Text="14%" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Row="2" Text="Estimated payment" Foreground="#64748B" FontSize="11"/><TextBlock Grid.Row="2" Text="₺241,500 / month" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                        </Grid>
+                        <TextBlock Text="Analyst note" Style="{StaticResource MetricLabel}" Margin="0,14,0,5"/>
+                        <TextBox Text="{Binding DecisionNote}" Height="58" TextWrapping="Wrap" AcceptsReturn="True" Padding="7"/>
+                        <Button Content="Prepare offer" Command="{Binding PrepareOfferCommand}" Style="{StaticResource ActionButton}" Margin="0,12,0,7"/>
+                        <Button Content="Send to analyst review" Command="{Binding StartReviewCommand}" Style="{StaticResource OutlineButton}"/>
+                        <TextBlock Text="All actions will be recorded with user, policy version, timestamp and reason." Foreground="#64748B" FontSize="9" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -12,7 +12,7 @@ public sealed class SalesforceBulkService : ISalesforceBulkService
             var jobId = "7508d00000" + Guid.NewGuid().ToString("N")[..10];
             return new BulkJobResult(true, jobId, objectName, "Open", 0, 0, DateTime.UtcNow);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return new BulkJobResult(false, "", objectName, "Failed", 0, 0, DateTime.UtcNow);
         }
@@ -26,7 +26,7 @@ public sealed class SalesforceBulkService : ISalesforceBulkService
             var linesCount = string.IsNullOrWhiteSpace(csvData) ? 0 : csvData.Split('\n').Length - 1;
             return new BulkJobResult(true, jobId, "Account", "JobComplete", Math.Max(1, linesCount), 0, DateTime.UtcNow);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return new BulkJobResult(false, jobId, "Account", "Failed", 0, 0, DateTime.UtcNow);
         }

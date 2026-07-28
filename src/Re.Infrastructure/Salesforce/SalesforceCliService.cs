@@ -35,9 +35,9 @@ public sealed class SalesforceCliService(IConfiguration configuration) : ISalesf
     {
         if (string.IsNullOrWhiteSpace(alias) ||
             alias.Any(c => !char.IsLetterOrDigit(c) && c is not '-' and not '_'))
-            return new(false, "Alias yalnızca harf, rakam, tire ve alt çizgi içerebilir.");
+            return new(false, "Alias may contain letters, numbers, hyphens, and underscores only.");
         if (!File.Exists(Path.Combine(ProjectPath, "sfdx-project.json")))
-            return new(false, "Salesforce DX proje dosyası bulunamadı.");
+            return new(false, "Salesforce DX project file was not found.");
         try
         {
             var instanceUrl = sandbox ? "https://test.salesforce.com" : "https://login.salesforce.com";
@@ -53,9 +53,9 @@ public sealed class SalesforceCliService(IConfiguration configuration) : ISalesf
                 }
             };
             process.Start();
-            return new(true, "Salesforce güvenli giriş ekranı açıldı. Giriş tamamlandıktan sonra org listesini yenileyin.");
+            return new(true, "The secure Salesforce sign-in page was opened. Refresh the org list after signing in.");
         }
-        catch (Exception ex) { return new(false, $"Salesforce CLI başlatılamadı: {ex.Message}"); }
+        catch (Exception ex) { return new(false, $"Salesforce CLI could not be started: {ex.Message}"); }
     }
 
     public async Task<string?> GetOrgLoginUrlAsync(string alias, CancellationToken cancellationToken = default)

@@ -32,7 +32,7 @@ public partial class SalesforceCloudViewModel : ObservableObject
     [ObservableProperty] private int _storageUsagePercent = 64;
     [ObservableProperty] private int _apiQuotaPercent = 18;
     [ObservableProperty] private string _weeklyTrendText = "+24.5%";
-    
+
     [ObservableProperty] private double _chartBarHeight1 = 45;
     [ObservableProperty] private double _chartBarHeight2 = 70;
     [ObservableProperty] private double _chartBarHeight3 = 60;
@@ -61,15 +61,15 @@ public partial class SalesforceCloudViewModel : ObservableObject
     [ObservableProperty] private string? _webViewUrl = "https://login.salesforce.com";
 
     // Metadata Studio Inputs
-    [ObservableProperty] private string _newObjectLabel = "ERP Fatura Başlığı";
+    [ObservableProperty] private string _newObjectLabel = "ERP Invoice Header";
     [ObservableProperty] private string _newObjectApiName = "ERP_Invoice_Header__c";
-    [ObservableProperty] private string _newObjectPluralLabel = "ERP Fatura Başlıkları";
-    [ObservableProperty] private string _newObjectDescription = "ERP sisteminden aktarılan fatura üst başlık kayıtları.";
+    [ObservableProperty] private string _newObjectPluralLabel = "ERP Invoice Headers";
+    [ObservableProperty] private string _newObjectDescription = "Invoice header records transferred from the ERP system.";
 
     [ObservableProperty] private string _newRuleName = "Require_Tax_Number_On_Account";
     [ObservableProperty] private string _newRuleObject = "Account";
     [ObservableProperty] private string _newRuleFormula = "ISBLANK(Tax_Number__c)";
-    [ObservableProperty] private string _newRuleErrorMessage = "Cari kart kaydı oluşturmak için Vergi Numarası girilmesi zorunludur.";
+    [ObservableProperty] private string _newRuleErrorMessage = "Tax Number is required to create an account record.";
 
     [ObservableProperty] private string _newFlowName = "ERP_Auto_Invoice_Approval_Flow";
     [ObservableProperty] private string _newFlowTriggerObject = "Opportunity";
@@ -256,7 +256,7 @@ public partial class SalesforceCloudViewModel : ObservableObject
         }
 
         bool isSandbox = NewOrgEnvironment == "Sandbox";
-        
+
         var result = await _api.PostAsync<string>("api/salesforce/cli/login",
             new SalesforceCliLoginRequest(NewOrgAlias, isSandbox));
         if (result is null) { _dialog.Error("Failed to launch Salesforce secure login screen."); return; }
@@ -301,18 +301,18 @@ public partial class SalesforceCloudViewModel : ObservableObject
         {
             var line = new Re.Contracts.Sales.CreateInvoiceLineRequest(
                 Guid.NewGuid(), // Dummy ProductId
-                null, null, "Salesforce Kurulum ve Danışmanlık Hizmeti", "SRV-SF-001",
-                1, 50000, 0, 0, 20, 1, $"{SelectedTenant.DisplayName} için org kurulumu."
+                null, null, "Salesforce Setup and Consulting Service", "SRV-SF-001",
+                1, 50000, 0, 0, 20, 1, $"{SelectedTenant.DisplayName} organization setup."
             );
 
             var req = new Re.Contracts.Sales.CreateInvoiceRequest(
                 Guid.Empty, "TKLF-" + DateTime.Now.ToString("yyyyMMddHHmmss"), DateTime.UtcNow,
-                null, null, $"{SelectedTenant.DisplayName} için Salesforce entegrasyon teklifi",
+                null, null, $"{SelectedTenant.DisplayName} Salesforce integration proposal",
                 new System.Collections.Generic.List<Re.Contracts.Sales.CreateInvoiceLineRequest> { line }
             );
 
             var result = await _api.PostAsync<Re.Contracts.Sales.InvoiceResponse>("api/invoices", req);
-            
+
             if (result != null)
             {
                 _dialog.Info($"Draft invoice {result.DocumentNumber} for {SelectedTenant.DisplayName} has been successfully created in ERP.", "Proposal Created Successfully");
@@ -341,7 +341,7 @@ public partial class SalesforceCloudViewModel : ObservableObject
         try
         {
             var url = await _api.GetAsync<string>($"api/salesforce/cli/loginurl/{SelectedTenant.DisplayName}");
-            
+
             if (string.IsNullOrEmpty(url))
             {
                 _dialog.Error("Could not retrieve auto-login URL for this org. CLI authorization may have expired.");
@@ -471,9 +471,9 @@ public partial class SalesforceCloudViewModel : ObservableObject
             var res = await _api.PostAsync<CompositeResponseDto>("api/salesforce/composite/upsert-account", new
             {
                 ExternalId = "CARI-10042",
-                AccountName = "ABC Makina San. ve Tic. A.Ş.",
-                ContactLastName = "Yılmaz",
-                OpportunityName = "ABC Makina - 2026 ERP Entegrasyon Fırsatı",
+                AccountName = "ABC Machinery Inc.",
+                ContactLastName = "Williams",
+                OpportunityName = "ABC Machinery - 2026 ERP Integration Opportunity",
                 Amount = 450000.00m
             });
             CompositeResultText = res?.Message ?? "Composite REST API: Account, Contact and Opportunity updated atomically.";

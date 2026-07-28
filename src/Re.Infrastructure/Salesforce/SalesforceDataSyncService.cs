@@ -2,18 +2,18 @@ using Re.Application.Interfaces;
 
 namespace Re.Infrastructure.Salesforce;
 
-public sealed class SalesforceDataSyncService(ISalesforceCliService cli) : ISalesforceDataSyncService
+public sealed class SalesforceDataSyncService : ISalesforceDataSyncService
 {
     public async Task<SalesforceSyncResult> SyncCustomersToSalesforceAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             await Task.Delay(100, cancellationToken);
-            return new SalesforceSyncResult(true, "Cari Hesap kayıtları Salesforce Account nesnesine (External ID ile) aktarıldı.", 50, DateTime.UtcNow);
+            return new SalesforceSyncResult(true, "Account records were synchronized to Salesforce Account using External ID.", 50, DateTime.UtcNow);
         }
         catch (Exception ex)
         {
-            return new SalesforceSyncResult(false, $"Cari aktarım hatası: {ex.Message}", 0, DateTime.UtcNow);
+            return new SalesforceSyncResult(false, $"Account synchronization error: {ex.Message}", 0, DateTime.UtcNow);
         }
     }
 
@@ -22,11 +22,11 @@ public sealed class SalesforceDataSyncService(ISalesforceCliService cli) : ISale
         try
         {
             await Task.Delay(100, cancellationToken);
-            return new SalesforceSyncResult(true, "Stok ve Ürün kayıtları Salesforce Product2 / PricebookEntry nesnelerine aktarıldı.", 120, DateTime.UtcNow);
+            return new SalesforceSyncResult(true, "Inventory and product records were synchronized to Salesforce Product2 / PricebookEntry.", 120, DateTime.UtcNow);
         }
         catch (Exception ex)
         {
-            return new SalesforceSyncResult(false, $"Stok/Ürün aktarım hatası: {ex.Message}", 0, DateTime.UtcNow);
+            return new SalesforceSyncResult(false, $"Inventory/product synchronization error: {ex.Message}", 0, DateTime.UtcNow);
         }
     }
 
@@ -35,18 +35,18 @@ public sealed class SalesforceDataSyncService(ISalesforceCliService cli) : ISale
         try
         {
             await Task.Delay(100, cancellationToken);
-            return new SalesforceSyncResult(true, "Fatura ve Teklif kayıtları Salesforce Opportunity / Invoice nesnelerine aktarıldı.", 35, DateTime.UtcNow);
+            return new SalesforceSyncResult(true, "Invoice and quote records were synchronized to Salesforce Opportunity / Invoice.", 35, DateTime.UtcNow);
         }
         catch (Exception ex)
         {
-            return new SalesforceSyncResult(false, $"Fatura aktarım hatası: {ex.Message}", 0, DateTime.UtcNow);
+            return new SalesforceSyncResult(false, $"Invoice synchronization error: {ex.Message}", 0, DateTime.UtcNow);
         }
     }
 
     public async Task<SalesforceSyncResult> DeployReadyMadePackageAsync(string targetOrgAlias, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(targetOrgAlias))
-            return new SalesforceSyncResult(false, "Geçersiz hedef org alias.", 0, DateTime.UtcNow);
+            return new SalesforceSyncResult(false, "Invalid target org alias.", 0, DateTime.UtcNow);
 
         try
         {
@@ -55,7 +55,7 @@ public sealed class SalesforceDataSyncService(ISalesforceCliService cli) : ISale
         }
         catch (Exception ex)
         {
-            return new SalesforceSyncResult(false, $"Otomatik paket kurulum hatası: {ex.Message}", 0, DateTime.UtcNow);
+            return new SalesforceSyncResult(false, $"Automatic package installation error: {ex.Message}", 0, DateTime.UtcNow);
         }
     }
 }
