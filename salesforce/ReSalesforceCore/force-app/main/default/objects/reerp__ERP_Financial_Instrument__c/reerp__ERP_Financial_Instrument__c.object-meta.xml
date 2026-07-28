@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>ERP Financial Instrument</label>
+    <pluralLabel>ERP Financial Instruments</pluralLabel>
+    <nameField>
+        <label>Instrument Number</label>
+        <type>Text</type>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>
