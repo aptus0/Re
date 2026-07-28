@@ -86,5 +86,13 @@
     <sys:String x:Key="Salesforce.SyncAccounts">Carileri Otomatik Senkronize Et</sys:String>
     <sys:String x:Key="Salesforce.SyncProducts">Ürün &amp; Fiyat Listelerini Senkronize Et</sys:String>
     <sys:String x:Key="Salesforce.SyncInvoices">Faturaları (Opportunity) Senkronize Et</sys:String>
-    <sys:String x:Key="Salesforce.SyncNow">Tüm Verileri Şimdi Senkronize Et</sys:String>
+    <sys:String x:Key="Salesforce.SyncNow">Şimdi Senkronize Et</sys:String>
+
+    <!-- Navigasyon Tooltip Simgeleri -->
+    <sys:String x:Key="Tooltip.Dashboard">Genel durum, satışlar ve finansal özet paneli</sys:String>
+    <sys:String x:Key="Tooltip.Products">Ürün listesi, stok kartları ve varyant yönetimi</sys:String>
+    <sys:String x:Key="Tooltip.Accounts">Cari hesap kartları, müşteri ve tedarikçi takibi</sys:String>
+    <sys:String x:Key="Tooltip.Invoices">Satış ve alış faturaları operasyon ekranı</sys:String>
+    <sys:String x:Key="Tooltip.POS">Hızlı kasa satışı ve fiş basım ekranı</sys:String>
+    <sys:String x:Key="Tooltip.PackageCenter">Kurumsal modül ve e-Entegratör yönetim merkezi</sys:String>
 </ResourceDictionary>
