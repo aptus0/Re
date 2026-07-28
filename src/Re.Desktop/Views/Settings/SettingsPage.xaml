@@ -4,63 +4,114 @@
              Background="#F3F3F5">
     <UserControl.Resources>
         <Style x:Key="LabelStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#3E3E3C"/>
+            <Setter Property="Foreground" Value="#475569"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="Height" Value="36"/>
+            <Setter Property="Height" Value="34"/>
             <Setter Property="Padding" Value="10,0"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="#16325C"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
             <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#D8DDE6"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CaretBrush" Value="#16325C"/>
+            <Setter Property="CaretBrush" Value="#0176D3"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#0176D3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style TargetType="ComboBox">
-            <Setter Property="Height" Value="36"/>
+            <Setter Property="Height" Value="34"/>
             <Setter Property="Padding" Value="10,0"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="#16325C"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
             <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#D8DDE6"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
             <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
         <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="#3E3E3C"/>
+            <Setter Property="Foreground" Value="#475569"/>
             <Setter Property="Margin" Value="0,6"/>
             <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
         <Style x:Key="SectionBox" TargetType="GroupBox">
-            <Setter Property="Foreground" Value="#16325C"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#0176D3"/>
+            <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#D8DDE6"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="20"/>
             <Setter Property="Margin" Value="0,0,0,16"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
         <Style x:Key="CommandButton" TargetType="Button">
-            <Setter Property="Height" Value="36"/>
+            <Setter Property="Height" Value="34"/>
             <Setter Property="Padding" Value="20,0"/>
-            <Setter Property="Background" Value="#F4F6F9"/>
-            <Setter Property="Foreground" Value="#16325C"/>
-            <Setter Property="BorderBrush" Value="#D8DDE6"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#F8FAFC"/>
+                                <Setter Property="BorderBrush" Value="#94A3B8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style x:Key="PrimaryCommandButton" TargetType="Button">
-            <Setter Property="Height" Value="36"/>
+            <Setter Property="Height" Value="34"/>
             <Setter Property="Padding" Value="24,0"/>
-            <Setter Property="Background" Value="#0070D2"/>
+            <Setter Property="Background" Value="#F97316"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#005FB2"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#EA580C"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#EA580C"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#C2410C"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
 
@@ -142,10 +193,11 @@
                                         <ColumnDefinition Width="*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel>
-                                        <TextBlock Text="Interface Language" Style="{StaticResource LabelStyle}"/>
-                                        <ComboBox SelectedIndex="1" Padding="10,6">
-                                            <ComboBoxItem Content="Türkçe 🇹🇷 (Turkish)"/>
-                                            <ComboBoxItem Content="English 🇬🇧 (English)"/>
+                                        <TextBlock Text="{DynamicResource Settings.Language}" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="InterfaceLanguage" Padding="10,6"
+                                                  SelectionChanged="InterfaceLanguage_SelectionChanged">
+                                            <ComboBoxItem Content="{DynamicResource Settings.English}" Tag="en-US"/>
+                                            <ComboBoxItem Content="{DynamicResource Settings.Turkish}" Tag="tr-TR"/>
                                         </ComboBox>
                                     </StackPanel>
                                     <StackPanel Grid.Column="2">
@@ -337,7 +389,7 @@
                                     </StackPanel>
                                 </Grid>
                             </GroupBox>
-                            
+
                             <!-- SOAP & Endpoint -->
                             <GroupBox Header="SOAP Endpoint Configuration" Style="{StaticResource SectionBox}">
                                 <Grid>
@@ -383,7 +435,7 @@
                                             </ComboBox>
                                         </StackPanel>
                                         <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
-                                            <Button Content="Sync All Data Now" Style="{StaticResource PrimaryCommandButton}" Height="36"/>
+                                            <Button Content="Sync All Data Now" Click="SyncAllData_Click" Style="{StaticResource PrimaryCommandButton}" Height="36"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>

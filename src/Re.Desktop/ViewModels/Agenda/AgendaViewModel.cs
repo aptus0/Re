@@ -12,7 +12,7 @@ public partial class AgendaViewModel : ObservableObject
 
     [ObservableProperty] private string _currentMonthYear = string.Empty;
     [ObservableProperty] private DateTime _currentDate;
-    [ObservableProperty] private string _selectedTypeFilter = "Tümü";
+    [ObservableProperty] private string _selectedTypeFilter = "All";
     [ObservableProperty] private bool _isFormOpen;
     [ObservableProperty] private EventFormModel _formModel = new();
     [ObservableProperty] private int _monthlyEventCount;
@@ -22,7 +22,7 @@ public partial class AgendaViewModel : ObservableObject
 
     public ObservableCollection<CalendarDay> CalendarDays { get; } = [];
     public ObservableCollection<CalendarEvent> UpcomingEvents { get; } = [];
-    public List<string> TypeFilters { get; } = ["Tümü", "Toplantı", "Görüşme", "Hatırlatma", "Görev"];
+    public List<string> TypeFilters { get; } = ["All", "Meeting", "Call", "Reminder", "Task"];
 
     public AgendaViewModel()
     {
@@ -68,7 +68,7 @@ public partial class AgendaViewModel : ObservableObject
     }
 
     private bool MatchesFilter(CalendarEvent calendarEvent) =>
-        SelectedTypeFilter == "Tümü" || calendarEvent.Type == SelectedTypeFilter;
+        SelectedTypeFilter == "All" || calendarEvent.Type == SelectedTypeFilter;
 
     private void UpdateSummaries()
     {
@@ -76,9 +76,9 @@ public partial class AgendaViewModel : ObservableObject
             .Where(x => x.Key.Year == CurrentDate.Year && x.Key.Month == CurrentDate.Month)
             .SelectMany(x => x.Value).ToList();
         MonthlyEventCount = monthEvents.Count;
-        MeetingCount = monthEvents.Count(x => x.Type == "Toplantı");
-        ReminderCount = monthEvents.Count(x => x.Type == "Hatırlatma");
-        HighPriorityCount = monthEvents.Count(x => x.Priority == "Yüksek");
+        MeetingCount = monthEvents.Count(x => x.Type == "Meeting");
+        ReminderCount = monthEvents.Count(x => x.Type == "Reminder");
+        HighPriorityCount = monthEvents.Count(x => x.Priority == "High");
 
         UpcomingEvents.Clear();
         foreach (var item in _eventStore
@@ -125,12 +125,12 @@ public partial class AgendaViewModel : ObservableObject
             TimeSpan.TryParse(FormModel.EndTime, out var end) && end <= start)
             return;
 
-        var color = FormModel.Priority == "Yüksek" ? "#C62828" :
-            FormModel.Type == "Toplantı" ? "#8E1717" : "#202124";
+        var color = FormModel.Priority == "High" ? "#C62828" :
+            FormModel.Type == "Meeting" ? "#8E1717" : "#202124";
         AddStoredEvent(FormModel.EventDate, new CalendarEvent
         {
             Title = FormModel.Title.Trim(),
-            Time = FormModel.IsAllDay ? "Tüm gün" : FormModel.StartTime,
+            Time = FormModel.IsAllDay ? "All day" : FormModel.StartTime,
             StartTime = FormModel.StartTime,
             EndTime = FormModel.EndTime,
             Type = FormModel.Type,
@@ -155,9 +155,9 @@ public partial class EventFormModel : ObservableObject
     [ObservableProperty] private string _startTime = "09:00";
     [ObservableProperty] private string _endTime = "10:00";
     [ObservableProperty] private bool _isAllDay;
-    [ObservableProperty] private string _type = "Toplantı";
+    [ObservableProperty] private string _type = "Meeting";
     [ObservableProperty] private string _priority = "Normal";
-    [ObservableProperty] private string _reminder = "15 dakika önce";
+    [ObservableProperty] private string _reminder = "15 minutes before";
     [ObservableProperty] private string _relatedAccount = string.Empty;
     [ObservableProperty] private string _description = string.Empty;
     [ObservableProperty] private string _dateStr = string.Empty;

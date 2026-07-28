@@ -1,4 +1,4 @@
-﻿using Re.Contracts.Auth;
+using Re.Contracts.Auth;
 
 namespace Re.Desktop.Services;
 

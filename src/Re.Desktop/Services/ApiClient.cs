@@ -44,57 +44,85 @@ public class ApiClient
 
     public async Task<AuthResponse?> LoginAsync(LoginRequest request)
     {
-        var response = await _http.PostAsJsonAsync("api/auth/login", request);
-        if (!response.IsSuccessStatusCode) return null;
-
-        var result = await response.Content.ReadFromJsonAsync<ApiResult<AuthResponse>>(JsonOptions);
-        return result?.Data;
+        try
+        {
+            var response = await _http.PostAsJsonAsync("api/auth/login", request);
+            if (!response.IsSuccessStatusCode) return null;
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<AuthResponse>>(JsonOptions);
+            return result?.Data;
+        }
+        catch (HttpRequestException) { return null; }
+        catch (TaskCanceledException) { return null; }
     }
 
     public async Task<AuthResponse?> RefreshTokenAsync(string refreshToken)
     {
-        var response = await _http.PostAsJsonAsync("api/auth/refresh",
-            new RefreshTokenRequest(refreshToken));
-        if (!response.IsSuccessStatusCode) return null;
-
-        var result = await response.Content.ReadFromJsonAsync<ApiResult<AuthResponse>>(JsonOptions);
-        return result?.Data;
+        try
+        {
+            var response = await _http.PostAsJsonAsync("api/auth/refresh",
+                new RefreshTokenRequest(refreshToken));
+            if (!response.IsSuccessStatusCode) return null;
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<AuthResponse>>(JsonOptions);
+            return result?.Data;
+        }
+        catch (HttpRequestException) { return null; }
+        catch (TaskCanceledException) { return null; }
     }
 
     // ── Generic helpers ───────────────────────────────────────────────
 
     public async Task<T?> GetAsync<T>(string url)
     {
-        SetAuthHeader();
-        var response = await _http.GetAsync(url);
-        if (!response.IsSuccessStatusCode) return default;
-        var result = await response.Content.ReadFromJsonAsync<ApiResult<T>>(JsonOptions);
-        return result is { Success: true } ? result.Data : default;
+        try
+        {
+            SetAuthHeader();
+            var response = await _http.GetAsync(url);
+            if (!response.IsSuccessStatusCode) return default;
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<T>>(JsonOptions);
+            return result is { Success: true } ? result.Data : default;
+        }
+        catch (HttpRequestException) { return default; }
+        catch (TaskCanceledException) { return default; }
     }
 
     public async Task<T?> PostAsync<T>(string url, object body)
     {
-        SetAuthHeader();
-        var response = await _http.PostAsJsonAsync(url, body);
-        if (!response.IsSuccessStatusCode) return default;
-        var result = await response.Content.ReadFromJsonAsync<ApiResult<T>>(JsonOptions);
-        return result is { Success: true } ? result.Data : default;
+        try
+        {
+            SetAuthHeader();
+            var response = await _http.PostAsJsonAsync(url, body);
+            if (!response.IsSuccessStatusCode) return default;
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<T>>(JsonOptions);
+            return result is { Success: true } ? result.Data : default;
+        }
+        catch (HttpRequestException) { return default; }
+        catch (TaskCanceledException) { return default; }
     }
 
     public async Task<T?> PutAsync<T>(string url, object body)
     {
-        SetAuthHeader();
-        var response = await _http.PutAsJsonAsync(url, body);
-        if (!response.IsSuccessStatusCode) return default;
-        var result = await response.Content.ReadFromJsonAsync<ApiResult<T>>(JsonOptions);
-        return result is { Success: true } ? result.Data : default;
+        try
+        {
+            SetAuthHeader();
+            var response = await _http.PutAsJsonAsync(url, body);
+            if (!response.IsSuccessStatusCode) return default;
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<T>>(JsonOptions);
+            return result is { Success: true } ? result.Data : default;
+        }
+        catch (HttpRequestException) { return default; }
+        catch (TaskCanceledException) { return default; }
     }
 
     public async Task<bool> DeleteAsync(string url)
     {
-        SetAuthHeader();
-        var response = await _http.DeleteAsync(url);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            SetAuthHeader();
+            var response = await _http.DeleteAsync(url);
+            return response.IsSuccessStatusCode;
+        }
+        catch (HttpRequestException) { return false; }
+        catch (TaskCanceledException) { return false; }
     }
 
     private void SetAuthHeader()

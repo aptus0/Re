@@ -2,17 +2,30 @@ using System.Windows;
 using System.Windows.Controls;
 using System.IO;
 using System.Text.Json;
+using Re.Desktop.Services;
 namespace Re.Desktop.Views.Settings;
 public partial class SettingsPage : UserControl
 {
+    private readonly IUiLocalizationService _localization;
+    private readonly IDialogService _dialog;
+    private readonly ApiClient _api;
+    private bool _initializing = true;
     private static readonly string SettingsPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "ReERP", "barcode-settings.json");
 
-    public SettingsPage()
+    public SettingsPage(IUiLocalizationService localization, IDialogService dialog, ApiClient api)
     {
+        _localization = localization;
+        _dialog = dialog;
+        _api = api;
         InitializeComponent();
+        InterfaceLanguage.SelectedItem = InterfaceLanguage.Items.OfType<ComboBoxItem>()
+            .FirstOrDefault(x => string.Equals(
+                x.Tag?.ToString(), localization.CurrentCulture, StringComparison.OrdinalIgnoreCase))
+            ?? InterfaceLanguage.Items[0];
         LoadBarcodeSettings();
+        _initializing = false;
     }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -32,17 +45,27 @@ public partial class SettingsPage : UserControl
             ConfirmBeforePrint = ConfirmBeforePrinting.IsChecked == true
         }, new JsonSerializerOptions { WriteIndented = true }));
         StatusText.Text = $"Last saved: {DateTime.Now:HH:mm}";
-        MessageBox.Show("System settings saved successfully.", "Settings",
-            MessageBoxButton.OK, MessageBoxImage.Information);
+        _dialog.Success("System settings saved successfully.", "Settings");
     }
 
     private void ResetButton_Click(object sender, RoutedEventArgs e)
     {
-        if (MessageBox.Show("Are you sure you want to reset all settings to defaults?", "Reset Settings",
-                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+        if (!_dialog.Confirm("Are you sure you want to reset all settings to defaults?", "Reset Settings"))
             return;
 
         StatusText.Text = "Default values loaded";
+    }
+
+    private void InterfaceLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_initializing || InterfaceLanguage.SelectedItem is not ComboBoxItem item)
+            return;
+
+        _localization.SetCulture(item.Tag?.ToString() ?? "en-US");
+        StatusText.Text = _localization.Translate("Settings.LanguageApplied");
+        _dialog.Success(
+            _localization.Translate("Settings.LanguageApplied"),
+            _localization.Translate("Dialog.Success"));
     }
 
     private void LoadBarcodeSettings()
@@ -71,6 +94,32 @@ public partial class SettingsPage : UserControl
         comboBox.SelectedItem = comboBox.Items.OfType<ComboBoxItem>()
             .FirstOrDefault(x => string.Equals(x.Content?.ToString(), value, StringComparison.OrdinalIgnoreCase))
             ?? comboBox.Items[0];
+    }
+
+    private async void SyncAllData_Click(object sender, RoutedEventArgs e)
+    {
+        if (_api == null) return;
+        StatusText.Text = "Syncing with Salesforce...";
+        try
+        {
+            var targetOrg = "ReSoft_Developer";
+            var response = await _api.PostAsync<object>($"api/salesforce/sync/full-job?targetOrg={targetOrg}", new { });
+            if (response != null)
+            {
+                StatusText.Text = "Sync complete";
+                _dialog.Success("Full Salesforce sync job completed successfully: schema objects, customers, products and invoices have been migrated.", "Auto-Sync Job");
+            }
+            else
+            {
+                StatusText.Text = "Sync failed";
+                _dialog.Error("Zero-Touch Salesforce sync job failed. Verify connection status.");
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusText.Text = "Sync error";
+            _dialog.Error($"Sync error: {ex.Message}");
+        }
     }
 }
 

@@ -1,4 +1,5 @@
-<Project Sdk="Microsoft.NET.Sdk">
+
+	<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -10,12 +11,15 @@
     <RootNamespace>Re.Desktop</RootNamespace>
     <AssemblyTitle>Re Kobi Cözümleri Desktop</AssemblyTitle>
     <Company>Re</Company>
-    <Version>1.0.1</Version>
-    <FileVersion>1.0.1.0</FileVersion>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <Version>1.1.0</Version>
+    <FileVersion>1.1.0.0</FileVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <StartupObject>Re.Desktop.App</StartupObject>
     <ApplicationIcon>..\..\Re_ERP_Logo.ico</ApplicationIcon>
+    <UseAppHost>true</UseAppHost>
+    <DebugType>portable</DebugType>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\**\*" />
+    <Resource Include="Resources\**\*" Exclude="Resources\**\*.xaml" />
     <Resource Include="..\..\Re.png" Link="Re.png" />
   </ItemGroup>
 

@@ -22,21 +22,21 @@
 
             <Grid>
                 <StackPanel>
-                    <TextBlock Text="Ajanda ve Planlama" Style="{StaticResource CorporatePageTitle}"/>
-                    <TextBlock Text="Toplantı, görüşme, görev ve hatırlatmaların operasyon takvimi" Foreground="#666" FontSize="12"/>
+                    <TextBlock Text="Calendar &amp; Planning" Style="{StaticResource CorporatePageTitle}"/>
+                    <TextBlock Text="Operational calendar for meetings, calls, tasks, and reminders" Foreground="#666" FontSize="12"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <ComboBox Width="130" Height="32" ItemsSource="{Binding TypeFilters}" SelectedItem="{Binding SelectedTypeFilter}" Background="White" Foreground="#202124" Margin="0,0,7,0"/>
-                    <Button Content="Bugün" Command="{Binding GoTodayCommand}" Style="{StaticResource CorporateButton}" Margin="0,0,7,0"/>
-                    <Button Content="+ Yeni Etkinlik" Command="{Binding AddEventFromButtonCommand}" Style="{StaticResource CorporatePrimaryButton}"/>
+                    <ComboBox Width="130" Height="32" ItemsSource="{Binding TypeFilters}" SelectedItem="{Binding SelectedTypeFilter}" Background="White" Foreground="#0F172A" Margin="0,0,7,0"/>
+                    <Button Content="Today" Command="{Binding GoTodayCommand}" Style="{StaticResource CorporateButton}" Margin="0,0,7,0"/>
+                    <Button Content="+ New Etkinlik" Command="{Binding AddEventFromButtonCommand}" Style="{StaticResource CorporatePrimaryButton}"/>
                 </StackPanel>
             </Grid>
 
             <UniformGrid Grid.Row="2" Columns="4">
-                <Border Style="{StaticResource CorporateSurface}" Margin="0,0,6,0"><StackPanel><TextBlock Text="AYLIK ETKİNLİK" FontSize="10" Foreground="#666"/><TextBlock Text="{Binding MonthlyEventCount}" FontSize="19" FontWeight="Bold" Margin="0,4,0,0"/></StackPanel></Border>
+                <Border Style="{StaticResource CorporateSurface}" Margin="0,0,6,0"><StackPanel><TextBlock Text="MONTHLY EVENTS" FontSize="10" Foreground="#666"/><TextBlock Text="{Binding MonthlyEventCount}" FontSize="19" FontWeight="Bold" Margin="0,4,0,0"/></StackPanel></Border>
                 <Border Style="{StaticResource CorporateSurface}" Margin="0,0,6,0"><StackPanel><TextBlock Text="TOPLANTI" FontSize="10" Foreground="#666"/><TextBlock Text="{Binding MeetingCount}" FontSize="19" FontWeight="Bold" Margin="0,4,0,0"/></StackPanel></Border>
                 <Border Style="{StaticResource CorporateSurface}" Margin="0,0,6,0"><StackPanel><TextBlock Text="HATIRLATMA" FontSize="10" Foreground="#666"/><TextBlock Text="{Binding ReminderCount}" FontSize="19" FontWeight="Bold" Margin="0,4,0,0"/></StackPanel></Border>
-                <Border Style="{StaticResource CorporateSurface}"><StackPanel><TextBlock Text="YÜKSEK ÖNCELİK" FontSize="10" Foreground="#666"/><TextBlock Text="{Binding HighPriorityCount}" FontSize="19" FontWeight="Bold" Foreground="#C62828" Margin="0,4,0,0"/></StackPanel></Border>
+                <Border Style="{StaticResource CorporateSurface}"><StackPanel><TextBlock Text="HIGH PRIORITY" FontSize="10" Foreground="#666"/><TextBlock Text="{Binding HighPriorityCount}" FontSize="19" FontWeight="Bold" Foreground="#0176D3" Margin="0,4,0,0"/></StackPanel></Border>
             </UniformGrid>
 
             <Grid Grid.Row="4">
@@ -46,17 +46,17 @@
                         <Grid.RowDefinitions><RowDefinition Height="46"/><RowDefinition Height="32"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                         <Grid Margin="12,0">
                             <Button Content="‹" Width="30" Height="28" Command="{Binding PreviousMonthCommand}" Style="{StaticResource CorporateButton}" HorizontalAlignment="Left"/>
-                            <TextBlock Text="{Binding CurrentMonthYear}" FontSize="17" FontWeight="SemiBold" Foreground="#202124" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding CurrentMonthYear}" FontSize="17" FontWeight="SemiBold" Foreground="#0F172A" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <Button Content="›" Width="30" Height="28" Command="{Binding NextMonthCommand}" Style="{StaticResource CorporateButton}" HorizontalAlignment="Right"/>
                         </Grid>
-                        <UniformGrid Grid.Row="1" Columns="7" Background="#202124">
-                            <TextBlock Text="Pazartesi" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Text="Salı" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Text="Çarşamba" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Text="Perşembe" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Text="Cuma" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Text="Cumartesi" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Text="Pazar" Foreground="#FF9E9E" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <UniformGrid Grid.Row="1" Columns="7" Background="#0F172A">
+                            <TextBlock Text="Monday" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="Tuesday" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="Wednesday" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="Thursday" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="Friday" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="Fridayrtesi" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="Sunday" Foreground="#FF9E9E" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </UniformGrid>
                         <ItemsControl Grid.Row="2" ItemsSource="{Binding CalendarDays}">
                             <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="7" Rows="6"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
@@ -68,7 +68,7 @@
                                             <Style TargetType="Border">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False"><Setter Property="Background" Value="#F3F3F3"/></DataTrigger>
-                                                    <DataTrigger Binding="{Binding IsToday}" Value="True"><Setter Property="Background" Value="#FDECEC"/><Setter Property="BorderBrush" Value="#C62828"/></DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsToday}" Value="True"><Setter Property="Background" Value="#FDECEC"/><Setter Property="BorderBrush" Value="#0176D3"/></DataTrigger>
                                                     <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#FAE1E1"/><Setter Property="Cursor" Value="Hand"/></Trigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -80,7 +80,7 @@
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <Border Background="#F3F3F3" BorderBrush="{Binding Color}" BorderThickness="3,0,0,0" Padding="4,2" Margin="0,0,0,2">
-                                                            <Grid><TextBlock Text="{Binding Time}" FontSize="9" Foreground="#666" Width="38"/><TextBlock Text="{Binding Title}" Margin="40,0,0,0" FontSize="9" FontWeight="SemiBold" Foreground="#202124" TextTrimming="CharacterEllipsis"/></Grid>
+                                                            <Grid><TextBlock Text="{Binding Time}" FontSize="9" Foreground="#666" Width="38"/><TextBlock Text="{Binding Title}" Margin="40,0,0,0" FontSize="9" FontWeight="SemiBold" Foreground="#0F172A" TextTrimming="CharacterEllipsis"/></Grid>
                                                         </Border>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
@@ -96,7 +96,7 @@
                 <Border Grid.Column="2" Style="{StaticResource CorporateSurface}">
                     <Grid>
                         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="10"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <StackPanel><TextBlock Text="Yaklaşan Etkinlikler" FontSize="14" FontWeight="SemiBold"/><TextBlock Text="Bugünden itibaren ilk 8 kayıt" FontSize="10" Foreground="#777"/></StackPanel>
+                        <StackPanel><TextBlock Text="Upcoming Events" FontSize="14" FontWeight="SemiBold"/><TextBlock Text="First 8 entries from today" FontSize="10" Foreground="#777"/></StackPanel>
                         <ItemsControl Grid.Row="2" ItemsSource="{Binding UpcomingEvents}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -105,7 +105,7 @@
                                             <Border Width="4" Background="{Binding Color}" HorizontalAlignment="Left"/>
                                             <StackPanel Margin="12,0,0,0">
                                                 <TextBlock Text="{Binding Title}" FontSize="11" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                                                <StackPanel Orientation="Horizontal" Margin="0,3,0,0"><TextBlock Text="{Binding Date, StringFormat='dd MMM ddd'}" FontSize="9" Foreground="#777"/><TextBlock Text="{Binding Time, StringFormat=' · {0}'}" FontSize="9" Foreground="#777"/><TextBlock Text="{Binding Type, StringFormat=' · {0}'}" FontSize="9" Foreground="#C62828"/></StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,3,0,0"><TextBlock Text="{Binding Date, StringFormat='dd MMM ddd'}" FontSize="9" Foreground="#777"/><TextBlock Text="{Binding Time, StringFormat=' · {0}'}" FontSize="9" Foreground="#777"/><TextBlock Text="{Binding Type, StringFormat=' · {0}'}" FontSize="9" Foreground="#0176D3"/></StackPanel>
                                             </StackPanel>
                                         </Grid>
                                     </Border>
@@ -113,7 +113,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                         <Border Grid.Row="3" Background="#FDECEC" BorderBrush="#E4B1B1" BorderThickness="1" Padding="9" Margin="0,10,0,0">
-                            <TextBlock Text="Takvim hücresine tıklayarak o tarih için hızlı etkinlik oluşturabilirsiniz." FontSize="10" Foreground="#8E1717" TextWrapping="Wrap"/>
+                            <TextBlock Text="Click a calendar cell to create an event for that date." FontSize="10" Foreground="#014486" TextWrapping="Wrap"/>
                         </Border>
                     </Grid>
                 </Border>
@@ -122,35 +122,35 @@
 
         <Border Background="#99000000">
             <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding IsFormOpen}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Border.Style>
-            <Border Width="620" Background="#F5F5F5" BorderBrush="#202124" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Border Width="620" Background="#F5F5F5" BorderBrush="#0F172A" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <Grid DataContext="{Binding FormModel}">
                     <Grid.RowDefinitions><RowDefinition Height="56"/><RowDefinition Height="*"/><RowDefinition Height="54"/></Grid.RowDefinitions>
-                    <Border Background="#202124" Padding="16,0">
-                        <Grid><StackPanel VerticalAlignment="Center"><TextBlock Text="Yeni Etkinlik" Foreground="White" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="{Binding DateStr}" Foreground="#D0D0D0" FontSize="10"/></StackPanel><Button Content="X" Width="32" Height="28" HorizontalAlignment="Right" Background="#C62828" Foreground="White" BorderBrush="#8E1717" Command="{Binding DataContext.CloseFormCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/></Grid>
+                    <Border Background="#0F172A" Padding="16,0">
+                        <Grid><StackPanel VerticalAlignment="Center"><TextBlock Text="New Etkinlik" Foreground="White" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="{Binding DateStr}" Foreground="#D0D0D0" FontSize="10"/></StackPanel><Button Content="X" Width="32" Height="28" HorizontalAlignment="Right" Background="#0176D3" Foreground="White" BorderBrush="#014486" Command="{Binding DataContext.CloseFormCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/></Grid>
                     </Border>
                     <Grid Grid.Row="1" Margin="18">
                         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="12"/><RowDefinition Height="Auto"/><RowDefinition Height="12"/><RowDefinition Height="Auto"/><RowDefinition Height="12"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <StackPanel><TextBlock Text="Etkinlik başlığı *" Style="{StaticResource AgendaFieldLabel}"/><TextBox Text="{Binding Title}" Style="{StaticResource AgendaTextBox}"/></StackPanel>
+                        <StackPanel><TextBlock Text="Event title *" Style="{StaticResource AgendaFieldLabel}"/><TextBox Text="{Binding Title}" Style="{StaticResource AgendaTextBox}"/></StackPanel>
                         <Grid Grid.Row="2">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                            <StackPanel><TextBlock Text="Tarih" Style="{StaticResource AgendaFieldLabel}"/><DatePicker SelectedDate="{Binding EventDate}" Height="32"/></StackPanel>
-                            <StackPanel Grid.Column="2"><TextBlock Text="Başlangıç" Style="{StaticResource AgendaFieldLabel}"/><ComboBox Text="{Binding StartTime}" IsEditable="True" Height="32"><ComboBoxItem Content="09:00"/><ComboBoxItem Content="10:00"/><ComboBoxItem Content="11:00"/><ComboBoxItem Content="14:00"/><ComboBoxItem Content="15:00"/></ComboBox></StackPanel>
-                            <StackPanel Grid.Column="4"><TextBlock Text="Bitiş" Style="{StaticResource AgendaFieldLabel}"/><ComboBox Text="{Binding EndTime}" IsEditable="True" Height="32"><ComboBoxItem Content="10:00"/><ComboBoxItem Content="11:00"/><ComboBoxItem Content="12:00"/><ComboBoxItem Content="15:00"/><ComboBoxItem Content="16:00"/></ComboBox></StackPanel>
+                            <StackPanel><TextBlock Text="Date" Style="{StaticResource AgendaFieldLabel}"/><DatePicker SelectedDate="{Binding EventDate}" Height="32"/></StackPanel>
+                            <StackPanel Grid.Column="2"><TextBlock Text="Start" Style="{StaticResource AgendaFieldLabel}"/><ComboBox Text="{Binding StartTime}" IsEditable="True" Height="32"><ComboBoxItem Content="09:00"/><ComboBoxItem Content="10:00"/><ComboBoxItem Content="11:00"/><ComboBoxItem Content="14:00"/><ComboBoxItem Content="15:00"/></ComboBox></StackPanel>
+                            <StackPanel Grid.Column="4"><TextBlock Text="End" Style="{StaticResource AgendaFieldLabel}"/><ComboBox Text="{Binding EndTime}" IsEditable="True" Height="32"><ComboBoxItem Content="10:00"/><ComboBoxItem Content="11:00"/><ComboBoxItem Content="12:00"/><ComboBoxItem Content="15:00"/><ComboBoxItem Content="16:00"/></ComboBox></StackPanel>
                         </Grid>
                         <Grid Grid.Row="4">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                            <StackPanel><TextBlock Text="Tür" Style="{StaticResource AgendaFieldLabel}"/><ComboBox Text="{Binding Type}" Height="32"><ComboBoxItem Content="Toplantı"/><ComboBoxItem Content="Görüşme"/><ComboBoxItem Content="Hatırlatma"/><ComboBoxItem Content="Görev"/></ComboBox></StackPanel>
-                            <StackPanel Grid.Column="2"><TextBlock Text="Öncelik" Style="{StaticResource AgendaFieldLabel}"/><ComboBox Text="{Binding Priority}" Height="32"><ComboBoxItem Content="Düşük"/><ComboBoxItem Content="Normal"/><ComboBoxItem Content="Yüksek"/></ComboBox></StackPanel>
-                            <StackPanel Grid.Column="4"><TextBlock Text="Hatırlatma" Style="{StaticResource AgendaFieldLabel}"/><ComboBox Text="{Binding Reminder}" Height="32"><ComboBoxItem Content="Yok"/><ComboBoxItem Content="15 dakika önce"/><ComboBoxItem Content="1 saat önce"/><ComboBoxItem Content="1 gün önce"/></ComboBox></StackPanel>
+                            <StackPanel><TextBlock Text="Type" Style="{StaticResource AgendaFieldLabel}"/><ComboBox Text="{Binding Type}" Height="32"><ComboBoxItem Content="Meeting"/><ComboBoxItem Content="Call"/><ComboBoxItem Content="Reminder"/><ComboBoxItem Content="Task"/></ComboBox></StackPanel>
+                            <StackPanel Grid.Column="2"><TextBlock Text="Priority" Style="{StaticResource AgendaFieldLabel}"/><ComboBox Text="{Binding Priority}" Height="32"><ComboBoxItem Content="Low"/><ComboBoxItem Content="Normal"/><ComboBoxItem Content="High"/></ComboBox></StackPanel>
+                            <StackPanel Grid.Column="4"><TextBlock Text="Reminder" Style="{StaticResource AgendaFieldLabel}"/><ComboBox Text="{Binding Reminder}" Height="32"><ComboBoxItem Content="None"/><ComboBoxItem Content="15 minutes before"/><ComboBoxItem Content="1 hour before"/><ComboBoxItem Content="1 day before"/></ComboBox></StackPanel>
                         </Grid>
                         <Grid Grid.Row="6">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                            <StackPanel><TextBlock Text="İlgili cari / birim" Style="{StaticResource AgendaFieldLabel}"/><TextBox Text="{Binding RelatedAccount}" Style="{StaticResource AgendaTextBox}"/><CheckBox Content="Tüm gün" IsChecked="{Binding IsAllDay}" Foreground="#333" Margin="0,8,0,0"/></StackPanel>
-                            <StackPanel Grid.Column="2"><TextBlock Text="Açıklama" Style="{StaticResource AgendaFieldLabel}"/><TextBox Text="{Binding Description}" Height="62" AcceptsReturn="True" TextWrapping="Wrap" Foreground="#171717" Background="White" BorderBrush="#AAA" Padding="8"/></StackPanel>
+                            <StackPanel><TextBlock Text="Related account / department" Style="{StaticResource AgendaFieldLabel}"/><TextBox Text="{Binding RelatedAccount}" Style="{StaticResource AgendaTextBox}"/><CheckBox Content="All day" IsChecked="{Binding IsAllDay}" Foreground="#333" Margin="0,8,0,0"/></StackPanel>
+                            <StackPanel Grid.Column="2"><TextBlock Text="Description" Style="{StaticResource AgendaFieldLabel}"/><TextBox Text="{Binding Description}" Height="62" AcceptsReturn="True" TextWrapping="Wrap" Foreground="#171717" Background="White" BorderBrush="#AAA" Padding="8"/></StackPanel>
                         </Grid>
                     </Grid>
                     <Border Grid.Row="2" BorderBrush="#C8C8C8" BorderThickness="0,1,0,0" Padding="14,9">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="İptal" Command="{Binding DataContext.CloseFormCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Style="{StaticResource CorporateButton}" Width="95" Margin="0,0,7,0"/><Button Content="Etkinliği Kaydet" Command="{Binding DataContext.SaveEventCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Style="{StaticResource CorporatePrimaryButton}" Width="135"/></StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="Cancel" Command="{Binding DataContext.CloseFormCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Style="{StaticResource CorporateButton}" Width="95" Margin="0,0,7,0"/><Button Content="Save Event" Command="{Binding DataContext.SaveEventCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Style="{StaticResource CorporatePrimaryButton}" Width="135"/></StackPanel>
                     </Border>
                 </Grid>
             </Border>

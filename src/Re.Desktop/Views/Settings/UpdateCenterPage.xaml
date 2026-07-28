@@ -1,0 +1,23 @@
+<UserControl x:Class="Re.Desktop.Views.Settings.UpdateCenterPage"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="#F4F6F9">
+ <Grid Margin="24">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+  <TextBlock Text="Update Center" FontSize="26" FontWeight="Bold" Foreground="#172B4D"/>
+  <Border Grid.Row="1" Background="White" BorderBrush="#D8DDE6" BorderThickness="1" CornerRadius="10" Padding="24" Margin="0,18,0,16">
+   <Grid>
+    <StackPanel>
+     <TextBlock Text="{Binding ApplicationVersion, StringFormat='Re Business Platform {0}'}" FontSize="19" FontWeight="Bold" Foreground="#172B4D"/>
+     <TextBlock Text="{Binding UpdateStatus}" Foreground="#006644" Margin="0,8,0,0"/>
+     <TextBlock Text="Stable channel · Signed desktop distribution · Package-aware updates" Foreground="#5E6C84" Margin="0,5,0,0"/>
+    </StackPanel>
+    <Button HorizontalAlignment="Right" VerticalAlignment="Center" Content="Check for updates"
+            Command="{Binding CheckUpdatesCommand}" Background="#0176D3" Foreground="White" BorderThickness="0" Padding="22,10"/>
+   </Grid>
+  </Border>
+  <Border Grid.Row="2" Background="#E8F3FF" BorderBrush="#B3D7F2" BorderThickness="1" CornerRadius="8" Padding="18" VerticalAlignment="Top">
+   <TextBlock Text="Updates are applied per installed package. Core data modules are updated together to preserve invoice, stock, finance and account consistency. Salesforce CRM remains independent and is never modified by this center."
+              Foreground="#014486" TextWrapping="Wrap" FontSize="14"/>
+  </Border>
+ </Grid>
+</UserControl>
