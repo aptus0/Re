@@ -56,3 +56,19 @@ public enum MovementDirection
     Credit = 2   // Alacak
 }
 
+public enum OrderType
+{
+    Sales = 1,
+    Purchase = 2
+}
+
+public enum OrderStatus
+{
+    Draft = 0,
+    Confirmed = 1,
+    PartiallyFulfilled = 2,
+    Fulfilled = 3,
+    Invoiced = 4,
+    Cancelled = 5
+}
+

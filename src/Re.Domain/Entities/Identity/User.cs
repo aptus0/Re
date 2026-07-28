@@ -33,8 +33,8 @@ public class User : BaseEntity, IMustHaveCompany
     public static User Create(Guid companyId, string username, string email,
         string firstName, string lastName, string passwordHash, Guid? branchId = null)
     {
-        if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Kullanıcı adı boş olamaz.");
-        if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("E-posta boş olamaz.");
+        if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Username is required.");
+        if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email is required.");
 
         return new User
         {

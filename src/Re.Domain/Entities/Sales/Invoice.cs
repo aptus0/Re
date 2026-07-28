@@ -58,7 +58,7 @@ public class Invoice : BaseEntity, IMustHaveCompany
         DateTime documentDate, Guid? customerId = null, Guid? warehouseId = null)
     {
         if (string.IsNullOrWhiteSpace(documentNumber))
-            throw new ArgumentException("Belge numarası boş olamaz.");
+            throw new ArgumentException("Document number is required.");
 
         return new Invoice
         {
@@ -80,13 +80,39 @@ public class Invoice : BaseEntity, IMustHaveCompany
     {
         EnsureIsDraft();
         if (string.IsNullOrWhiteSpace(documentNumber))
-            throw new ArgumentException("Belge numarası boş olamaz.");
+            throw new ArgumentException("Document number is required.");
 
         DocumentNumber = documentNumber;
         DocumentDate = documentDate;
         CustomerId = customerId;
         WarehouseId = warehouseId;
         Notes = notes;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetCommercialTerms(DateTime? dueDate, string currency, decimal exchangeRate,
+        PaymentType? paymentType)
+    {
+        EnsureIsDraft();
+        if (dueDate.HasValue && dueDate.Value.Date < DocumentDate.Date)
+            throw new DomainException("Due date cannot be earlier than invoice date.");
+        if (string.IsNullOrWhiteSpace(currency) || currency.Trim().Length != 3)
+            throw new DomainException("Currency must be a three-letter code.");
+        if (exchangeRate <= 0) throw new DomainException("Exchange rate must be positive.");
+        DueDate = dueDate;
+        Currency = currency.Trim().ToUpperInvariant();
+        ExchangeRate = exchangeRate;
+        PaymentType = paymentType;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void MarkEInvoicePrepared(string uuid, string status)
+    {
+        if (Status is not (DocumentStatus.Approved or DocumentStatus.PartiallyPaid or DocumentStatus.FullyPaid))
+            throw new DomainException("Only approved invoices can be prepared as an electronic document.");
+        if (string.IsNullOrWhiteSpace(uuid)) throw new DomainException("Electronic document UUID is required.");
+        EInvoiceUuid = uuid;
+        EInvoiceStatus = status;
         UpdatedAt = DateTime.UtcNow;
     }
 
@@ -110,7 +136,7 @@ public class Invoice : BaseEntity, IMustHaveCompany
     {
         EnsureIsDraft();
         if (!Lines.Any())
-            throw new DomainException("Satır içermeyen fatura onaylanamaz.");
+            throw new DomainException("An invoice without lines cannot be approved.");
 
         Status = DocumentStatus.Approved;
         ApprovedBy = approvedBy;
@@ -121,7 +147,7 @@ public class Invoice : BaseEntity, IMustHaveCompany
     public void Cancel(Guid cancelledBy, string reason)
     {
         if (Status == DocumentStatus.Cancelled)
-            throw new DomainException("Fatura zaten iptal edilmiş.");
+            throw new DomainException("Invoice is already cancelled.");
         if (Status == DocumentStatus.Draft)
         {
             Status = DocumentStatus.Cancelled;
@@ -146,7 +172,7 @@ public class Invoice : BaseEntity, IMustHaveCompany
 
     public void RecordPayment(decimal amount)
     {
-        if (amount <= 0) throw new DomainException("Ödeme tutarı pozitif olmalıdır.");
+        if (amount <= 0) throw new DomainException("Payment amount must be positive.");
         PaidAmount += amount;
         Status = PaidAmount >= TotalAmount
             ? DocumentStatus.FullyPaid

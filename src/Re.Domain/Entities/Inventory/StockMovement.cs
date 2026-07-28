@@ -48,10 +48,14 @@ public class StockMovement : BaseEntity, IMustHaveCompany
         decimal stockAfterMovement,
         string? referenceDocumentType = null,
         Guid? referenceDocumentId = null,
-        string? notes = null)
+        string? notes = null,
+        Guid? productVariantId = null,
+        string? lotNumber = null,
+        string? serialNumber = null,
+        DateTime? expiryDate = null)
     {
         if (quantity == 0)
-            throw new DomainException("Stok hareketi miktarı sıfır olamaz.");
+            throw new DomainException("Stock movement quantity cannot be zero.");
 
         return new StockMovement
         {
@@ -66,6 +70,10 @@ public class StockMovement : BaseEntity, IMustHaveCompany
             ReferenceDocumentType = referenceDocumentType,
             ReferenceDocumentId = referenceDocumentId,
             Notes = notes,
+            ProductVariantId = productVariantId,
+            LotNumber = lotNumber,
+            SerialNumber = serialNumber,
+            ExpiryDate = expiryDate,
             MovementDate = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow
         };
@@ -88,7 +96,7 @@ public class StockMovement : BaseEntity, IMustHaveCompany
             StockAfterMovement = currentStock - Quantity,
             ReferenceDocumentType = "StockMovementReversal",
             ReferenceDocumentId = Id,
-            Notes = $"İptal: {reason}",
+            Notes = $"Cancelled: {reason}",
             MovementDate = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow
         };

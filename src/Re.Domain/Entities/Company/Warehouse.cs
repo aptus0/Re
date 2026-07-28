@@ -1,4 +1,4 @@
-﻿using Re.Domain.Entities.Common;
+using Re.Domain.Entities.Common;
 
 namespace Re.Domain.Entities.Company;
 
@@ -21,8 +21,8 @@ public class Warehouse : BaseEntity
 
     public static Warehouse Create(Guid branchId, string code, string name, bool isDefault = false)
     {
-        if (string.IsNullOrWhiteSpace(code)) throw new ArgumentException("Depo kodu boş olamaz.");
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Depo adı boş olamaz.");
+        if (string.IsNullOrWhiteSpace(code)) throw new ArgumentException("Warehouse code is required.");
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Warehouse name is required.");
 
         return new Warehouse
         {

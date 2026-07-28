@@ -26,8 +26,8 @@ public class Branch : BaseEntity, IMustHaveCompany
 
     public static Branch Create(Guid companyId, string code, string name, bool isHeadquarters = false)
     {
-        if (string.IsNullOrWhiteSpace(code)) throw new ArgumentException("Şube kodu boş olamaz.");
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Şube adı boş olamaz.");
+        if (string.IsNullOrWhiteSpace(code)) throw new ArgumentException("Branch code is required.");
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Branch name is required.");
 
         return new Branch
         {

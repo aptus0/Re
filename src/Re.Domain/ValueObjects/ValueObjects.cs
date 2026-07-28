@@ -1,4 +1,4 @@
-﻿namespace Re.Domain.ValueObjects;
+namespace Re.Domain.ValueObjects;
 
 /// <summary>
 /// Para tutarı ve para birimi. Değer nesnesi – değiştirilemez.
@@ -24,7 +24,7 @@ public sealed record Money(decimal Amount, string Currency = "TRY")
     public Money ApplyDiscount(decimal discountPercent)
     {
         if (discountPercent < 0 || discountPercent > 100)
-            throw new ArgumentOutOfRangeException(nameof(discountPercent), "İndirim oranı 0-100 arasında olmalıdır.");
+            throw new ArgumentOutOfRangeException(nameof(discountPercent), "Discount rate must be between 0 and 100.");
         return this with { Amount = Amount * (1 - discountPercent / 100) };
     }
 
@@ -33,7 +33,7 @@ public sealed record Money(decimal Amount, string Currency = "TRY")
     private void EnsureSameCurrency(Money other)
     {
         if (Currency != other.Currency)
-            throw new InvalidOperationException($"Para birimi uyuşmuyor: {Currency} ≠ {other.Currency}");
+            throw new InvalidOperationException($"Currency mismatch: {Currency} ≠ {other.Currency}");
     }
 }
 
@@ -46,7 +46,7 @@ public sealed record Address(
     string City,
     string? District,
     string? PostalCode,
-    string Country = "Türkiye")
+    string Country = "Turkey")
 {
     public override string ToString() =>
         string.Join(", ", new[] { Line1, Line2, District, City, PostalCode, Country }
@@ -65,9 +65,9 @@ public sealed record TaxNumber
     {
         var digits = value.Trim().Replace(" ", "");
         if (digits.Length != 10 && digits.Length != 11)
-            throw new ArgumentException("Vergi numarası 10 (VKN) veya 11 (TCKN) haneli olmalıdır.");
+            throw new ArgumentException("Tax number must contain 10 (VKN) or 11 (TCKN) digits.");
         if (!digits.All(char.IsDigit))
-            throw new ArgumentException("Vergi numarası yalnızca rakamlardan oluşmalıdır.");
+            throw new ArgumentException("Tax number may contain digits only.");
         Value = digits;
     }
 

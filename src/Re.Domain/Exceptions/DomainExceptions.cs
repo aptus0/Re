@@ -1,4 +1,4 @@
-﻿namespace Re.Domain.Exceptions;
+namespace Re.Domain.Exceptions;
 
 public class DomainException : Exception
 {
@@ -20,21 +20,21 @@ public class BusinessRuleViolationException : DomainException
 public class DocumentLockedException : DomainException
 {
     public DocumentLockedException(string documentType, Guid documentId)
-        : base($"'{documentType}' belgesi (Id: {documentId}) onaylanmış durumda olduğu için değiştirilemez. Hata için ters kayıt oluşturun.")
+        : base($"'{documentType}' document (Id: {documentId}) is approved and cannot be changed. Create a reversal entry to correct it.")
     { }
 }
 
 public class InsufficientStockException : DomainException
 {
     public InsufficientStockException(string productName, string warehouseName, decimal available, decimal requested)
-        : base($"'{productName}' ürününde '{warehouseName}' deposunda yeterli stok yok. Mevcut: {available}, İstenen: {requested}")
+        : base($"'{productName}' product at '{warehouseName}' warehouse has insufficient stock. Available: {available}, Requested: {requested}")
     { }
 }
 
 public class EntityNotFoundException : DomainException
 {
     public EntityNotFoundException(string entityType, Guid id)
-        : base($"'{entityType}' kaydı bulunamadı. Id: {id}")
+        : base($"'{entityType}' record not found. Id: {id}")
     { }
 }
 

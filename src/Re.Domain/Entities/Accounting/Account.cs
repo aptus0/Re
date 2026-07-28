@@ -58,8 +58,8 @@ public class Account : BaseEntity, IMustHaveCompany
 
     public static Account Create(Guid companyId, string code, string name, AccountType accountType)
     {
-        if (string.IsNullOrWhiteSpace(code)) throw new ArgumentException("Cari kodu boş olamaz.");
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Cari adı boş olamaz.");
+        if (string.IsNullOrWhiteSpace(code)) throw new ArgumentException("Account code is required.");
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Account name is required.");
 
         return new Account
         {
@@ -109,7 +109,7 @@ public class Account : BaseEntity, IMustHaveCompany
 
     public void UpdateBaseInfo(string name, AccountType accountType, bool isActive)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Cari adı boş olamaz.");
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Account name is required.");
         Name = name.Trim();
         AccountType = accountType;
         IsActive = isActive;
@@ -197,7 +197,7 @@ public class CashRegisterMovement : BaseEntity, IMustHaveCompany
 {
     public Guid CompanyId { get; set; }
     public Guid CashRegisterId { get; set; }
-    public MovementDirection Direction { get; set; } // Borç / Alacak (Kasa için Giriş / Çıkış)
+    public MovementDirection Direction { get; set; } // Borç / Alacak (Kasa için Receipt / Issue)
     public decimal Amount { get; set; }
     public string Currency { get; set; } = "TRY";
     public decimal ExchangeRate { get; set; } = 1;

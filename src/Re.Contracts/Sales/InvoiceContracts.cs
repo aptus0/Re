@@ -21,7 +21,11 @@ public record CreateInvoiceRequest(
     Guid? CustomerId,
     Guid? WarehouseId,
     string? Notes,
-    List<CreateInvoiceLineRequest> Lines);
+    List<CreateInvoiceLineRequest> Lines,
+    DateTime? DueDate = null,
+    string Currency = "TRY",
+    decimal ExchangeRate = 1,
+    string? PaymentType = null);
 
 public record UpdateInvoiceLineRequest(
     Guid? Id, // Null if new line
@@ -44,7 +48,17 @@ public record UpdateInvoiceRequest(
     Guid? CustomerId,
     Guid? WarehouseId,
     string? Notes,
-    List<UpdateInvoiceLineRequest> Lines);
+    List<UpdateInvoiceLineRequest> Lines,
+    DateTime? DueDate = null,
+    string Currency = "TRY",
+    decimal ExchangeRate = 1,
+    string? PaymentType = null);
+
+public record ReverseInvoiceRequest(string Reason);
+
+public record ElectronicDocumentPreparationResponse(
+    Guid InvoiceId, string DocumentNumber, string DocumentType, string Uuid,
+    string Status, bool IsEInvoicePayer, string? Alias, IReadOnlyList<string> Warnings);
 
 public record InvoiceLineResponse(
     Guid Id,
@@ -95,4 +109,8 @@ public record InvoiceListResponse(
     string? CustomerName,
     decimal TotalAmount,
     decimal PaidAmount,
-    string Status);
+    string Status,
+    DateTime? DueDate = null,
+    decimal RemainingAmount = 0,
+    string Currency = "TRY",
+    string? EInvoiceStatus = null);

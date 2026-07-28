@@ -74,9 +74,9 @@ public class Product : BaseEntity, IMustHaveCompany
     public static Product Create(Guid companyId, string code, string name,
         decimal salePrice, decimal vatRate = 20, Guid? categoryId = null, Guid? brandId = null)
     {
-        if (string.IsNullOrWhiteSpace(code)) throw new ArgumentException("Ürün kodu boş olamaz.");
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Ürün adı boş olamaz.");
-        if (salePrice < 0) throw new ArgumentException("Satış fiyatı negatif olamaz.");
+        if (string.IsNullOrWhiteSpace(code)) throw new ArgumentException("Product code is required.");
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Product name is required.");
+        if (salePrice < 0) throw new ArgumentException("Sales price cannot be negative.");
 
         return new Product
         {
@@ -94,7 +94,7 @@ public class Product : BaseEntity, IMustHaveCompany
 
     public void UpdatePrices(decimal purchasePrice, decimal salePrice, decimal dealerPrice, decimal vatRate)
     {
-        if (salePrice < 0) throw new DomainException("Satış fiyatı negatif olamaz.");
+        if (salePrice < 0) throw new DomainException("Sales price cannot be negative.");
         PurchasePrice = purchasePrice;
         SalePrice = salePrice;
         DealerPrice = dealerPrice;
@@ -129,7 +129,7 @@ public class Product : BaseEntity, IMustHaveCompany
     public void AddBarcode(string barcodeValue, string barcodeType = "EAN13")
     {
         if (Barcodes.Any(b => b.Value == barcodeValue))
-            throw new DomainException($"'{barcodeValue}' barkodu zaten tanımlı.");
+            throw new DomainException($"'{barcodeValue}' barcode is already defined.");
         Barcodes.Add(new ProductBarcode
         {
             Id = Guid.NewGuid(),
@@ -142,7 +142,7 @@ public class Product : BaseEntity, IMustHaveCompany
 
     public void UpdateBaseInfo(string name, string? shortName, string? description, Guid? categoryId, Guid? brandId, Guid? unitId, bool isActive)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Ürün adı boş olamaz.");
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Product name is required.");
         Name = name.Trim();
         ShortName = shortName;
         Description = description;

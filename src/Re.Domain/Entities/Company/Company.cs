@@ -1,4 +1,4 @@
-﻿using Re.Domain.Entities.Common;
+using Re.Domain.Entities.Common;
 
 namespace Re.Domain.Entities.Company;
 
@@ -19,7 +19,7 @@ public class Company : BaseEntity
     public string? City { get; private set; }
     public string? District { get; private set; }
     public string? PostalCode { get; private set; }
-    public string Country { get; private set; } = "Türkiye";
+    public string Country { get; private set; } = "Turkey";
     public string? LogoPath { get; private set; }
     public string BaseCurrency { get; private set; } = "TRY";
     public int FiscalYearStartMonth { get; private set; } = 1;
@@ -33,7 +33,7 @@ public class Company : BaseEntity
     public static Company Create(string name, string? taxNumber = null)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Firma adı boş olamaz.", nameof(name));
+            throw new ArgumentException("Company name is required.", nameof(name));
 
         return new Company
         {
@@ -61,7 +61,7 @@ public class Company : BaseEntity
         City = city?.Trim();
         District = district?.Trim();
         PostalCode = postalCode?.Trim();
-        Country = country?.Trim() ?? "Türkiye";
+        Country = country?.Trim() ?? "Turkey";
         UpdatedAt = DateTime.UtcNow;
     }
 }
