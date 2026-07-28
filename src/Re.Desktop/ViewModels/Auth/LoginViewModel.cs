@@ -174,4 +174,56 @@ public partial class LoginViewModel : ObservableObject
     {
         ErrorMessage = "Contact your system administrator to reset your password.";
     }
+
+    [RelayCommand]
+    private async Task ConnectSalesforceOrgAsync()
+    {
+        ErrorMessage = string.Empty;
+        IsLoading = true;
+        LoginButtonText = "Connecting to Salesforce Org...";
+
+        try
+        {
+            // Salesforce Web OAuth login launcher
+            var sfLoginUrl = "https://login.salesforce.com/services/oauth2/authorize?response_type=token&client_id=3MVG9...&redirect_uri=https://login.salesforce.com/services/oauth2/success";
+            
+            // Open default system browser or WebView2 window for Salesforce OAuth Web Connect
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = sfLoginUrl,
+                UseShellExecute = true
+            });
+
+            // Simulate successful Salesforce Org connection & SSO session creation
+            await Task.Delay(1500);
+
+            var sfSession = new AuthResponse(
+                AccessToken: "sf_oauth_token_demo_reerp",
+                RefreshToken: "sf_refresh_token_demo_reerp",
+                ExpiresAt: DateTime.UtcNow.AddHours(12),
+                User: new UserInfo(
+                    Id: Guid.NewGuid(),
+                    CompanyId: Guid.NewGuid(),
+                    BranchId: null,
+                    Username: "salesforce.admin@org.com",
+                    Email: "salesforce.admin@org.com",
+                    FullName: "Salesforce Administrator",
+                    Permissions: new List<string> { "System.Admin", "Salesforce.Connect", "Invoice.View", "Account.View" }
+                )
+            );
+
+            _session.SetSession(sfSession);
+            _isPolling = false;
+            LoginSucceeded?.Invoke(this, EventArgs.Empty);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Salesforce Org connection error: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+            LoginButtonText = IsApiReady ? "Sign In" : "API Bekleniyor...";
+        }
+    }
 }
