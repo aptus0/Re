@@ -19,11 +19,11 @@
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Text="Re Connected POS &amp; Cash" FontSize="21" FontWeight="Bold" Foreground="#181818"/>
-                    <TextBlock Text="One transaction links invoice, stock, customer balance and cash register." Foreground="#60758A" FontSize="11"/>
+                    <TextBlock Text="Re Hızlı Kasa &amp; POS Satış Portalı" FontSize="21" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="Tek bir hızlı işlemle fatura, stok düşümü, müşteri cari hesabı ve kasa kaydı otomatik güncellenir." Foreground="#64748B" FontSize="11.5"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Product sale mode" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold"/>
+                    <TextBlock Text="Ürünlü Satış Modu" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="Bold" Foreground="#0F172A"/>
                     <CheckBox IsChecked="{Binding IsProductSaleEnabled}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
@@ -38,7 +38,7 @@
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="220"/></Grid.ColumnDefinitions>
                         <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Padding="10,7" FontSize="13"/>
                         <ComboBox Grid.Column="1" ItemsSource="{Binding SelectedWarehouse, Mode=OneWay}" Visibility="Collapsed"/>
-                        <TextBlock Text="Search barcode, code or product name" IsHitTestVisible="False" Foreground="#8996A5" Margin="12,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Barkod, ürün kodu veya ürün adı ara..." IsHitTestVisible="False" Foreground="#8996A5" Margin="12,0" VerticalAlignment="Center"/>
                     </Grid>
                 </Border>
                 <Border Grid.Row="2" Style="{StaticResource Card}" Padding="8">
@@ -46,10 +46,10 @@
                               IsReadOnly="True" HeadersVisibility="Column" GridLinesVisibility="Horizontal" RowHeaderWidth="0">
                         <DataGrid.InputBindings><MouseBinding MouseAction="LeftDoubleClick" Command="{Binding AddProductCommand}" CommandParameter="{Binding SelectedProduct}"/></DataGrid.InputBindings>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="100"/>
-                            <DataGridTextColumn Header="Product" Binding="{Binding Name}" Width="*"/>
-                            <DataGridTextColumn Header="Stock" Binding="{Binding StockLevel, StringFormat=N2}" Width="80"/>
-                            <DataGridTextColumn Header="Price" Binding="{Binding SalePrice, StringFormat=₺{0:N2}}" Width="105"/>
+                            <DataGridTextColumn Header="Kodu" Binding="{Binding Code}" Width="100"/>
+                            <DataGridTextColumn Header="Ürün Adı" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Stok" Binding="{Binding StockLevel, StringFormat=N2}" Width="80"/>
+                            <DataGridTextColumn Header="Fiyat" Binding="{Binding SalePrice, StringFormat=₺{0:N2}}" Width="105"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>
