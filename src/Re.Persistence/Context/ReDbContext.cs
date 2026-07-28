@@ -31,6 +31,8 @@ public class ReDbContext : DbContext
     public DbSet<Company>    Companies  => Set<Company>();
     public DbSet<Branch>     Branches   => Set<Branch>();
     public DbSet<Warehouse>  Warehouses => Set<Warehouse>();
+    public DbSet<FiscalPeriod> FiscalPeriods => Set<FiscalPeriod>();
+    public DbSet<DocumentSeries> DocumentSeries => Set<DocumentSeries>();
 
     // Identity
     public DbSet<User>           Users          => Set<User>();
@@ -65,6 +67,7 @@ public class ReDbContext : DbContext
     public DbSet<CashRegisterMovement> CashRegisterMovements => Set<CashRegisterMovement>();
     public DbSet<BankAccount>        BankAccounts        => Set<BankAccount>();
     public DbSet<BankAccountMovement> BankAccountMovements => Set<BankAccountMovement>();
+    public DbSet<ChequeNote>          ChequeNotes          => Set<ChequeNote>();
 
     // Salesforce control plane
     public DbSet<SalesforceTenant> SalesforceTenants => Set<SalesforceTenant>();
@@ -325,6 +328,24 @@ public class ReDbContext : DbContext
             e.HasIndex(x => new { x.BranchId, x.Code }).IsUnique();
             e.HasOne(x => x.Branch).WithMany(b => b.Warehouses).HasForeignKey(x => x.BranchId);
         });
+
+        m.Entity<FiscalPeriod>(e =>
+        {
+            e.ToTable("FiscalPeriods");
+            e.Property(x => x.Name).HasMaxLength(100).IsRequired();
+            e.Property(x => x.Status).HasConversion<string>().HasMaxLength(30);
+            e.HasIndex(x => new { x.CompanyId, x.FiscalYear, x.StartDate, x.EndDate }).IsUnique();
+            e.Property(x => x.RowVersion).IsRowVersion();
+        });
+
+        m.Entity<DocumentSeries>(e =>
+        {
+            e.ToTable("DocumentSeries");
+            e.Property(x => x.DocumentType).HasMaxLength(60).IsRequired();
+            e.Property(x => x.Prefix).HasMaxLength(12).IsRequired();
+            e.HasIndex(x => new { x.CompanyId, x.BranchId, x.DocumentType }).IsUnique();
+            e.Property(x => x.RowVersion).IsRowVersion();
+        });
     }
 
     // ── Inventory ─────────────────────────────────────────────────────────
@@ -568,6 +589,22 @@ public class ReDbContext : DbContext
              .WithMany()
              .HasForeignKey(x => x.BankAccountId)
              .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        m.Entity<ChequeNote>(e =>
+        {
+            if (supportsTemporalTables) e.ToTable("ChequeNotes", t => t.IsTemporal());
+            else e.ToTable("ChequeNotes");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Number).HasMaxLength(60).IsRequired();
+            e.Property(x => x.Currency).HasMaxLength(3).IsRequired();
+            e.Property(x => x.Amount).HasPrecision(18, 4);
+            e.Property(x => x.ExchangeRate).HasPrecision(18, 6);
+            e.Property(x => x.BankName).HasMaxLength(160);
+            e.Property(x => x.BranchName).HasMaxLength(160);
+            e.Property(x => x.Drawer).HasMaxLength(200);
+            e.Property(x => x.Description).HasMaxLength(1000);
+            e.HasIndex(x => new { x.CompanyId, x.Number }).IsUnique();
         });
     }
 

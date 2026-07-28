@@ -14,35 +14,20 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var provider = configuration["Database:Provider"] ?? "Sqlite";
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            connectionString = "Server=(localdb)\\mssqllocaldb;Database=ReErpDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
+        }
 
         services.AddDbContext<ReDbContext>(options =>
         {
-            if (provider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
+            options.UseSqlServer(connectionString, sql =>
             {
-                var connectionString = configuration.GetConnectionString("DefaultConnection")
-                    ?? throw new InvalidOperationException("'DefaultConnection' connection string is missing.");
-                options.UseSqlServer(connectionString, sql =>
-                {
-                    sql.MigrationsAssembly(typeof(DependencyInjection).Assembly.FullName);
-                    sql.CommandTimeout(120);
-                    sql.EnableRetryOnFailure(5, TimeSpan.FromSeconds(30), null);
-                });
-            }
-            else
-            {
-                var sqlitePath = configuration["Database:SqlitePath"];
-                if (string.IsNullOrWhiteSpace(sqlitePath))
-                {
-                    sqlitePath = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                        "ReSoft", "Re", "Data", "Re.db");
-                }
-
-                sqlitePath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(sqlitePath));
-                Directory.CreateDirectory(Path.GetDirectoryName(sqlitePath)!);
-                options.UseSqlite($"Data Source={sqlitePath};Cache=Shared;Foreign Keys=True");
-            }
+                sql.MigrationsAssembly(typeof(DependencyInjection).Assembly.FullName);
+                sql.CommandTimeout(120);
+                sql.EnableRetryOnFailure(5, TimeSpan.FromSeconds(30), null);
+            });
 
 #if DEBUG
             options.EnableSensitiveDataLogging();
@@ -54,7 +39,7 @@ public static class DependencyInjection
     }
 
     /// <summary>
-    /// Uygulama başlangıcında migration'ları otomatik uygular.
+    /// Uygulama başlangıcında migration'ları otomatik uygular ve varsayılan verileri yükler.
     /// </summary>
     public static async Task MigrateAndSeedAsync(IServiceProvider serviceProvider)
     {
@@ -62,102 +47,8 @@ public static class DependencyInjection
         var dbContext = scope.ServiceProvider.GetRequiredService<ReDbContext>();
         var hasher = scope.ServiceProvider.GetRequiredService<Re.Application.Common.Interfaces.IPasswordHasher>();
 
-        if (dbContext.Database.IsSqlite())
-        {
-            await dbContext.Database.EnsureCreatedAsync();
-            await EnsureSqliteModuleTablesAsync(dbContext);
-        }
-        else
-            await dbContext.Database.MigrateAsync();
+        await dbContext.Database.MigrateAsync();
         await SeedDefaultDataAsync(dbContext, hasher);
-    }
-
-    private static async Task EnsureSqliteModuleTablesAsync(ReDbContext db)
-    {
-        await db.Database.ExecuteSqlRawAsync("""
-            CREATE TABLE IF NOT EXISTS PurchaseInvoices (
-                Id TEXT NOT NULL PRIMARY KEY,
-                CompanyId TEXT NOT NULL,
-                BranchId TEXT NOT NULL,
-                SupplierId TEXT NOT NULL,
-                WarehouseId TEXT NOT NULL,
-                DocumentNumber TEXT NOT NULL,
-                SupplierDocumentNumber TEXT NULL,
-                DocumentDate TEXT NOT NULL,
-                DueDate TEXT NULL,
-                Status INTEGER NOT NULL,
-                SubTotal TEXT NOT NULL,
-                TaxAmount TEXT NOT NULL,
-                TotalAmount TEXT NOT NULL,
-                Currency TEXT NOT NULL,
-                ExchangeRate TEXT NOT NULL,
-                Notes TEXT NULL,
-                ApprovedBy TEXT NULL,
-                ApprovedAt TEXT NULL,
-                CreatedAt TEXT NOT NULL,
-                CreatedBy TEXT NULL,
-                UpdatedAt TEXT NULL,
-                UpdatedBy TEXT NULL,
-                IsDeleted INTEGER NOT NULL DEFAULT 0,
-                DeletedAt TEXT NULL,
-                DeletedBy TEXT NULL,
-                RowVersion BLOB NULL
-            );
-            CREATE UNIQUE INDEX IF NOT EXISTS IX_PurchaseInvoices_CompanyId_DocumentNumber
-                ON PurchaseInvoices (CompanyId, DocumentNumber);
-            CREATE TABLE IF NOT EXISTS PurchaseInvoiceLines (
-                Id TEXT NOT NULL PRIMARY KEY,
-                PurchaseInvoiceId TEXT NOT NULL,
-                ProductId TEXT NOT NULL,
-                ProductVariantId TEXT NULL,
-                ProductCode TEXT NOT NULL,
-                ProductName TEXT NOT NULL,
-                Quantity TEXT NOT NULL,
-                UnitPrice TEXT NOT NULL,
-                DiscountPercent TEXT NOT NULL,
-                VatRate TEXT NOT NULL,
-                LotNumber TEXT NULL,
-                SerialNumber TEXT NULL,
-                ExpiryDate TEXT NULL,
-                CreatedAt TEXT NOT NULL,
-                CreatedBy TEXT NULL,
-                UpdatedAt TEXT NULL,
-                UpdatedBy TEXT NULL,
-                IsDeleted INTEGER NOT NULL DEFAULT 0,
-                DeletedAt TEXT NULL,
-                DeletedBy TEXT NULL,
-                RowVersion BLOB NULL,
-                FOREIGN KEY (PurchaseInvoiceId) REFERENCES PurchaseInvoices (Id) ON DELETE CASCADE
-            );
-            CREATE INDEX IF NOT EXISTS IX_PurchaseInvoiceLines_PurchaseInvoiceId
-                ON PurchaseInvoiceLines (PurchaseInvoiceId);
-            CREATE TABLE IF NOT EXISTS Orders (
-                Id TEXT NOT NULL PRIMARY KEY,
-                CompanyId TEXT NOT NULL, BranchId TEXT NOT NULL, AccountId TEXT NOT NULL,
-                WarehouseId TEXT NOT NULL, OrderNumber TEXT NOT NULL,
-                CustomerReference TEXT NULL, Type INTEGER NOT NULL, Status INTEGER NOT NULL,
-                OrderDate TEXT NOT NULL, RequestedDeliveryDate TEXT NULL,
-                Currency TEXT NOT NULL, ExchangeRate TEXT NOT NULL,
-                SubTotal TEXT NOT NULL, TaxAmount TEXT NOT NULL, TotalAmount TEXT NOT NULL,
-                Notes TEXT NULL, InvoiceId TEXT NULL, ConfirmedBy TEXT NULL, ConfirmedAt TEXT NULL,
-                CreatedAt TEXT NOT NULL, CreatedBy TEXT NULL, UpdatedAt TEXT NULL, UpdatedBy TEXT NULL,
-                IsDeleted INTEGER NOT NULL DEFAULT 0, DeletedAt TEXT NULL, DeletedBy TEXT NULL,
-                RowVersion BLOB NULL
-            );
-            CREATE UNIQUE INDEX IF NOT EXISTS IX_Orders_CompanyId_OrderNumber
-                ON Orders (CompanyId, OrderNumber);
-            CREATE TABLE IF NOT EXISTS OrderLines (
-                Id TEXT NOT NULL PRIMARY KEY, OrderId TEXT NOT NULL, ProductId TEXT NOT NULL,
-                ProductVariantId TEXT NULL, ProductCode TEXT NOT NULL, ProductName TEXT NOT NULL,
-                Quantity TEXT NOT NULL, FulfilledQuantity TEXT NOT NULL,
-                UnitPrice TEXT NOT NULL, DiscountPercent TEXT NOT NULL, VatRate TEXT NOT NULL,
-                Notes TEXT NULL, CreatedAt TEXT NOT NULL, CreatedBy TEXT NULL,
-                UpdatedAt TEXT NULL, UpdatedBy TEXT NULL, IsDeleted INTEGER NOT NULL DEFAULT 0,
-                DeletedAt TEXT NULL, DeletedBy TEXT NULL, RowVersion BLOB NULL,
-                FOREIGN KEY (OrderId) REFERENCES Orders (Id) ON DELETE CASCADE
-            );
-            CREATE INDEX IF NOT EXISTS IX_OrderLines_OrderId ON OrderLines (OrderId);
-            """);
     }
 
     private static async Task SeedDefaultDataAsync(ReDbContext db, Re.Application.Common.Interfaces.IPasswordHasher hasher)
