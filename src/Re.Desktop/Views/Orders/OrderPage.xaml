@@ -1,0 +1,53 @@
+<UserControl x:Class="Re.Desktop.Views.Orders.OrderPage"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="#F4F6F9">
+ <Grid Margin="22">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="16"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+  <Grid>
+   <StackPanel><TextBlock Text="Order Management" FontSize="27" FontWeight="Bold" Foreground="#172B4D"/><TextBlock Text="Sales and purchase orders, fulfilment, warehouse and invoice lifecycle" Foreground="#5E6C84"/></StackPanel>
+   <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+    <Button Content="Refresh" Command="{Binding RefreshCommand}" Padding="14,9" Margin="0,0,7,0"/>
+    <Button Content="Confirm" Command="{Binding ConfirmCommand}" Padding="14,9" Margin="0,0,7,0" Background="#2E844A" Foreground="White"/>
+    <Button Content="Fulfil Remaining" Command="{Binding FulfilCommand}" Padding="14,9" Margin="0,0,7,0" Background="#B45309" Foreground="White"/>
+    <Button Content="Create Invoice" Command="{Binding CreateInvoiceCommand}" Padding="14,9" Margin="0,0,7,0"/>
+    <Button Content="+ New Order" Command="{Binding NewCommand}" Padding="18,9" Background="#0176D3" Foreground="White"/>
+   </StackPanel>
+  </Grid>
+  <Border Grid.Row="2" Background="White" BorderBrush="#D8DDE6" BorderThickness="1" CornerRadius="9">
+   <DataGrid ItemsSource="{Binding Orders}" SelectedItem="{Binding SelectedOrder}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" RowHeight="42">
+    <DataGrid.Columns>
+     <DataGridTextColumn Header="ORDER" Binding="{Binding OrderNumber}" Width="140"/>
+     <DataGridTextColumn Header="TYPE" Binding="{Binding Type}" Width="90"/>
+     <DataGridTextColumn Header="DATE" Binding="{Binding OrderDate, StringFormat='dd.MM.yyyy'}" Width="100"/>
+     <DataGridTextColumn Header="ACCOUNT" Binding="{Binding AccountName}" Width="*"/>
+     <DataGridTextColumn Header="WAREHOUSE" Binding="{Binding WarehouseName}" Width="150"/>
+     <DataGridTextColumn Header="TOTAL" Binding="{Binding TotalAmount, StringFormat=N2}" Width="115"/>
+     <DataGridTextColumn Header="FULFILLED %" Binding="{Binding FulfilmentPercent}" Width="105"/>
+     <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="135"/>
+    </DataGrid.Columns>
+   </DataGrid>
+  </Border>
+  <Border Grid.RowSpan="3" Background="#99000000" Visibility="{Binding IsEditorOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+   <Border Width="1050" Height="690" Padding="22" Background="White" CornerRadius="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+     <Grid><TextBlock Text="New Order" FontSize="22" FontWeight="Bold"/><Button Content="X" Command="{Binding CloseEditorCommand}" HorizontalAlignment="Right" Background="Transparent" BorderThickness="0"/></Grid>
+     <Grid Grid.Row="1" Margin="0,18,0,14"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="10"/><ColumnDefinition/><ColumnDefinition Width="10"/><ColumnDefinition/><ColumnDefinition Width="10"/><ColumnDefinition/></Grid.ColumnDefinitions>
+      <StackPanel><TextBlock Text="Order Type"/><ComboBox ItemsSource="{Binding OrderTypes}" SelectedItem="{Binding SelectedType}" Height="34"/></StackPanel>
+      <StackPanel Grid.Column="2"><TextBlock Text="Order Number"/><TextBox Text="{Binding OrderNumber}" Height="34"/></StackPanel>
+      <StackPanel Grid.Column="4"><TextBlock Text="Account"/><ComboBox ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedAccount}" DisplayMemberPath="Name" Height="34"/></StackPanel>
+      <StackPanel Grid.Column="6"><TextBlock Text="Warehouse"/><ComboBox ItemsSource="{Binding Warehouses}" SelectedItem="{Binding SelectedWarehouse}" DisplayMemberPath="Name" Height="34"/></StackPanel>
+     </Grid>
+     <Grid Grid.Row="2" Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="12"/><ColumnDefinition Width="180"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <ComboBox ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedProduct}" DisplayMemberPath="Name" Height="35"/>
+      <DatePicker Grid.Column="2" SelectedDate="{Binding DeliveryDate}" Height="35"/>
+      <Button Grid.Column="4" Content="+ Add Product" Command="{Binding AddLineCommand}" Background="#0176D3" Foreground="White" Padding="16,8"/>
+     </Grid>
+     <DataGrid Grid.Row="3" ItemsSource="{Binding Lines}" AutoGenerateColumns="False" CanUserAddRows="False">
+      <DataGrid.Columns><DataGridTextColumn Header="CODE" Binding="{Binding ProductCode}" Width="100"/><DataGridTextColumn Header="PRODUCT" Binding="{Binding ProductName}" Width="*"/><DataGridTextColumn Header="QTY" Binding="{Binding Quantity}" Width="80"/><DataGridTextColumn Header="UNIT PRICE" Binding="{Binding UnitPrice}" Width="110"/><DataGridTextColumn Header="DISC. %" Binding="{Binding DiscountPercent}" Width="80"/><DataGridTextColumn Header="VAT %" Binding="{Binding VatRate}" Width="70"/><DataGridTextColumn Header="NET" Binding="{Binding NetAmount, StringFormat=N2}" Width="110"/><DataGridTemplateColumn Width="70"><DataGridTemplateColumn.CellTemplate><DataTemplate><Button Content="Remove" Command="{Binding DataContext.RemoveLineCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Foreground="#BA0517" Background="Transparent" BorderThickness="0"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn></DataGrid.Columns>
+     </DataGrid>
+     <Grid Grid.Row="4" Margin="0,15,0,0"><StackPanel Orientation="Horizontal"><TextBlock Text="{Binding SubTotal, StringFormat='Subtotal {0:N2}'}" Margin="0,0,18,0"/><TextBlock Text="{Binding VatTotal, StringFormat='VAT {0:N2}'}" Margin="0,0,18,0"/><TextBlock Text="{Binding GrandTotal, StringFormat='TOTAL {0:N2}'}" FontSize="17" FontWeight="Bold" Foreground="#0176D3"/></StackPanel><StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="Cancel" Command="{Binding CloseEditorCommand}" Padding="18,9" Margin="0,0,8,0"/><Button Content="Save Draft" Command="{Binding SaveCommand}" Padding="22,9" Background="#0176D3" Foreground="White"/></StackPanel></Grid>
+    </Grid>
+   </Border>
+  </Border>
+ </Grid>
+</UserControl>
