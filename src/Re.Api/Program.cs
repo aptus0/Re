@@ -4,6 +4,7 @@ using Re.Infrastructure;
 using Re.Persistence;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Hosting.WindowsServices;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -11,12 +12,28 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ContentRootPath = AppContext.BaseDirectory
 });
 
+var isWindowsService = WindowsServiceHelpers.IsWindowsService();
+builder.WebHost.UseUrls("http://127.0.0.1:5188");
+
+// A Windows Service does not have the interactive user's LocalAppData profile.
+// Keep the service database in ProgramData so it is stable across logons/reboots.
+if (isWindowsService && string.IsNullOrWhiteSpace(builder.Configuration["Database:SqlitePath"]))
+{
+    var serviceDataDirectory = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+        "ReSoft", "Re", "Data");
+    Directory.CreateDirectory(serviceDataDirectory);
+    builder.Configuration["Database:SqlitePath"] = Path.Combine(serviceDataDirectory, "Re.db");
+}
+
 // Portable installations get a stable, per-user signing key automatically.
 // Production environments can still override it with JwtSettings__SecretKey.
 if (string.IsNullOrWhiteSpace(builder.Configuration["JwtSettings:SecretKey"]))
 {
     var securityDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        Environment.GetFolderPath(isWindowsService
+            ? Environment.SpecialFolder.CommonApplicationData
+            : Environment.SpecialFolder.LocalApplicationData),
         "ReSoft", "Re", "Security");
     Directory.CreateDirectory(securityDirectory);
     var keyPath = Path.Combine(securityDirectory, "jwt-signing.key");
@@ -40,7 +57,7 @@ builder.Host.UseWindowsService(options =>
 var parentPid = builder.Configuration.GetValue<int?>("parent-pid");
 if (parentPid.HasValue)
 {
-    Task.Run(async () =>
+    _ = Task.Run(async () =>
     {
         try
         {
@@ -78,7 +95,7 @@ builder.Services.AddOpenApi("v1", options =>
         {
             Title   = "Re ERP API",
             Version = "v1",
-            Description = "Re ERP – Stok, Satış, Cari ve Finans API"
+            Description = "Re ERP – Inventory, Sales, Accounts, and Finance API"
         };
         return Task.CompletedTask;
     });
@@ -132,7 +149,7 @@ app.UseExceptionHandler(errApp =>
         }
         else if (ex is UnauthorizedAccessException)
         {
-            statusCode = 401; message = "Yetkisiz erişim.";
+            statusCode = 401; message = "Unauthorized access.";
         }
         else if (ex is DomainException)
         {
@@ -140,7 +157,7 @@ app.UseExceptionHandler(errApp =>
         }
         else
         {
-            statusCode = 500; message = "Beklenmeyen bir hata oluştu.";
+            statusCode = 500; message = "An unexpected error occurred.";
         }
 
         ctx.Response.StatusCode = statusCode;
@@ -157,6 +174,18 @@ app.UseExceptionHandler(errApp =>
 // app.UseHttpsRedirection();
 app.UseCors("ReCors");
 app.UseAuthentication();
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true &&
+        Guid.TryParse(context.User.FindFirst("companyId")?.Value, out var companyId))
+    {
+        var tenant = context.RequestServices.GetRequiredService<Re.Application.Interfaces.ICurrentTenantService>();
+        Guid? branchId = Guid.TryParse(context.User.FindFirst("branchId")?.Value, out var parsedBranch)
+            ? parsedBranch : null;
+        tenant.SetTenant(companyId, branchId);
+    }
+    await next();
+});
 app.UseAuthorization();
 app.MapControllers();
 
@@ -168,13 +197,5 @@ app.MapGet("/health", () => Results.Ok(new
     Timestamp = DateTime.UtcNow
 })).WithTags("Health");
 
-try
-{
-    app.Run();
-}
-catch (Exception ex) when (ex is System.IO.IOException || ex is System.Net.Sockets.SocketException)
-{
-    // API is already running or port is in use. Exiting gracefully.
-    Console.WriteLine("API port is already in use. Exiting gracefully.");
-}
+app.Run();
 

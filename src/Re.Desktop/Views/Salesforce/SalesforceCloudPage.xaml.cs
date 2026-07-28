@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Web.WebView2.Core;
+using Re.Desktop.Services;
 using Re.Desktop.ViewModels.Salesforce;
 
 namespace Re.Desktop.Views.Salesforce;
@@ -11,13 +12,20 @@ public partial class SalesforceCloudPage : UserControl
 {
     private const string SalesforceLoginUrl = "https://login.salesforce.com";
     private readonly SalesforceCloudViewModel _viewModel;
+    private readonly IDialogService _dialog;
+    private readonly IUiLocalizationService _localization;
     private bool _initializationStarted;
     private bool _viewModelEventsAttached;
 
-    public SalesforceCloudPage(SalesforceCloudViewModel viewModel)
+    public SalesforceCloudPage(
+        SalesforceCloudViewModel viewModel,
+        IDialogService dialog,
+        IUiLocalizationService localization)
     {
         InitializeComponent();
         _viewModel = viewModel;
+        _dialog = dialog;
+        _localization = localization;
         DataContext = viewModel;
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
@@ -73,12 +81,12 @@ public partial class SalesforceCloudPage : UserControl
             await SfWebView.EnsureCoreWebView2Async(environment);
             ConfigureBrowser();
             NavigateTo(_viewModel.WebViewUrl ?? SalesforceLoginUrl);
-            _viewModel.UpdateBrowserStatus("Salesforce tarayıcı profili hazır · Oturum kalıcı olarak korunuyor");
+            _viewModel.UpdateBrowserStatus("Salesforce browser profile is ready | Session persistence is enabled");
         }
         catch (Exception ex)
         {
             _initializationStarted = false;
-            _viewModel.UpdateBrowserStatus($"Salesforce WebView başlatılamadı: {ex.Message}");
+            _viewModel.UpdateBrowserStatus($"Salesforce WebView could not be started: {ex.Message}");
         }
     }
 
@@ -97,26 +105,27 @@ public partial class SalesforceCloudPage : UserControl
         Directory.CreateDirectory(downloadFolder);
         core.Profile.DefaultDownloadFolderPath = downloadFolder;
 
-        core.Settings.AreDefaultContextMenusEnabled = true;
+        core.Settings.AreDefaultContextMenusEnabled = false;
         core.Settings.AreDevToolsEnabled = false;
-        core.Settings.IsStatusBarEnabled = true;
+        // The app owns the single bottom status bar. Disable Chromium's second bar.
+        core.Settings.IsStatusBarEnabled = false;
         core.Settings.IsZoomControlEnabled = true;
         core.Settings.IsPasswordAutosaveEnabled = false;
         core.Settings.IsGeneralAutofillEnabled = false;
 
         core.NavigationStarting += (_, _) =>
-            _viewModel.UpdateBrowserStatus("Salesforce açılıyor...");
+            _viewModel.UpdateBrowserStatus("Opening Salesforce...");
         core.NavigationCompleted += Browser_NavigationCompleted;
         core.NewWindowRequested += Browser_NewWindowRequested;
         core.ProcessFailed += (_, args) =>
-            _viewModel.UpdateBrowserStatus($"WebView işlemi durdu ({args.ProcessFailedKind}). Sayfayı yenileyin.");
+            _viewModel.UpdateBrowserStatus($"The WebView process stopped ({args.ProcessFailedKind}). Refresh the page.");
     }
 
     private async void Browser_NavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
     {
         if (!e.IsSuccess)
         {
-            _viewModel.UpdateBrowserStatus($"Salesforce sayfası yüklenemedi: {e.WebErrorStatus}");
+            _viewModel.UpdateBrowserStatus($"The Salesforce page could not be loaded: {e.WebErrorStatus}");
             return;
         }
 
@@ -130,12 +139,12 @@ public partial class SalesforceCloudPage : UserControl
             var hasSalesforceSession = cookies.Any(cookie =>
                 cookie.Name.Equals("sid", StringComparison.OrdinalIgnoreCase));
             _viewModel.UpdateBrowserStatus(hasSalesforceSession
-                ? $"Salesforce oturumu aktif · Yerel cache hazır · {uri.Host}"
-                : $"Salesforce giriş bekleniyor · {uri.Host}");
+                ? $"Salesforce session active | Local cache ready | {uri.Host}"
+                : $"Waiting for Salesforce sign-in | {uri.Host}");
         }
         catch
         {
-            _viewModel.UpdateBrowserStatus($"Salesforce açık · {uri.Host}");
+            _viewModel.UpdateBrowserStatus($"Salesforce is open | {uri.Host}");
         }
     }
 
@@ -184,17 +193,14 @@ public partial class SalesforceCloudPage : UserControl
         if (SfWebView.CoreWebView2 is null)
             return;
 
-        var result = MessageBox.Show(
-            "Kaydedilmiş Salesforce oturumu ve çerezleri temizlenecek. Devam edilsin mi?",
-            "Salesforce Oturumunu Sıfırla",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
-        if (result != MessageBoxResult.Yes)
+        if (!_dialog.Confirm(
+                _localization.Translate("Salesforce.ResetPrompt"),
+                _localization.Translate("Salesforce.ResetSession")))
             return;
 
         SfWebView.CoreWebView2.CookieManager.DeleteAllCookies();
         _viewModel.WebViewUrl = SalesforceLoginUrl;
         NavigateTo(SalesforceLoginUrl);
-        _viewModel.UpdateBrowserStatus("Salesforce oturumu temizlendi");
+        _viewModel.UpdateBrowserStatus(_localization.Translate("Salesforce.SessionCleared"));
     }
 }

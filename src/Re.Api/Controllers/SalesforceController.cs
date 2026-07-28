@@ -7,6 +7,7 @@ using Re.Contracts.Salesforce;
 using Re.Domain.Entities.Salesforce;
 using Re.Persistence.Context;
 using Re.Application.Interfaces;
+using Re.Infrastructure.Salesforce;
 
 namespace Re.Api.Controllers;
 
@@ -71,6 +72,16 @@ public sealed class SalesforceController(
         return Ok(ApiResponse<SalesforceSyncResult>.Ok(result));
     }
 
+    [HttpPost("sync/full-job")]
+    public async Task<ActionResult<ApiResponse<SalesforceJobQueueResult>>> RunFullSyncJob(
+        [FromQuery] string targetOrg,
+        [FromServices] SalesforceSyncJobWorker worker,
+        CancellationToken cancellationToken)
+    {
+        var result = await worker.RunFullAutoSyncJobQueueAsync(targetOrg, cancellationToken);
+        return Ok(ApiResponse<SalesforceJobQueueResult>.Ok(result));
+    }
+
     [HttpGet("cli/status")]
     public async Task<ActionResult<ApiResponse<SalesforceCliStatusResponse>>> CliStatus(CancellationToken cancellationToken)
     {
@@ -101,7 +112,7 @@ public sealed class SalesforceController(
     {
         var url = await cli.GetOrgLoginUrlAsync(alias, cancellationToken);
         return string.IsNullOrEmpty(url)
-            ? BadRequest(ApiResponse<string>.Fail("Salesforce org bağlantı URL'si alınamadı."))
+            ? BadRequest(ApiResponse<string>.Fail("Salesforce org connection URL could not be obtained."))
             : Ok(ApiResponse<string>.Ok(url));
     }
 
@@ -174,11 +185,11 @@ public sealed class SalesforceController(
     public async Task<ActionResult<ApiResponse<SalesforceTenantResponse>>> Connect(SalesforceConnectionRequest request)
     {
         if (!Uri.TryCreate(request.InstanceUrl, UriKind.Absolute, out var instance) || instance.Scheme != Uri.UriSchemeHttps)
-            return BadRequest(ApiResponse<SalesforceTenantResponse>.Fail("Salesforce instance adresi geçerli bir HTTPS adresi olmalıdır."));
+            return BadRequest(ApiResponse<SalesforceTenantResponse>.Fail("Salesforce instance URL must be a valid HTTPS address."));
         if (string.IsNullOrWhiteSpace(request.CredentialReference))
-            return BadRequest(ApiResponse<SalesforceTenantResponse>.Fail("Token yerine güvenli kasa credential referansı gereklidir."));
+            return BadRequest(ApiResponse<SalesforceTenantResponse>.Fail("A secure vault credential reference is required instead of a token."));
         if (await db.SalesforceTenants.AnyAsync(x => x.SalesforceOrgId == request.SalesforceOrgId))
-            return Conflict(ApiResponse<SalesforceTenantResponse>.Fail("Bu Salesforce organizasyonu zaten bağlı."));
+            return Conflict(ApiResponse<SalesforceTenantResponse>.Fail("This Salesforce organization is already connected."));
 
         var tenant = new SalesforceTenant
         {
@@ -198,7 +209,7 @@ public sealed class SalesforceController(
     public async Task<ActionResult<ApiResponse<SalesforceDiscoveryResponse>>> Discover(Guid tenantId)
     {
         var tenant = await db.SalesforceTenants.FirstOrDefaultAsync(x => x.Id == tenantId);
-        if (tenant is null) return NotFound(ApiResponse<SalesforceDiscoveryResponse>.Fail("Salesforce organizasyonu bulunamadı."));
+        if (tenant is null) return NotFound(ApiResponse<SalesforceDiscoveryResponse>.Fail("Salesforce organization not found."));
 
         // Bu kayıt scanner worker için kalıcı, denetlenebilir bir snapshot'tır.
         var discovery = new SalesforceOrgDiscovery
@@ -247,7 +258,7 @@ public sealed class SalesforceController(
         var existing = await db.SalesforceBlueprints
             .FirstOrDefaultAsync(x => x.Name == name && x.Version == version);
         if (existing is not null)
-            return Ok(ApiResponse<SalesforceBlueprintResponse>.Ok(MapBlueprint(existing), "Blueprint zaten hazır."));
+            return Ok(ApiResponse<SalesforceBlueprintResponse>.Ok(MapBlueprint(existing), "Blueprint is already available."));
 
         var blueprint = new SalesforceBlueprint
         {
@@ -267,7 +278,7 @@ public sealed class SalesforceController(
         };
         db.Add(blueprint);
         await db.SaveChangesAsync();
-        return Ok(ApiResponse<SalesforceBlueprintResponse>.Ok(MapBlueprint(blueprint), "Retail blueprint yayınlandı."));
+        return Ok(ApiResponse<SalesforceBlueprintResponse>.Ok(MapBlueprint(blueprint), "Retail blueprint was published."));
     }
 
     [HttpGet("deployments")]
@@ -281,9 +292,9 @@ public sealed class SalesforceController(
         var tenant = await db.SalesforceTenants.FindAsync(request.TenantId);
         var blueprint = await db.SalesforceBlueprints.FindAsync(request.BlueprintId);
         if (tenant is null || blueprint is null)
-            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Tenant veya blueprint bulunamadı."));
+            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Tenant or blueprint not found."));
         if (blueprint.Status != SalesforceBlueprintStatus.Published)
-            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Yalnızca yayınlanmış blueprint kurulabilir."));
+            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Only published blueprints can be installed."));
 
         var stages = Enum.GetValues<SalesforceDeploymentStage>();
         var job = new SalesforceDeploymentJob
@@ -302,11 +313,11 @@ public sealed class SalesforceController(
     public async Task<ActionResult<ApiResponse<SalesforceDeploymentResponse>>> Advance(Guid id)
     {
         var job = await JobQuery().SingleOrDefaultAsync(x => x.Id == id);
-        if (job is null) return NotFound(ApiResponse<SalesforceDeploymentResponse>.Fail("Deployment bulunamadı."));
+        if (job is null) return NotFound(ApiResponse<SalesforceDeploymentResponse>.Fail("Deployment not found."));
         if (job.Status is SalesforceDeploymentStatus.Completed or SalesforceDeploymentStatus.Cancelled)
-            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Tamamlanmış deployment ilerletilemez."));
+            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("A completed deployment cannot be advanced."));
         if (job.Status == SalesforceDeploymentStatus.WaitingForApproval)
-            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Production geçişi için yetkili kullanıcı onayı bekleniyor."));
+            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Authorized user approval is required for production promotion."));
 
         job.Status = SalesforceDeploymentStatus.Running;
         job.StartedAt ??= DateTime.UtcNow;
@@ -316,7 +327,7 @@ public sealed class SalesforceController(
             current.Status = SalesforceStepStatus.Completed;
             current.StartedAt ??= DateTime.UtcNow;
             current.CompletedAt = DateTime.UtcNow;
-            current.LogSummary = "Worker aşaması başarıyla tamamlandı.";
+            current.LogSummary = "Worker stage completed successfully.";
         }
         var next = job.Steps.OrderBy(x => x.Sequence).FirstOrDefault(x => x.Status == SalesforceStepStatus.Pending);
         if (next is null)
@@ -342,17 +353,17 @@ public sealed class SalesforceController(
         Guid id, ApproveSalesforceDeploymentRequest request)
     {
         var job = await JobQuery().SingleOrDefaultAsync(x => x.Id == id);
-        if (job is null) return NotFound(ApiResponse<SalesforceDeploymentResponse>.Fail("Deployment bulunamadı."));
+        if (job is null) return NotFound(ApiResponse<SalesforceDeploymentResponse>.Fail("Deployment not found."));
         if (job.Status != SalesforceDeploymentStatus.WaitingForApproval ||
             job.CurrentStage != SalesforceDeploymentStage.UserAcceptance)
-            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Bu deployment onay aşamasında değil."));
+            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("This deployment is not awaiting approval."));
         if (string.IsNullOrWhiteSpace(request.ApprovalNote) || request.ApprovalNote.Trim().Length < 10)
-            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Denetim kaydı için en az 10 karakterlik onay notu girilmelidir."));
+            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Enter an approval note of at least 10 characters for the audit record."));
 
         var step = job.Steps.Single(x => x.Stage == SalesforceDeploymentStage.UserAcceptance);
         step.Status = SalesforceStepStatus.Completed;
         step.CompletedAt = DateTime.UtcNow;
-        step.LogSummary = $"Yetkili onayı: {request.ApprovalNote.Trim()}";
+        step.LogSummary = $"Authorized approval: {request.ApprovalNote.Trim()}";
         job.Status = SalesforceDeploymentStatus.Running;
         var next = job.Steps.OrderBy(x => x.Sequence).FirstOrDefault(x => x.Status == SalesforceStepStatus.Pending);
         if (next is not null)
@@ -362,7 +373,7 @@ public sealed class SalesforceController(
             job.CurrentStage = next.Stage;
         }
         await db.SaveChangesAsync();
-        return Ok(ApiResponse<SalesforceDeploymentResponse>.Ok(MapJob(job), "Deployment onaylandı."));
+        return Ok(ApiResponse<SalesforceDeploymentResponse>.Ok(MapJob(job), "Deployment approved."));
     }
 
     public record CreateCustomObjectRequest(string Label, string ApiName, string PluralLabel, string Description);
@@ -373,38 +384,38 @@ public sealed class SalesforceController(
     public ActionResult<ApiResponse<string>> CreateCustomObject(CreateCustomObjectRequest req)
     {
         if (string.IsNullOrWhiteSpace(req.Label) || string.IsNullOrWhiteSpace(req.ApiName))
-            return BadRequest(ApiResponse<string>.Fail("Obje adı ve API adı boş olamaz."));
+            return BadRequest(ApiResponse<string>.Fail("Object label and API name are required."));
         var apiName = req.ApiName.EndsWith("__c") ? req.ApiName : req.ApiName + "__c";
-        return Ok(ApiResponse<string>.Ok($"Özel Obje ({req.Label} - {apiName}) SFDX projesine eklendi ve Org'a deploy edildi."));
+        return Ok(ApiResponse<string>.Ok($"Custom Object ({req.Label} - {apiName}) was added to the SFDX project and deployed to the org."));
     }
 
     [HttpPost("metadata/validation-rules")]
     public ActionResult<ApiResponse<string>> CreateValidationRule(CreateValidationRuleRequest req)
     {
         if (string.IsNullOrWhiteSpace(req.RuleName) || string.IsNullOrWhiteSpace(req.Formula))
-            return BadRequest(ApiResponse<string>.Fail("Kural adı ve formül zorunludur."));
-        return Ok(ApiResponse<string>.Ok($"Doğrulama Kuralı ({req.RuleName}) [{req.ObjectApiName}] nesnesine başarıyla eklendi."));
+            return BadRequest(ApiResponse<string>.Fail("Rule name and formula are required."));
+        return Ok(ApiResponse<string>.Ok($"Validation Rule ({req.RuleName}) [{req.ObjectApiName}] was added successfully."));
     }
 
     [HttpPost("metadata/flows")]
     public ActionResult<ApiResponse<string>> CreateFlow(CreateFlowRequest req)
     {
         if (string.IsNullOrWhiteSpace(req.FlowName))
-            return BadRequest(ApiResponse<string>.Fail("Flow adı zorunludur."));
-        return Ok(ApiResponse<string>.Ok($"Flow ({req.FlowName}) otomasyonu oluşturuldu ve yayına alındı."));
+            return BadRequest(ApiResponse<string>.Fail("Flow name is required."));
+        return Ok(ApiResponse<string>.Ok($"Flow ({req.FlowName}) automation was created and published."));
     }
 
     [HttpPost("deployments/{id:guid}/retry")]
     public async Task<ActionResult<ApiResponse<SalesforceDeploymentResponse>>> Retry(Guid id)
     {
         var job = await JobQuery().SingleOrDefaultAsync(x => x.Id == id);
-        if (job is null) return NotFound(ApiResponse<SalesforceDeploymentResponse>.Fail("Deployment bulunamadı."));
+        if (job is null) return NotFound(ApiResponse<SalesforceDeploymentResponse>.Fail("Deployment not found."));
         var failed = job.Steps.FirstOrDefault(x => x.Status == SalesforceStepStatus.Failed);
         if (job.Status != SalesforceDeploymentStatus.Failed || failed is null)
-            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Yalnızca başarısız aşama yeniden başlatılabilir."));
+            return BadRequest(ApiResponse<SalesforceDeploymentResponse>.Fail("Only a failed stage can be retried."));
         failed.Status = SalesforceStepStatus.Pending;
         failed.RetryCount++;
-        failed.LogSummary = "Yeniden çalışma kuyruğuna alındı.";
+        failed.LogSummary = "Queued for retry.";
         job.Status = SalesforceDeploymentStatus.Pending;
         job.RetryCount++;
         job.ErrorMessage = null;

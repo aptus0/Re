@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using Microsoft.Win32;
@@ -16,7 +16,7 @@ public partial class InvoiceListViewModel : ObservableObject
 {
     private readonly List<InvoiceRowDto> _allInvoices = [];
     [ObservableProperty] private string _searchText = "";
-    [ObservableProperty] private string _selectedStatus = "Tümü";
+    [ObservableProperty] private string _selectedStatus = "All";
     [ObservableProperty] private DateTime? _startDate = DateTime.Today.AddMonths(-1);
     [ObservableProperty] private DateTime? _endDate = DateTime.Today;
     [ObservableProperty] private int _totalCount;
@@ -27,7 +27,7 @@ public partial class InvoiceListViewModel : ObservableObject
     [ObservableProperty] private InvoiceRowDto? _selectedInvoice;
 
     public ObservableCollection<InvoiceRowDto> Invoices { get; } = [];
-    public List<string> StatusFilters { get; } = ["Tümü", "Taslak", "Onaylı", "Kısmi Ödeme", "Tam Ödeme", "İptal"];
+    public List<string> StatusFilters { get; } = ["All", "Draft", "Approved", "Partially Paid", "Fully Paid", "Cancel"];
 
     public InvoiceListViewModel() => ApplyFilter();
 
@@ -50,11 +50,11 @@ public partial class InvoiceListViewModel : ObservableObject
 
         var statusCode = SelectedStatus switch
         {
-            "Taslak" => "Draft",
-            "Onaylı" => "Approved",
-            "Kısmi Ödeme" => "PartiallyPaid",
-            "Tam Ödeme" => "FullyPaid",
-            "İptal" => "Cancelled",
+            "Draft" => "Draft",
+            "Approved" => "Approved",
+            "Partially Paid" => "PartiallyPaid",
+            "Fully Paid" => "FullyPaid",
+            "Cancel" => "Cancelled",
             _ => null
         };
         if (statusCode is not null)
@@ -78,16 +78,16 @@ public partial class InvoiceListViewModel : ObservableObject
 
     [RelayCommand]
     private void NewInvoice() =>
-        MessageBox.Show("Yeni fatura işlemi Satış Faturaları ekranındaki ayrıntılı forma yönlendirilir.",
-            "Yeni Fatura", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show("New invoice entry is handled in the detailed Sales Invoices form.",
+            "New Invoice", MessageBoxButton.OK, MessageBoxImage.Information);
 
     [RelayCommand]
     private void ViewInvoice(InvoiceRowDto? invoice)
     {
         if (invoice is null) return;
         MessageBox.Show(
-            $"Belge: {invoice.DocumentNumber}\nCari: {invoice.CustomerName}\nToplam: {invoice.TotalAmount:N2} ₺\nKalan: {invoice.RemainingAmount:N2} ₺",
-            "Fatura Özeti", MessageBoxButton.OK, MessageBoxImage.Information);
+            $"Document: {invoice.DocumentNumber}\nAccounts: {invoice.CustomerName}\nTotal: {invoice.TotalAmount:N2} ₺\nRemaining: {invoice.RemainingAmount:N2} ₺",
+            "Invoice Summary", MessageBoxButton.OK, MessageBoxImage.Information);
     }
     [RelayCommand]
     private void ApproveInvoice(InvoiceRowDto? invoice)
@@ -103,14 +103,14 @@ public partial class InvoiceListViewModel : ObservableObject
     {
         var dialog = new SaveFileDialog
         {
-            Title = "Fatura listesini dışa aktar",
-            Filter = "CSV Dosyası (*.csv)|*.csv",
+            Title = "Export invoice list",
+            Filter = "CSV File (*.csv)|*.csv",
             FileName = $"fatura-listesi-{DateTime.Now:yyyyMMdd-HHmm}.csv"
         };
         if (dialog.ShowDialog() != true) return;
 
         static string Csv(string value) => $"\"{value.Replace("\"", "\"\"")}\"";
-        var lines = new List<string> { "Belge No;Tarih;Cari;Toplam;Kalan;Durum" };
+        var lines = new List<string> { "Document No;Date;Account;Total;Remaining;Status" };
         lines.AddRange(Invoices.Select(i => string.Join(";",
             Csv(i.DocumentNumber), i.DocumentDate.ToString("yyyy-MM-dd"), Csv(i.CustomerName),
             i.TotalAmount.ToString("0.00"), i.RemainingAmount.ToString("0.00"), Csv(i.Status))));
@@ -118,7 +118,7 @@ public partial class InvoiceListViewModel : ObservableObject
     }
     [RelayCommand] private void ClearFilters()
     {
-        SearchText = ""; SelectedStatus = "Tümü";
+        SearchText = ""; SelectedStatus = "All";
         StartDate = DateTime.Today.AddMonths(-1); EndDate = DateTime.Today;
     }
 }

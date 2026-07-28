@@ -1,7 +1,7 @@
 <Window x:Class="Re.Desktop.Views.Salesforce.SalesforceMetadataStudioWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Salesforce Geliştirici &amp; Deployment Stüdyosu" Height="750" Width="1050"
+        Title="Salesforce Developer &amp; Deployment Studio" Height="750" Width="1050"
         WindowStartupLocation="CenterOwner" Background="#F1F5F9">
 
     <Grid Margin="24">
@@ -18,47 +18,47 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Text="🛠️ Salesforce Geliştirici &amp; Deployment Stüdyosu" Foreground="White" FontSize="20" FontWeight="Bold"/>
-                    <TextBlock Text="Özel Obje (Custom Object), Doğrulama Kuralı (Validation Rule), Flow Otomasyonları ve API Operasyonları." Foreground="#94A3B8" FontSize="13" Margin="0,4,0,0"/>
+                    <TextBlock Text="🛠️ Salesforce Developer &amp; Deployment Studio" Foreground="White" FontSize="20" FontWeight="Bold"/>
+                    <TextBlock Text="Custom objects, validation rules, flow automation, and API operations." Foreground="#94A3B8" FontSize="13" Margin="0,4,0,0"/>
                 </StackPanel>
-                <Button Grid.Column="1" Content="Kapat" Click="CloseButton_Click" Width="90" Height="34" Background="#334155" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                <Button Grid.Column="1" Content="Close" Click="CloseButton_Click" Width="90" Height="34" Background="#334155" Foreground="White" BorderThickness="0" Cursor="Hand"/>
             </Grid>
         </Border>
 
         <!-- Tab Control -->
         <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0">
             <!-- TAB 1: Custom Objects -->
-            <TabItem Header="📦 Özel Obje Stüdyosu">
+            <TabItem Header="📦 Custom Object Studio">
                 <Border Background="White" CornerRadius="8" Padding="24" Margin="0,12,0,0">
                     <StackPanel>
-                        <TextBlock Text="Yeni Salesforce Özel Nesnesi (Custom Object)" FontWeight="Bold" FontSize="16" Margin="0,0,0,16"/>
+                        <TextBlock Text="New Salesforce Custom Objectsi (Custom Object)" FontWeight="Bold" FontSize="16" Margin="0,0,0,16"/>
                         <Grid Margin="0,0,0,14">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="Obje Etiketi (Label)" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
-                                <TextBox x:Name="TxtObjectLabel" Text="ERP Fatura Başlığı" Padding="10,8"/>
+                                <TextBox x:Name="TxtObjectLabel" Text="ERP Invoice Header" Padding="10,8"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2">
                                 <TextBlock Text="API Name (__c)" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
                                 <TextBox x:Name="TxtObjectApiName" Text="ERP_Invoice_Header__c" Padding="10,8"/>
                             </StackPanel>
                         </Grid>
-                        <TextBlock Text="Açıklama &amp; Entegrasyon Notları" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
-                        <TextBox x:Name="TxtObjectDescription" Text="ERP sisteminden aktarılan fatura üst başlık kayıtları." Padding="10,8" Margin="0,0,0,20"/>
+                        <TextBlock Text="Description &amp; Integration Notes" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
+                        <TextBox x:Name="TxtObjectDescription" Text="Invoice header records transferred from the ERP system." Padding="10,8" Margin="0,0,0,20"/>
                         <Button Content="🚀 Objeyi Org'a Deploy Et" Click="DeployObject_Click" Height="40" Background="#2563EB" Foreground="White" FontWeight="Bold" Cursor="Hand"/>
                     </StackPanel>
                 </Border>
             </TabItem>
 
             <!-- TAB 2: Validation Rules -->
-            <TabItem Header="🛡️ Doğrulama Kuralları">
+            <TabItem Header="🛡️ Validation Rules">
                 <Border Background="White" CornerRadius="8" Padding="24" Margin="0,12,0,0">
                     <StackPanel>
-                        <TextBlock Text="Kayıt Doğrulama Kuralı (Validation Rule)" FontWeight="Bold" FontSize="16" Margin="0,0,0,16"/>
+                        <TextBlock Text="Record Validation Rule" FontWeight="Bold" FontSize="16" Margin="0,0,0,16"/>
                         <Grid Margin="0,0,0,14">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="Kural Adı" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
+                                <TextBlock Text="Rule Name" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
                                 <TextBox x:Name="TxtRuleName" Text="Require_Tax_Number_On_Account" Padding="10,8"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2">
@@ -66,11 +66,11 @@
                                 <TextBox x:Name="TxtRuleObject" Text="Account" Padding="10,8"/>
                             </StackPanel>
                         </Grid>
-                        <TextBlock Text="Hata Koşul Formülü" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
+                        <TextBlock Text="Error Condition Formula" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
                         <TextBox x:Name="TxtRuleFormula" Text="ISBLANK(Tax_Number__c)" Padding="10,8" Margin="0,0,0,14"/>
-                        <TextBlock Text="Görüntülenecek Hata Mesajı" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
-                        <TextBox x:Name="TxtRuleErrorMessage" Text="Cari kart kaydı için Vergi Numarası girilmesi zorunludur." Padding="10,8" Margin="0,0,0,20"/>
-                        <Button Content="🛡️ Kuralı Org'a Deploy Et" Click="DeployRule_Click" Height="40" Background="#2563EB" Foreground="White" FontWeight="Bold" Cursor="Hand"/>
+                        <TextBlock Text="Displayed Error Message" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
+                        <TextBox x:Name="TxtRuleErrorMessage" Text="Tax Number is required for account records." Padding="10,8" Margin="0,0,0,20"/>
+                        <Button Content="🛡️ Deploy Rule to Org" Click="DeployRule_Click" Height="40" Background="#2563EB" Foreground="White" FontWeight="Bold" Cursor="Hand"/>
                     </StackPanel>
                 </Border>
             </TabItem>
@@ -79,11 +79,11 @@
             <TabItem Header="⚡ Flow &amp; Otomasyon">
                 <Border Background="White" CornerRadius="8" Padding="24" Margin="0,12,0,0">
                     <StackPanel>
-                        <TextBlock Text="Salesforce Otomasyon Akışı (Record-Triggered Flow)" FontWeight="Bold" FontSize="16" Margin="0,0,0,16"/>
+                        <TextBlock Text="Salesforce Automation Flow (Record-Triggered Flow)" FontWeight="Bold" FontSize="16" Margin="0,0,0,16"/>
                         <Grid Margin="0,0,0,14">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="Flow Adı" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
+                                <TextBlock Text="Flow Name" Foreground="#475569" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6"/>
                                 <TextBox x:Name="TxtFlowName" Text="ERP_Auto_Invoice_Approval_Flow" Padding="10,8"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2">
@@ -91,7 +91,7 @@
                                 <TextBox x:Name="TxtFlowTrigger" Text="Opportunity" Padding="10,8"/>
                             </StackPanel>
                         </Grid>
-                        <Button Content="⚡ Flow'u Org'a Deploy Et &amp; Aktifleştir" Click="DeployFlow_Click" Height="40" Background="#2563EB" Foreground="White" FontWeight="Bold" Cursor="Hand" Margin="0,20,0,0"/>
+                        <Button Content="⚡ Deploy Flow to Org &amp; Activate" Click="DeployFlow_Click" Height="40" Background="#2563EB" Foreground="White" FontWeight="Bold" Cursor="Hand" Margin="0,20,0,0"/>
                     </StackPanel>
                 </Border>
             </TabItem>

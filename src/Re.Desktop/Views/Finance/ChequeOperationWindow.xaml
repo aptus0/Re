@@ -1,0 +1,142 @@
+<Window x:Class="Re.Desktop.Views.Finance.ChequeOperationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="New Cheque / Promissory Note" Width="600" Height="560"
+        WindowStartupLocation="CenterOwner" WindowStyle="None" AllowsTransparency="False"
+        Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" ResizeMode="NoResize">
+    
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,4,0,12"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,4,0,12"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/> <!-- Custom Drag Title Bar -->
+            <RowDefinition Height="*"/>    <!-- Input Form -->
+            <RowDefinition Height="54"/>   <!-- Actions Bar -->
+        </Grid.RowDefinitions>
+
+        <!-- Custom Drag Title Bar -->
+        <Border Grid.Row="0" Background="#032D60" MouseDown="TitleBar_MouseDown" Padding="16,0">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="🎫" FontSize="14" Foreground="White" Margin="0,0,8,0"/>
+                    <TextBlock Text="New Finance Document" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="PORTFOLIO ENTRY • RE ERP" Foreground="#9ED7FF" FontSize="10.5" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                    <Button Content="×" Background="Transparent" Foreground="White" BorderThickness="0" FontSize="18" Padding="0" Width="30" Height="30" Cursor="Hand" Click="Cancel_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Form Content Area -->
+        <Border Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="22" Margin="20">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Number -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Document Number *" FontWeight="SemiBold"/>
+                            <TextBox Text="{Binding Number, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <!-- Type -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Document Type *" FontWeight="SemiBold"/>
+                            <ComboBox ItemsSource="{Binding ChequeTypes}" SelectedItem="{Binding SelectedChequeType}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Account / Debtor -->
+                    <TextBlock Text="Target Account (Cari Hesap) *" FontWeight="SemiBold"/>
+                    <ComboBox ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedAccount}" DisplayMemberPath="Name"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Amount -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Amount *" FontWeight="SemiBold"/>
+                            <TextBox Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <!-- Currency -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Currency" FontWeight="SemiBold"/>
+                            <ComboBox ItemsSource="{Binding Currencies}" SelectedItem="{Binding Currency}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Due Date -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Due Date (Vade) *" FontWeight="SemiBold"/>
+                            <DatePicker SelectedDate="{Binding DueDate}" Height="32" Margin="0,4,0,12"/>
+                        </StackPanel>
+
+                        <!-- Bank Name -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Bank Name (Cheques Only)"/>
+                            <TextBox Text="{Binding BankName, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsBankEnabled}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Drawer -->
+                    <TextBlock Text="Drawer (Keşideci) / Reference" FontWeight="SemiBold"/>
+                    <TextBox Text="{Binding Drawer, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <!-- Description -->
+                    <TextBlock Text="Description" FontWeight="SemiBold"/>
+                    <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" Height="54" AcceptsReturn="True" TextWrapping="Wrap" Padding="8,4" VerticalContentAlignment="Top" Margin="0,4,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Footer Actions Bar -->
+        <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0" Padding="16,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Discard" Click="Cancel_Click" Background="White" Foreground="#475569" BorderBrush="#CBD5E1" BorderThickness="1" Margin="0,0,8,0" Padding="20,0" Height="34" FontWeight="SemiBold" Cursor="Hand">
+                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                </Button>
+                <Button Content="Save Document" Click="Save_Click" Background="#F97316" Foreground="White" BorderThickness="0" Padding="24,0" Height="34" FontWeight="Bold" Cursor="Hand">
+                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

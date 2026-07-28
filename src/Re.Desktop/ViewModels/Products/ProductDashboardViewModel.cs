@@ -19,7 +19,7 @@ public partial class ProductDashboardViewModel(
     [ObservableProperty] private int _inactive30DaysCount;
     [ObservableProperty] private decimal _todayInbound;
     [ObservableProperty] private decimal _todayOutbound;
-    [ObservableProperty] private string _lastUpdated = "Henüz güncellenmedi";
+    [ObservableProperty] private string _lastUpdated = "Not updated yet";
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private CriticalStockItem? _selectedCriticalProduct;
 
@@ -35,7 +35,7 @@ public partial class ProductDashboardViewModel(
         try
         {
             var result = await api.GetAsync<InventoryDashboardResponse>("api/inventory-dashboard");
-            if (result is null) { dialog.Error("Stok kontrol merkezi verileri alınamadı."); return; }
+            if (result is null) { dialog.Error("Inventory control center data could not be loaded."); return; }
             TotalProducts = result.TotalProducts; ActiveProducts = result.ActiveProducts;
             TotalStockQuantity = result.TotalStockQuantity; TotalStockValue = result.TotalStockValue;
             CriticalStockCount = result.CriticalStockCount; OutOfStockCount = result.OutOfStockCount;
@@ -46,7 +46,7 @@ public partial class ProductDashboardViewModel(
             LastUpdated = result.RefreshedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss");
             OnPropertyChanged(nameof(HasNoCriticalProducts)); OnPropertyChanged(nameof(HasNoMovements));
         }
-        catch (Exception ex) { dialog.Error($"Stok kontrol merkezi yüklenemedi.\n{ex.GetBaseException().Message}"); }
+        catch (Exception ex) { dialog.Error($"Inventory control center could not be loaded.\n{ex.GetBaseException().Message}"); }
         finally { IsLoading = false; OnPropertyChanged(nameof(HasNoCriticalProducts)); OnPropertyChanged(nameof(HasNoMovements)); }
     }
 

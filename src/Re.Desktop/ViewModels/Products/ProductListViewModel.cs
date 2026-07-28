@@ -14,6 +14,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using Re.Desktop.Views.Products;
+using Re.Desktop.Views.StockMovements;
+using Re.Desktop.ViewModels.StockMovements;
 using Microsoft.Extensions.DependencyInjection;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
@@ -35,24 +37,34 @@ public partial class ProductListViewModel : ObservableObject
     [ObservableProperty] private int _currentPage = 1;
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private bool _isSearchEmpty = true;
-    [ObservableProperty] private string _selectedCategory = "Tümü";
-    [ObservableProperty] private string _selectedStockFilter = "Tümü";
+    [ObservableProperty] private string _selectedCategory = "All";
+    [ObservableProperty] private string _selectedStockFilter = "All";
     [ObservableProperty] private string _pagingLabel = "";
+    [ObservableProperty] private int _lowStockCount;
+    [ObservableProperty] private int _outOfStockCount;
+    [ObservableProperty] private decimal _inventoryValue;
 
     // Panel Kontrolü (Görüntüleme)
     [ObservableProperty] private bool _isPanelOpen;
     [ObservableProperty] private ProductDetailItem? _selectedProduct;
 
-    // Form Kontrolü (Ekleme/Düzenleme)
+    // Form Kontrolü (Ekleme/Editme)
     [ObservableProperty] private bool _isFormOpen;
     [ObservableProperty] private ProductFormModel _formModel = new();
-    [ObservableProperty] private string _formTitle = "Yeni Ürün Ekle";
+    [ObservableProperty] private string _formTitle = "Add Product";
 
     public ObservableCollection<ProductDetailItem> Products { get; } = [];
-    public ObservableCollection<string> Categories { get; } = ["Tümü"];
+    public ObservableCollection<string> Categories { get; } = ["All"];
     public ObservableCollection<CatalogItemResponse> CatalogCategories { get; } = [];
     public ObservableCollection<CatalogItemResponse> CatalogBrands { get; } = [];
-    public List<string> StockFilters { get; } = ["Tümü", "Stokta Var", "Düşük Stok", "Tükenmiş"];
+    public List<string> StockFilters { get; } = ["All", "In Stock", "Low Inventory", "Out of Stock"];
+    public IReadOnlyList<TaxRateOption> TaxRates { get; } =
+    [
+        new(0, "VAT Exempt", "0%"),
+        new(1, "Reduced Rate I", "1%"),
+        new(10, "Reduced Rate II", "10%"),
+        new(20, "Standard Rate", "20%")
+    ];
 
     public bool HasPreviousPage => CurrentPage > 1;
     public bool HasNextPage => CurrentPage * _pageSize < TotalCount;
@@ -97,7 +109,7 @@ public partial class ProductListViewModel : ObservableObject
             if (_api == null) return;
             await LoadCatalogsAsync();
             var response = await _api.GetAsync<Re.Contracts.Common.PagedResponse<ProductListResponse>>($"api/products?page=1&size=100");
-            
+
             if (response != null && response.Items != null)
             {
                 _allProducts = response.Items.Select(p => new ProductDetailItem
@@ -110,9 +122,9 @@ public partial class ProductListViewModel : ObservableObject
                     DealerPrice = p.DealerPrice,
                     VatRate = (int)p.VatRate,
                     CategoryId = p.CategoryId,
-                    CategoryName = p.CategoryName ?? "Tanımsız",
+                    CategoryName = p.CategoryName ?? "Unspecified",
                     BrandId = p.BrandId,
-                    Brand = p.BrandName ?? "Tanımsız",
+                    Brand = p.BrandName ?? "Unspecified",
                     Barcode = p.Barcode ?? string.Empty,
                     ImagePath = p.ImagePath ?? string.Empty,
                     IsActive = p.IsActive,
@@ -131,6 +143,9 @@ public partial class ProductListViewModel : ObservableObject
             }
 
             ApplyFilter();
+            LowStockCount = _allProducts.Count(x => x.StockLevel > 0 && x.StockLevel <= x.MinStockLevel);
+            OutOfStockCount = _allProducts.Count(x => x.StockLevel <= 0);
+            InventoryValue = _allProducts.Sum(x => x.StockLevel * x.PurchasePrice);
         }
         finally { IsLoading = false; }
     }
@@ -146,9 +161,9 @@ public partial class ProductListViewModel : ObservableObject
         foreach (var item in brands?.Where(x => x.IsActive) ?? []) CatalogBrands.Add(item);
         var selected = SelectedCategory;
         Categories.Clear();
-        Categories.Add("Tümü");
+        Categories.Add("All");
         foreach (var name in CatalogCategories.Select(x => x.Name).Distinct()) Categories.Add(name);
-        SelectedCategory = Categories.Contains(selected) ? selected : "Tümü";
+        SelectedCategory = Categories.Contains(selected) ? selected : "All";
     }
 
     private void ApplyFilter()
@@ -157,25 +172,26 @@ public partial class ProductListViewModel : ObservableObject
         if (!string.IsNullOrWhiteSpace(SearchText))
             filtered = filtered.Where(p =>
                 p.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                p.Code.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
-        
-        if (SelectedCategory != "Tümü")
+                p.Code.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                p.Barcode.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
+        if (SelectedCategory != "All")
             filtered = filtered.Where(p => p.CategoryName == SelectedCategory);
 
-        if (SelectedStockFilter == "Stokta Var")
+        if (SelectedStockFilter == "In Stock")
             filtered = filtered.Where(p => p.StockLevel > p.MinStockLevel);
-        else if (SelectedStockFilter == "Düşük Stok")
+        else if (SelectedStockFilter == "Low Inventory")
             filtered = filtered.Where(p => p.StockLevel > 0 && p.StockLevel <= p.MinStockLevel);
-        else if (SelectedStockFilter == "Tükenmiş")
+        else if (SelectedStockFilter == "Out of Stock")
             filtered = filtered.Where(p => p.StockLevel == 0);
 
         var list = filtered.ToList();
         TotalCount = list.Count;
         var page = list.Skip((CurrentPage - 1) * _pageSize).Take(_pageSize);
-        
+
         Products.Clear();
         foreach (var p in page) Products.Add(p);
-        
+
         UpdatePagingLabel();
     }
 
@@ -183,24 +199,24 @@ public partial class ProductListViewModel : ObservableObject
     {
         var from = (CurrentPage - 1) * _pageSize + 1;
         var to   = Math.Min(CurrentPage * _pageSize, TotalCount);
-        PagingLabel = TotalCount > 0 ? $"{from}-{to} / {TotalCount} ürün" : "Ürün bulunamadı";
+        PagingLabel = TotalCount > 0 ? $"{from}-{to} / {TotalCount} products" : "No products found";
     }
 
     [RelayCommand] private void ClosePanel() { IsPanelOpen = false; SelectedProduct = null; }
-    
+
     // Form İşlemleri
-    [RelayCommand] 
+    [RelayCommand]
     private async Task NewProductAsync()
-    { 
+    {
         await LoadCatalogsAsync();
         if (CatalogCategories.Count == 0 || CatalogBrands.Count == 0)
         {
-            _dialog?.Error("Ürün eklemeden önce en az bir aktif kategori ve marka tanımlamalısınız.", "Katalog Gerekli");
+            _dialog?.Error("Define at least one active category and brand before adding a product.", "Catalog Required");
             ManageCatalog();
             await LoadCatalogsAsync();
             if (CatalogCategories.Count == 0 || CatalogBrands.Count == 0) return;
         }
-        FormTitle = "Yeni Ürün Ekle";
+        FormTitle = "Add Product";
         FormModel = new ProductFormModel
         {
             SelectedCategory = CatalogCategories.First(),
@@ -210,12 +226,12 @@ public partial class ProductListViewModel : ObservableObject
         ShowProductEditor();
     }
 
-    [RelayCommand] 
+    [RelayCommand]
     private async Task EditProductAsync(ProductDetailItem? product)
-    { 
+    {
         if (product == null) return;
         await LoadCatalogsAsync();
-        FormTitle = "Ürün Düzenle";
+        FormTitle = "Product Edit";
         FormModel = new ProductFormModel
         {
             Id = product.Id,
@@ -264,7 +280,7 @@ public partial class ProductListViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _dialog?.Error($"Ürün kartı açılamadı.\n{ex.GetBaseException().Message}", "Ürün Yönetimi");
+            _dialog?.Error($"The product card could not be opened.\n{ex.GetBaseException().Message}", "Product Management");
         }
     }
 
@@ -279,43 +295,140 @@ public partial class ProductListViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task AdjustStock(ProductDetailItem? product)
+    {
+        product ??= SelectedProduct;
+        if (product is null || _api is null || _dialog is null)
+        {
+            _dialog?.Info("Select a product before posting a stock adjustment.", "Stock Adjustment");
+            return;
+        }
+        var vm = new StockAdjustmentViewModel(_api, _dialog, product);
+        var window = new StockAdjustmentWindow { DataContext = vm };
+        var owner = Application.Current.Windows.OfType<Re.Desktop.Views.Shell.MainWindow>()
+            .FirstOrDefault(x => x.IsVisible);
+        if (owner is not null) window.Owner = owner;
+        window.ShowDialog();
+        await LoadProductsAsync();
+    }
+
+    [RelayCommand]
+    private async Task AddCategoryDirect()
+    {
+        if (_api is null || _dialog is null) return;
+        var window = new Views.Products.CatalogItemQuickWindow("Add New Category")
+        {
+            Owner = Application.Current.Windows.OfType<Re.Desktop.Views.Shell.MainWindow>().FirstOrDefault(x => x.IsVisible)
+        };
+        if (window.ShowDialog() == true)
+        {
+            IsLoading = true;
+            try
+            {
+                var req = new SaveCategoryRequest(window.ItemCodeText, window.ItemNameText, "Quick Category", null, true);
+                var res = await _api.PostAsync<CatalogItemResponse>("api/product-catalog/categories", req);
+                if (res != null)
+                {
+                    _dialog.Success($"Category {res.Name} created successfully.", "Success");
+                    await LoadCatalogsAsync();
+                    var newlyCreated = CatalogCategories.FirstOrDefault(x => x.Id == res.Id);
+                    if (newlyCreated != null)
+                    {
+                        FormModel.SelectedCategory = newlyCreated;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _dialog.Error($"Failed to create category: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task AddBrandDirect()
+    {
+        if (_api is null || _dialog is null) return;
+        var window = new Views.Products.CatalogItemQuickWindow("Add New Brand")
+        {
+            Owner = Application.Current.Windows.OfType<Re.Desktop.Views.Shell.MainWindow>().FirstOrDefault(x => x.IsVisible)
+        };
+        if (window.ShowDialog() == true)
+        {
+            IsLoading = true;
+            try
+            {
+                var req = new SaveBrandRequest(window.ItemCodeText, window.ItemNameText, null, true);
+                var res = await _api.PostAsync<CatalogItemResponse>("api/product-catalog/brands", req);
+                if (res != null)
+                {
+                    _dialog.Success($"Brand {res.Name} created successfully.", "Success");
+                    await LoadCatalogsAsync();
+                    var newlyCreated = CatalogBrands.FirstOrDefault(x => x.Id == res.Id);
+                    if (newlyCreated != null)
+                    {
+                        FormModel.SelectedBrand = newlyCreated;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _dialog.Error($"Failed to create brand: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+    }
+
+    [RelayCommand]
     private async Task SaveProduct()
     {
         if (string.IsNullOrWhiteSpace(FormModel.Code) || string.IsNullOrWhiteSpace(FormModel.Name))
         {
-            _dialog?.Error("Ürün kodu ve ürün adı zorunludur.");
+            _dialog?.Error("Product code and product name are required.");
             return;
         }
         if (FormModel.SelectedCategory is null || FormModel.SelectedBrand is null)
         {
-            _dialog?.Error("Kategori ve marka seçimi zorunludur.");
+            _dialog?.Error("Category and brand are required.");
+            return;
+        }
+        if (TaxRates.All(x => x.Rate != FormModel.VatRate))
+        {
+            _dialog?.Error("Select 0%, 1%, 10% or 20% from the standard VAT table.");
             return;
         }
 
         if (FormModel.MinStockLevel < 0 || FormModel.MaxStockLevel < FormModel.MinStockLevel)
         {
-            _dialog?.Error("Maksimum stok minimum stoktan küçük olamaz; stok eşikleri negatif girilemez.");
+            _dialog?.Error("Maximum stock cannot be below minimum stock, and stock thresholds cannot be negative.");
             return;
         }
 
         if (FormModel.ReservedStock < 0 || FormModel.ReservedStock > FormModel.StockLevel)
         {
-            _dialog?.Error("Rezerve stok sıfırdan küçük veya mevcut stoktan büyük olamaz.");
+            _dialog?.Error("Reserved stock cannot be negative or exceed available stock.");
             return;
         }
 
         if (FormModel.SalePrice > 0 && FormModel.PurchasePrice > FormModel.SalePrice &&
             _dialog is not null &&
-            !_dialog.Confirm("Satış fiyatı alış fiyatının altında. Yetkili onayıyla devam edilsin mi?", "Maliyet Altı Satış"))
+            !_dialog.Confirm("Sales price is below purchase price. Continue with authorized approval?", "Below-Cost Sale"))
             return;
-        
+
         if (_api == null) return;
 
         IsLoading = true;
         try
         {
             var isNew = _allProducts.All(p => p.Id != FormModel.Id);
-            
+
             if (isNew)
             {
                 var req = new CreateProductRequest(
@@ -347,11 +460,11 @@ public partial class ProductListViewModel : ObservableObject
                         v.Code, v.Color, v.Size, v.Attribute1, v.Attribute2,
                         v.SalePrice, true)).ToList()
                 );
-                
+
                 var result = await _api.PostAsync<ProductResponse>("api/products", req);
                 if (result != null)
                 {
-                    _dialog?.Info("Ürün başarıyla kaydedildi.", "Başarılı");
+                    _dialog?.Success("Product saved successfully.", "Success");
                     IsFormOpen = false;
                     Application.Current.Windows.OfType<ProductEditorWindow>().FirstOrDefault()?.Close();
                     ClearFilters();
@@ -359,7 +472,7 @@ public partial class ProductListViewModel : ObservableObject
                 }
                 else
                 {
-                    _dialog?.Error("Ürün kaydedilirken bir hata oluştu veya bu kod zaten var.");
+                    _dialog?.Error("The product could not be saved or the code already exists.");
                 }
             }
             else
@@ -393,14 +506,14 @@ public partial class ProductListViewModel : ObservableObject
                 var result = await _api.PutAsync<ProductResponse>($"api/products/{FormModel.Id}", req);
                 if (result != null)
                 {
-                    _dialog?.Info("Ürün başarıyla güncellendi.", "Başarılı");
+                    _dialog?.Success("Product updated successfully.", "Success");
                     IsFormOpen = false;
                     Application.Current.Windows.OfType<ProductEditorWindow>().FirstOrDefault()?.Close();
                     await LoadProductsAsync();
                 }
                 else
                 {
-                    _dialog?.Error("Ürün güncellenirken bir hata oluştu.");
+                    _dialog?.Error("An error occurred while updating the product.");
                 }
             }
         }
@@ -411,13 +524,13 @@ public partial class ProductListViewModel : ObservableObject
     }
 
     [RelayCommand] private void CloseForm() { IsFormOpen = false; }
-    
+
     [RelayCommand]
     private async Task DeleteProduct(ProductDetailItem? product)
     {
         if (product is null) return;
         if (_dialog is not null &&
-            !_dialog.Confirm("Ürün silinecek (pasife alınacak). Devam edilsin mi?"))
+            !_dialog.Confirm("The product will be deactivated. Continue?"))
             return;
 
         if (_api == null) return;
@@ -428,13 +541,13 @@ public partial class ProductListViewModel : ObservableObject
             var success = await _api.DeleteAsync($"api/products/{product.Id}");
             if (success)
             {
-                _dialog?.Info("Ürün başarıyla silindi.", "Başarılı");
+                _dialog?.Success("Product deactivated successfully.", "Success");
                 ClosePanel();
                 await LoadProductsAsync();
             }
             else
             {
-                _dialog?.Error("Ürün silinirken hata oluştu.");
+                _dialog?.Error("The product could not be deactivated. Its stock balance must be zero first.");
             }
         }
         finally
@@ -451,7 +564,7 @@ public partial class ProductListViewModel : ObservableObject
             : SelectedProduct is not null ? [SelectedProduct] : [];
         if (items.Count == 0)
         {
-            _dialog?.Info("Barkod basmak için tablodan en az bir ürün işaretleyin.", "Barkod Yazdırma");
+            _dialog?.Warning("Select at least one product from the table to print barcodes.", "Barcode Printing");
             return;
         }
 
@@ -466,17 +579,17 @@ public partial class ProductListViewModel : ObservableObject
             var block = new Paragraph { Margin = new Thickness(0, 0, 0, 12) };
             block.Inlines.Add(new Bold(new Run(product.Name)));
             block.Inlines.Add(new LineBreak());
-            block.Inlines.Add(new Run($"Ürün Kodu: {product.Code}"));
+            block.Inlines.Add(new Run($"Product Code: {product.Code}"));
             block.Inlines.Add(new LineBreak());
             block.Inlines.Add(new Run($"EAN-13: {product.Barcode}"));
             block.Inlines.Add(new LineBreak());
-            block.Inlines.Add(new Run($"Fiyat: {product.SalePrice:N2} ₺"));
+            block.Inlines.Add(new Run($"Price: {product.SalePrice:N2} ₺"));
             document.Blocks.Add(block);
         }
 
         var printDialog = new PrintDialog();
         if (printDialog.ShowDialog() == true)
-            printDialog.PrintDocument(((IDocumentPaginatorSource)document).DocumentPaginator, "Re ERP Barkod Etiketleri");
+            printDialog.PrintDocument(((IDocumentPaginatorSource)document).DocumentPaginator, "Re ERP Barcode Etiketleri");
     }
 
     [RelayCommand]
@@ -484,22 +597,22 @@ public partial class ProductListViewModel : ObservableObject
     {
         if (Products.Count == 0)
         {
-            _dialog?.Info("Dışa aktarılacak ürün bulunamadı.", "Excel / CSV");
+            _dialog?.Warning("There are no products to export.", "Excel / CSV");
             return;
         }
 
         var dialog = new SaveFileDialog
         {
-            Title = "Ürün listesini dışa aktar",
-            Filter = "Excel Çalışma Kitabı (*.xlsx)|*.xlsx",
+            Title = "Export product list",
+            Filter = "Excel Workbook (*.xlsx)|*.xlsx",
             FileName = $"urun-listesi-{DateTime.Now:yyyyMMdd-HHmm}.xlsx"
         };
         if (dialog.ShowDialog() != true) return;
 
         var rows = new List<IReadOnlyList<string>>
         {
-            new[] { "Ürün Kodu", "Barkod", "Ürün Adı", "Kategori", "Marka", "Depo",
-                "Mevcut Stok", "Kullanılabilir", "Alış Fiyatı", "Satış Fiyatı", "Bayi Fiyatı", "KDV", "Durum" }
+            new[] { "Product Code", "Barcode", "Product Name", "Category", "Brand", "Warehouse",
+                "On-hand Inventory", "Available", "Purchase Price", "Sales Price", "Dealer Price", "KDV", "Status" }
         };
         rows.AddRange(Products.Select(p => (IReadOnlyList<string>)new[]
         {
@@ -509,7 +622,7 @@ public partial class ProductListViewModel : ObservableObject
             p.DealerPrice.ToString("0.00"), p.VatRate.ToString(), p.IsActive ? "Aktif" : "Pasif"
         }));
         WriteExcel(dialog.FileName, rows);
-        _dialog?.Info($"{Products.Count} ürün dışa aktarıldı.", "Aktarım Tamamlandı");
+        _dialog?.Success($"{Products.Count} products were exported.", "Export Complete");
     }
 
     private static void WriteExcel(string path, IReadOnlyList<IReadOnlyList<string>> rows)
@@ -521,7 +634,7 @@ public partial class ProductListViewModel : ObservableObject
         var sheetData = new Xl.SheetData();
         worksheetPart.Worksheet = new Xl.Worksheet(sheetData);
         var sheets = workbookPart.Workbook.AppendChild(new Xl.Sheets());
-        sheets.Append(new Xl.Sheet { Id = workbookPart.GetIdOfPart(worksheetPart), SheetId = 1, Name = "Ürünler" });
+        sheets.Append(new Xl.Sheet { Id = workbookPart.GetIdOfPart(worksheetPart), SheetId = 1, Name = "Products" });
         foreach (var sourceRow in rows)
         {
             var row = new Xl.Row();
@@ -533,7 +646,7 @@ public partial class ProductListViewModel : ObservableObject
     }
     [RelayCommand] private void ClearFilters()
     {
-        SearchText = ""; SelectedCategory = "Tümü"; SelectedStockFilter = "Tümü"; CurrentPage = 1;
+        SearchText = ""; SelectedCategory = "All"; SelectedStockFilter = "All"; CurrentPage = 1;
     }
     [RelayCommand]
     private void SelectAll()
@@ -556,7 +669,7 @@ public partial class ProductListViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _dialog?.Error($"Katalog yönetimi açılamadı.\n{ex.GetBaseException().Message}", "Katalog Yönetimi");
+            _dialog?.Error($"Catalog management could not be opened.\n{ex.GetBaseException().Message}", "Catalog Management");
         }
     }
     [RelayCommand] private void PreviousPage() { if (HasPreviousPage) { CurrentPage--; ApplyFilter(); } }
@@ -573,8 +686,8 @@ public partial class ProductFormModel : ObservableObject
     [ObservableProperty] private CatalogItemResponse? _selectedCategory;
     [ObservableProperty] private CatalogItemResponse? _selectedBrand;
     [ObservableProperty] private string _imagePath = string.Empty;
-    
-    // Tab 2: Barkod
+
+    // Tab 2: Barcode
     [ObservableProperty] private string _barcode1 = string.Empty;
     [ObservableProperty] private string _barcode2 = string.Empty;
     [ObservableProperty] private string _unit = "Adet";
@@ -584,8 +697,23 @@ public partial class ProductFormModel : ObservableObject
     [ObservableProperty] private decimal _salePrice;
     [ObservableProperty] private decimal _dealerPrice;
     [ObservableProperty] private int _vatRate = 20;
+    public decimal NetSalePrice => VatRate < 0 ? SalePrice : SalePrice / (1 + VatRate / 100m);
+    public decimal VatAmount => SalePrice - NetSalePrice;
+    public decimal GrossMargin => SalePrice <= 0 ? 0 : (SalePrice - PurchasePrice) / SalePrice * 100m;
+    partial void OnSalePriceChanged(decimal value)
+    {
+        OnPropertyChanged(nameof(NetSalePrice));
+        OnPropertyChanged(nameof(VatAmount));
+        OnPropertyChanged(nameof(GrossMargin));
+    }
+    partial void OnPurchasePriceChanged(decimal value) => OnPropertyChanged(nameof(GrossMargin));
+    partial void OnVatRateChanged(int value)
+    {
+        OnPropertyChanged(nameof(NetSalePrice));
+        OnPropertyChanged(nameof(VatAmount));
+    }
 
-    // Tab 4: Stok Ayarları
+    // Tab 4: Inventory Settingsı
     [ObservableProperty] private int _minStockLevel = 10;
     [ObservableProperty] private int _maxStockLevel = 100;
     [ObservableProperty] private int _safetyStockLevel = 5;
@@ -598,8 +726,8 @@ public partial class ProductFormModel : ObservableObject
     [ObservableProperty] private bool _isExpiryTrackingEnabled;
     [ObservableProperty] private string _valuationMethod = "Hareketli Ortalama";
 
-    // Tab 5: Depo Stokları
-    [ObservableProperty] private string _warehouse = "Merkez Depo";
+    // Tab 5: Warehouse Inventoryları
+    [ObservableProperty] private string _warehouse = "Merkez Warehouse";
     [ObservableProperty] private string _location = "A-01-01";
     [ObservableProperty] private int _stockLevel;
     [ObservableProperty] private int _reservedStock;
@@ -616,7 +744,7 @@ public partial class ProductFormModel : ObservableObject
     [ObservableProperty] private string _supplierCurrency = "TRY";
     [ObservableProperty] private decimal _supplierDiscountRate;
 
-    // Tab 7: Varyant
+    // Tab 7: Variant
     [ObservableProperty] private string _color = string.Empty;
     [ObservableProperty] private string _size = string.Empty;
     [ObservableProperty] private string _season = string.Empty;
@@ -662,7 +790,7 @@ public class ProductDetailItem : ObservableObject
     public string Barcode { get; set; } = string.Empty;
     public string ImagePath { get; set; } = string.Empty;
     public bool IsActive { get; set; }
-    
+
     public int StockLevel { get; set; }
     public int ReservedStock { get; set; }
     public int MinStockLevel { get; set; }
@@ -673,7 +801,7 @@ public class ProductDetailItem : ObservableObject
     public DateTime LastUpdate { get; set; }
 
     public int AvailableStock => StockLevel - ReservedStock;
-    public string StockStatus => StockLevel == 0 ? "Tükendi" : (AvailableStock <= MinStockLevel ? "Kritik Stok" : "Stok Yeterli");
+    public string StockStatus => StockLevel == 0 ? "Out of Stock" : (AvailableStock <= MinStockLevel ? "Critical Stock" : "Stock Available");
     public string StockStatusColor => StockLevel == 0 ? "#EF4444" : (AvailableStock <= MinStockLevel ? "#F59E0B" : "#10B981");
     public string StockStatusBg => StockLevel == 0 ? "#FEE2E2" : (AvailableStock <= MinStockLevel ? "#FEF3C7" : "#DCFCE7");
     public decimal ProfitMargin => AverageCost > 0 ? ((SalePrice - AverageCost) / AverageCost) * 100 : 100;
@@ -688,3 +816,5 @@ public partial class ProductVariantDraft : ObservableObject
     [ObservableProperty] private string _attribute2 = string.Empty;
     [ObservableProperty] private decimal _salePrice;
 }
+
+public sealed record TaxRateOption(int Rate, string Name, string Display);

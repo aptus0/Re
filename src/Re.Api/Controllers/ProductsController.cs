@@ -35,7 +35,9 @@ public class ProductsController : ControllerBase
 
         if (!string.IsNullOrWhiteSpace(search))
             query = query.Where(p =>
-                p.Name.Contains(search) || p.Code.Contains(search));
+                p.Name.Contains(search) || p.Code.Contains(search) ||
+                (p.Barcode1 != null && p.Barcode1.Contains(search)) ||
+                (p.Barcode2 != null && p.Barcode2.Contains(search)));
 
         if (categoryId.HasValue)
             query = query.Where(p => p.CategoryId == categoryId);
@@ -86,7 +88,7 @@ public class ProductsController : ControllerBase
             .Include(x => x.Unit)
             .FirstOrDefaultAsync(x => x.Id == id && x.CompanyId == CompanyId);
 
-        if (p is null) return NotFound(ApiResponse<ProductResponse>.Fail("Ürün bulunamadı."));
+        if (p is null) return NotFound(ApiResponse<ProductResponse>.Fail("Product not found."));
 
         return Ok(ApiResponse<ProductResponse>.Ok(new ProductResponse(
             p.Id, p.Code, p.Name, p.ShortName, p.SalePrice, p.PurchasePrice, p.DealerPrice, p.VatRate,
@@ -99,22 +101,24 @@ public class ProductsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ApiResponse<ProductResponse>>> CreateProduct([FromBody] CreateProductRequest req)
     {
+        if (req.VatRate is not (0 or 1 or 10 or 20))
+            return BadRequest(ApiResponse<ProductResponse>.Fail("Select a VAT rate from the standard VAT table."));
         if (!req.CategoryId.HasValue || !await _db.Categories.AnyAsync(x =>
                 x.Id == req.CategoryId && x.CompanyId == CompanyId && x.IsActive))
-            return BadRequest(ApiResponse<ProductResponse>.Fail("Aktif bir kategori seçilmelidir."));
+            return BadRequest(ApiResponse<ProductResponse>.Fail("Select an active category."));
         if (!req.BrandId.HasValue || !await _db.Brands.AnyAsync(x =>
                 x.Id == req.BrandId && x.CompanyId == CompanyId && x.IsActive))
-            return BadRequest(ApiResponse<ProductResponse>.Fail("Aktif bir marka seçilmelidir."));
+            return BadRequest(ApiResponse<ProductResponse>.Fail("Select an active brand."));
 
         if (await _db.Products.AnyAsync(p => p.Code == req.Code && p.CompanyId == CompanyId))
-            return BadRequest(ApiResponse<ProductResponse>.Fail($"'{req.Code}' kodlu ürün zaten mevcut."));
+            return BadRequest(ApiResponse<ProductResponse>.Fail($"'{req.Code}' product code already exists."));
 
         var barcode = string.IsNullOrWhiteSpace(req.Barcode1)
             ? await GenerateUniqueEan13Async()
             : req.Barcode1.Trim();
         if (await _db.Products.AnyAsync(p => p.CompanyId == CompanyId &&
                 (p.Barcode1 == barcode || p.Barcode2 == barcode)))
-            return BadRequest(ApiResponse<ProductResponse>.Fail($"'{barcode}' barkodu zaten kullanılıyor."));
+            return BadRequest(ApiResponse<ProductResponse>.Fail($"'{barcode}' barcode is already in use."));
 
         var product = Product.Create(CompanyId, req.Code, req.Name, req.SalePrice, req.VatRate,
             req.CategoryId, req.BrandId);
@@ -133,7 +137,7 @@ public class ProductsController : ControllerBase
         {
             var code = variant.Code.Trim().ToUpperInvariant();
             if (string.IsNullOrWhiteSpace(code))
-                return BadRequest(ApiResponse<ProductResponse>.Fail("Varyant kodu boş bırakılamaz."));
+                return BadRequest(ApiResponse<ProductResponse>.Fail("Variant code is required."));
             if (product.Variants.Any(x => x.Code == code))
                 return BadRequest(ApiResponse<ProductResponse>.Fail($"'{code}' varyant kodu birden fazla kez girildi."));
             product.Variants.Add(new ProductVariant
@@ -163,7 +167,7 @@ public class ProductsController : ControllerBase
             .Include(p => p.Barcodes)
             .FirstOrDefaultAsync(p => p.Id == id && p.CompanyId == CompanyId);
 
-        if (product is null) return NotFound(ApiResponse<object>.Fail("Ürün bulunamadı."));
+        if (product is null) return NotFound(ApiResponse<object>.Fail("Product not found."));
 
         product.AddBarcode(req.Value, req.BarcodeType);
         await _db.SaveChangesAsync();
@@ -185,7 +189,7 @@ public class ProductsController : ControllerBase
                  p.Barcodes.Any(b => b.Value == barcode)));
 
         if (product is null)
-            return NotFound(ApiResponse<ProductResponse>.Fail($"'{barcode}' barkodlu ürün bulunamadı."));
+            return NotFound(ApiResponse<ProductResponse>.Fail($"'{barcode}' barcode was not found."));
 
         return Ok(ApiResponse<ProductResponse>.Ok(new ProductResponse(
             product.Id, product.Code, product.Name, product.ShortName, product.SalePrice, product.PurchasePrice, product.DealerPrice, product.VatRate,
@@ -199,12 +203,14 @@ public class ProductsController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<ApiResponse<ProductResponse>>> UpdateProduct(Guid id, [FromBody] UpdateProductRequest req)
     {
+        if (req.VatRate is not (0 or 1 or 10 or 20))
+            return BadRequest(ApiResponse<ProductResponse>.Fail("Select a VAT rate from the standard VAT table."));
         if (!req.CategoryId.HasValue || !await _db.Categories.AnyAsync(x =>
                 x.Id == req.CategoryId && x.CompanyId == CompanyId && x.IsActive))
-            return BadRequest(ApiResponse<ProductResponse>.Fail("Aktif bir kategori seçilmelidir."));
+            return BadRequest(ApiResponse<ProductResponse>.Fail("Select an active category."));
         if (!req.BrandId.HasValue || !await _db.Brands.AnyAsync(x =>
                 x.Id == req.BrandId && x.CompanyId == CompanyId && x.IsActive))
-            return BadRequest(ApiResponse<ProductResponse>.Fail("Aktif bir marka seçilmelidir."));
+            return BadRequest(ApiResponse<ProductResponse>.Fail("Select an active brand."));
 
         var product = await _db.Products
             .Include(p => p.Category)
@@ -212,7 +218,7 @@ public class ProductsController : ControllerBase
             .Include(p => p.Unit)
             .FirstOrDefaultAsync(p => p.Id == id && p.CompanyId == CompanyId);
 
-        if (product is null) return NotFound(ApiResponse<ProductResponse>.Fail("Ürün bulunamadı."));
+        if (product is null) return NotFound(ApiResponse<ProductResponse>.Fail("Product not found."));
 
         product.UpdateBaseInfo(req.Name, req.ShortName, req.Description, req.CategoryId, req.BrandId, req.UnitId, req.IsActive);
         product.UpdatePrices(req.PurchasePrice, req.SalePrice, req.DealerPrice, req.VatRate);
@@ -240,11 +246,16 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult> DeleteProduct(Guid id)
     {
         var product = await _db.Products.FirstOrDefaultAsync(p => p.Id == id && p.CompanyId == CompanyId);
-        if (product is null) return NotFound(ApiResponse<object>.Fail("Ürün bulunamadı."));
+        if (product is null) return NotFound(ApiResponse<object>.Fail("Product not found."));
 
-        product.Deactivate(); // Soft delete işlemi, IsActive = false yapar
+        var stock = await _db.StockMovements.Where(x => x.ProductId == id).SumAsync(x => x.Quantity);
+        if (stock != 0)
+            return Conflict(ApiResponse<object>.Fail(
+                $"Product cannot be deactivated while stock balance is {stock:0.###}. Adjust stock to zero first."));
+
+        product.Deactivate();
         await _db.SaveChangesAsync();
-        return Ok(ApiResponse<object>.Ok(null));
+        return Ok(ApiResponse<object>.Ok(new { }));
     }
 
     private async Task<string> GenerateUniqueEan13Async()
@@ -260,7 +271,7 @@ public class ProductsController : ControllerBase
                     (x.Barcode1 == value || x.Barcode2 == value)))
                 return value;
         }
-        throw new InvalidOperationException("Benzersiz barkod üretilemedi.");
+        throw new InvalidOperationException("A unique barcode could not be generated.");
     }
 }
 

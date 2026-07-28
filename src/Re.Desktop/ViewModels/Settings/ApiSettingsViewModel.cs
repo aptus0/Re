@@ -11,7 +11,7 @@ namespace Re.Desktop.ViewModels.Settings;
 public partial class ApiSettingsViewModel : ObservableObject
 {
     [ObservableProperty]
-    private string _machineIp = "Yükleniyor...";
+    private string _machineIp = "Loading...";
 
     [ObservableProperty]
     private string _apiPort = "5188";
@@ -39,11 +39,11 @@ public partial class ApiSettingsViewModel : ObservableObject
                     return ip.ToString();
                 }
             }
-            return "IP Bulunamadı";
+            return "IP Not Found";
         }
         catch
         {
-            return "Hata";
+            return "Error";
         }
     }
 
@@ -59,16 +59,16 @@ public partial class ApiSettingsViewModel : ObservableObject
             p.StartInfo.RedirectStandardOutput = true;
             p.StartInfo.CreateNoWindow = true;
             p.Start();
-            
+
             string output = p.StandardOutput.ReadToEnd();
             p.WaitForExit();
 
             if (output.Contains("RUNNING"))
-                ServiceStatus = "Çalışıyor";
+                ServiceStatus = "Running";
             else if (output.Contains("STOPPED"))
                 ServiceStatus = "Durduruldu";
             else
-                ServiceStatus = "Yüklü Değil";
+                ServiceStatus = "Not Installed";
         }
         catch
         {
@@ -87,11 +87,11 @@ public partial class ApiSettingsViewModel : ObservableObject
 
         if (!File.Exists(exePath))
         {
-            MessageBox.Show("Re.Api.exe bulunamadı!", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Re.Api.exe was not found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
-        RunAdminCommand("sc.exe", $"create {ServiceName} binPath= \"{exePath}\" start= auto displayname= \"Re Kobi Çözümleri API\"");
+        RunAdminCommand("sc.exe", $"create {ServiceName} binPath= \"{exePath}\" start= auto displayname= \"Re Business Solutions API\"");
         RefreshStatus();
     }
 
@@ -114,7 +114,7 @@ public partial class ApiSettingsViewModel : ObservableObject
     {
         // Re.Desktop projesindeki ApiRunnerService kullanılıyor
         Re.Desktop.Services.ApiRunnerService.StartApi();
-        MessageBox.Show("Yerel API başlatma sinyali gönderildi. Port 5188 kontrol ediliyor...", "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show("The local API start signal was sent. Checking port 5188...", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void RunAdminCommand(string fileName, string arguments)
@@ -125,14 +125,14 @@ public partial class ApiSettingsViewModel : ObservableObject
             p.StartInfo.FileName = fileName;
             p.StartInfo.Arguments = arguments;
             p.StartInfo.UseShellExecute = true;
-            p.StartInfo.Verb = "runas"; // Yönetici izni
+            p.StartInfo.Verb = "runas"; // Directionetici izni
             p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             p.Start();
             p.WaitForExit();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"İşlem reddedildi veya hata oluştu:\n{ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"The operation was denied or failed:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

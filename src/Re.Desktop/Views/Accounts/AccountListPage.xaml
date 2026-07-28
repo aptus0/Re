@@ -50,26 +50,29 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Text="Cari Hesaplar" FontSize="28" FontWeight="Bold" Foreground="#1E293B" />
-                    <TextBlock Text="{Binding TotalCount, StringFormat='Toplam {0} kayıt listeleniyor'}"
+                    <TextBlock Text="Account Management" FontSize="28" FontWeight="Bold" Foreground="#1E293B" />
+                    <TextBlock Text="{Binding TotalCount, StringFormat='{}{0} records listed'}"
                                FontSize="14" Foreground="#64748B" Margin="0,4,0,0" />
                 </StackPanel>
-                
+
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <ComboBox Width="170" Height="34" Margin="0,0,10,0"
                               ItemsSource="{Binding AccountGroups}" SelectedItem="{Binding SelectedAccountGroup}"/>
                     <Border Background="White" CornerRadius="8" Padding="12,8" Margin="0,0,16,0" BorderBrush="#E2E8F0" BorderThickness="1">
                         <Grid>
                             <TextBlock Text="🔍" FontSize="16" Foreground="#94A3B8" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                      Width="200" Background="Transparent" BorderThickness="0" Margin="24,0,0,0"
                                      VerticalAlignment="Center" FontSize="14"/>
-                            <TextBlock Text="Cari ara..." Foreground="#94A3B8" FontSize="14" IsHitTestVisible="False" Margin="24,0,0,0" VerticalAlignment="Center"
+                            <TextBlock Text="Search account, code or tax number..." Foreground="#94A3B8" FontSize="14" IsHitTestVisible="False" Margin="24,0,0,0" VerticalAlignment="Center"
                                        Visibility="{Binding IsSearchEmpty, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         </Grid>
                     </Border>
-                    <Button Content="+ Yeni Cari Hesap" Command="{Binding NewAccountCommand}"
-                            Background="#C62828" Foreground="White" BorderThickness="0" Padding="14,8"
+                    <Button Content="+ Account Operation" Command="{Binding NewOperationCommand}" CommandParameter="{Binding SelectedAccount}"
+                            Background="#107C10" Foreground="White" BorderThickness="0" Padding="14,8"
+                            FontSize="13" FontWeight="SemiBold" Cursor="Hand" Margin="0,0,8,0"/>
+                    <Button Content="+ New Account" Command="{Binding NewAccountCommand}"
+                            Background="#0176D3" Foreground="White" BorderThickness="0" Padding="14,8"
                             FontSize="14" FontWeight="SemiBold" Cursor="Hand">
                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
                     </Button>
@@ -80,27 +83,27 @@
             <UniformGrid Grid.Row="2" Columns="5" Rows="1">
                 <Border Background="White" CornerRadius="3" Padding="12" Margin="0,0,6,0" BorderBrush="#C8C8C8" BorderThickness="1">
                     <StackPanel>
-                        <TextBlock Text="TOPLAM CARİ" FontSize="10" Foreground="#666" FontWeight="SemiBold"/>
+                        <TextBlock Text="TOTAL ACCOUNTS" FontSize="10" Foreground="#666" FontWeight="SemiBold"/>
                         <TextBlock Text="{Binding TotalCount}" FontSize="20" FontWeight="Bold" Foreground="#171717" Margin="0,5,0,0"/>
                     </StackPanel>
                 </Border>
                 <Border Background="White" CornerRadius="3" Padding="12" Margin="0,0,6,0" BorderBrush="#C8C8C8" BorderThickness="1">
                     <StackPanel>
-                        <TextBlock Text="TOPLAM ALACAK" FontSize="10" Foreground="#666" FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding TotalPayables}" FontSize="20" FontWeight="Bold" Foreground="#171717" Margin="0,5,0,0"/>
+                        <TextBlock Text="TOTAL RECEIVABLES" FontSize="10" Foreground="#666" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TotalReceivables}" FontSize="20" FontWeight="Bold" Foreground="#BA0517" Margin="0,5,0,0"/>
                     </StackPanel>
                 </Border>
                 <Border Background="White" CornerRadius="3" Padding="12" Margin="0,0,6,0" BorderBrush="#C8C8C8" BorderThickness="1">
                     <StackPanel>
-                        <TextBlock Text="TOPLAM BORÇ" FontSize="10" Foreground="#666" FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding TotalReceivables}" FontSize="20" FontWeight="Bold" Foreground="#C62828" Margin="0,5,0,0"/>
+                        <TextBlock Text="TOTAL PAYABLES" FontSize="10" Foreground="#666" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TotalPayables}" FontSize="20" FontWeight="Bold" Foreground="#107C10" Margin="0,5,0,0"/>
                     </StackPanel>
                 </Border>
                 <Border Background="White" CornerRadius="3" Padding="12" Margin="0,0,6,0" BorderBrush="#C8C8C8" BorderThickness="1">
-                    <StackPanel><TextBlock Text="MÜŞTERİLER" FontSize="10" Foreground="#666" FontWeight="SemiBold"/><TextBlock Text="{Binding CustomerCount}" FontSize="20" FontWeight="Bold" Foreground="#171717" Margin="0,5,0,0"/></StackPanel>
+                    <StackPanel><TextBlock Text="CUSTOMERS" FontSize="10" Foreground="#666" FontWeight="SemiBold"/><TextBlock Text="{Binding CustomerCount}" FontSize="20" FontWeight="Bold" Foreground="#171717" Margin="0,5,0,0"/></StackPanel>
                 </Border>
                 <Border Background="White" CornerRadius="3" Padding="12" BorderBrush="#C8C8C8" BorderThickness="1">
-                    <StackPanel><TextBlock Text="TEDARİKÇİLER" FontSize="10" Foreground="#666" FontWeight="SemiBold"/><TextBlock Text="{Binding SupplierCount}" FontSize="20" FontWeight="Bold" Foreground="#171717" Margin="0,5,0,0"/></StackPanel>
+                    <StackPanel><TextBlock Text="SUPPLIERS" FontSize="10" Foreground="#666" FontWeight="SemiBold"/><TextBlock Text="{Binding SupplierCount}" FontSize="20" FontWeight="Bold" Foreground="#171717" Margin="0,5,0,0"/></StackPanel>
                 </Border>
             </UniformGrid>
 
@@ -114,7 +117,7 @@
                 <!-- Sol Taraf: Liste -->
                 <Border Grid.Column="0" Background="White" CornerRadius="3" BorderBrush="#B8B8B8" BorderThickness="1" ClipToBounds="True">
                     <Border.Effect><DropShadowEffect Color="#E2E8F0" BlurRadius="15" ShadowDepth="4" Opacity="0.5"/></Border.Effect>
-                    
+
                     <DataGrid ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedAccount}"
                               AutoGenerateColumns="False" CanUserAddRows="False" Background="Transparent"
                               BorderThickness="0" RowHeight="42" HeadersVisibility="Column" GridLinesVisibility="All"
@@ -122,7 +125,7 @@
                               AlternationCount="2" AlternatingRowBackground="#F5F5F5" Margin="0">
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="Background" Value="#202124"/>
+                                <Setter Property="Background" Value="#0F172A"/>
                                 <Setter Property="Foreground" Value="White"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                                 <Setter Property="Padding" Value="9,8"/>
@@ -134,6 +137,17 @@
                                 <Setter Property="BorderBrush" Value="#F1F5F9"/>
                                 <Setter Property="BorderThickness" Value="0,0,0,1"/>
                                 <Setter Property="Cursor" Value="Hand" />
+                                <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
+                                <Setter Property="ContextMenu">
+                                    <Setter.Value>
+                                        <ContextMenu>
+                                            <MenuItem Header="Show Details (Window)" Command="{Binding DataContext.ShowAccountDetailWindowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                                            <MenuItem Header="New Operation" Command="{Binding DataContext.NewOperationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                                            <MenuItem Header="Export CSV Statement" Command="{Binding DataContext.ExportStatementCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                                            <MenuItem Header="Edit Account" Command="{Binding DataContext.EditAccountCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                                        </ContextMenu>
+                                    </Setter.Value>
+                                </Setter>
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Background" Value="#FDECEC"/>
@@ -158,25 +172,25 @@
                                 </Setter>
                             </Style>
                         </DataGrid.Resources>
-                        
+
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="Cari" Width="*">
+                            <DataGridTemplateColumn Header="Accounts" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                             <Border Width="40" Height="40" CornerRadius="20" Background="#E0E7FF" Margin="0,0,12,0">
-                                                <TextBlock Text="{Binding NameInitials}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#C62828"/>
+                                                <TextBlock Text="{Binding NameInitials}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#0176D3"/>
                                             </Border>
                                             <StackPanel VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" Foreground="#1E293B"/>
-                                                <TextBlock Text="{Binding Code, StringFormat='Kod: {0}'}" FontSize="12" Foreground="#94A3B8" Margin="0,2,0,0"/>
+                                                <TextBlock Text="{Binding Code, StringFormat='Code: {0}'}" FontSize="12" Foreground="#94A3B8" Margin="0,2,0,0"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            
-                            <DataGridTextColumn Header="Tür" Binding="{Binding Type}" Width="120">
+
+                            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="120">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="#475569"/>
@@ -184,8 +198,8 @@
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            
-                            <DataGridTemplateColumn Header="Bakiye" Width="150">
+
+                            <DataGridTemplateColumn Header="Balance" Width="150">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel VerticalAlignment="Center">
@@ -194,10 +208,10 @@
                                                     <Style TargetType="TextBlock">
                                                         <Setter Property="Foreground" Value="#1E293B"/>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding BalanceType}" Value="Borçlu">
+                                                            <DataTrigger Binding="{Binding BalanceType}" Value="Receivable">
                                                                 <Setter Property="Foreground" Value="#EF4444"/>
                                                             </DataTrigger>
-                                                            <DataTrigger Binding="{Binding BalanceType}" Value="Alacaklı">
+                                                            <DataTrigger Binding="{Binding BalanceType}" Value="Payable">
                                                                 <Setter Property="Foreground" Value="#10B981"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -210,7 +224,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn Header="Durum" Width="100">
+                            <DataGridTemplateColumn Header="Status" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border CornerRadius="12" Padding="12,4" HorizontalAlignment="Left">
@@ -244,7 +258,7 @@
                     </DataGrid>
                 </Border>
 
-                <!-- Sağ Taraf: Profil / Detay Paneli (Flyout) -->
+                <!-- Sağ Taraf: Profil / Details Paneli (Flyout) -->
                 <Border Grid.Column="1" Width="400" Background="White" CornerRadius="12" BorderBrush="#E2E8F0" BorderThickness="1" Margin="20,0,0,0">
                     <Border.Style>
                         <Style TargetType="Border">
@@ -257,33 +271,34 @@
                         </Style>
                     </Border.Style>
                     <Border.Effect><DropShadowEffect Color="#E2E8F0" BlurRadius="15" ShadowDepth="-4" Opacity="0.5"/></Border.Effect>
-                    
+
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Button Grid.Row="0" HorizontalAlignment="Right" Margin="16" Content="X" 
-                                Command="{Binding ClosePanelCommand}" 
+                        <Button Grid.Row="0" HorizontalAlignment="Right" Margin="16" Content="X"
+                                Command="{Binding ClosePanelCommand}"
                                 Background="Transparent" BorderThickness="0" Foreground="#94A3B8" FontWeight="Bold" FontSize="16" Cursor="Hand"/>
 
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,20">
                             <StackPanel Margin="24,0,24,24" DataContext="{Binding SelectedAccount}">
-                                
+
                                 <StackPanel HorizontalAlignment="Center" Margin="0,0,0,24">
-                                    <Border Width="80" Height="80" CornerRadius="40" Background="#C62828" Margin="0,0,0,16">
+                                    <Border Width="80" Height="80" CornerRadius="40" Background="#0176D3" Margin="0,0,0,16">
                                         <TextBlock Text="{Binding NameInitials}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="28" Foreground="White"/>
                                     </Border>
                                     <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="20" Foreground="#1E293B" TextAlignment="Center"/>
                                     <TextBlock Text="{Binding Type}" FontSize="14" Foreground="#64748B" TextAlignment="Center" Margin="0,4,0,0"/>
                                 </StackPanel>
 
-                                <UniformGrid Columns="2" Margin="0,0,0,24">
-                                    <Button Content="Düzenle" Command="{Binding DataContext.EditAccountCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#F1F5F9" Foreground="#475569" BorderThickness="0" Padding="0,10" Margin="0,0,6,0" FontWeight="SemiBold" Cursor="Hand">
+                                <UniformGrid Columns="3" Margin="0,0,0,24">
+                                    <Button Content="Edit" Command="{Binding DataContext.EditAccountCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#F1F5F9" Foreground="#475569" BorderThickness="0" Padding="0,10" Margin="0,0,6,0" FontWeight="SemiBold" Cursor="Hand">
                                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
                                     </Button>
-                                    <Button Content="Ekstre Al" Background="#F1F1F1" Foreground="#C62828" BorderThickness="1" BorderBrush="#C8C8C8" Padding="0,10" Margin="6,0,0,0" FontWeight="SemiBold" Cursor="Hand">
+                                    <Button Content="Operation" Command="{Binding DataContext.NewOperationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#E3FCEF" Foreground="#006644" BorderThickness="0" Padding="0,10" Margin="3,0" FontWeight="SemiBold" Cursor="Hand"/>
+                                    <Button Content="Statement" Command="{Binding DataContext.ExportStatementCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#F1F1F1" Foreground="#0176D3" BorderThickness="1" BorderBrush="#C8C8C8" Padding="0,10" Margin="6,0,0,0" FontWeight="SemiBold" Cursor="Hand">
                                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
                                     </Button>
                                 </UniformGrid>
@@ -291,12 +306,20 @@
                                 <Border Background="#F8FAFC" CornerRadius="8" Padding="16" Margin="0,0,0,24">
                                     <StackPanel>
                                         <Grid Margin="0,0,0,12">
-                                            <TextBlock Text="Güncel Bakiye:" FontSize="14" Foreground="#64748B"/>
+                                            <TextBlock Text="Current Balance:" FontSize="14" Foreground="#64748B"/>
                                             <TextBlock Text="{Binding Balance, StringFormat='N2'}" HorizontalAlignment="Right" FontWeight="Bold" FontSize="16" Foreground="#1E293B"/>
                                         </Grid>
                                         <Grid Margin="0,0,0,12">
-                                            <TextBlock Text="Risk Limiti:" FontSize="14" Foreground="#64748B"/>
+                                            <TextBlock Text="Credit Limit:" FontSize="14" Foreground="#64748B"/>
                                             <TextBlock Text="{Binding RiskLimit, StringFormat='N2'}" HorizontalAlignment="Right" FontWeight="Bold" FontSize="14" Foreground="#1E293B"/>
+                                        </Grid>
+                                        <Grid Margin="0,0,0,12">
+                                            <TextBlock Text="Invoice volume:" FontSize="14" Foreground="#64748B"/>
+                                            <TextBlock Text="{Binding TotalInvoiced, StringFormat=₺{0:N2}}" HorizontalAlignment="Right" FontWeight="Bold" FontSize="14"/>
+                                        </Grid>
+                                        <Grid Margin="0,0,0,12">
+                                            <TextBlock Text="{Binding InvoiceCount, StringFormat='Invoices: {0}'}" FontSize="12" Foreground="#64748B"/>
+                                            <TextBlock Text="{Binding OpenInvoiceBalance, StringFormat='Open: ₺{0:N2}'}" HorizontalAlignment="Right" Foreground="#C23934" FontWeight="SemiBold"/>
                                         </Grid>
                                         <ProgressBar Value="{Binding RiskPercentage}" Height="6" Background="#E2E8F0" Foreground="#EF4444" BorderThickness="0">
                                             <ProgressBar.Resources>
@@ -305,11 +328,76 @@
                                                 </Style>
                                             </ProgressBar.Resources>
                                         </ProgressBar>
-                                        <TextBlock Text="{Binding RiskPercentage, StringFormat='Risk Kullanımı: %{0:F0}'}" FontSize="12" Foreground="#94A3B8" Margin="0,4,0,0" HorizontalAlignment="Right"/>
+                                        <TextBlock Text="{Binding RiskPercentage, StringFormat='Credit Utilization: %{0:F0}'}" FontSize="12" Foreground="#94A3B8" Margin="0,4,0,0" HorizontalAlignment="Right"/>
                                     </StackPanel>
                                 </Border>
 
-                                <TextBlock Text="İletişim Bilgileri" FontWeight="Bold" FontSize="16" Foreground="#1E293B" Margin="0,0,0,12"/>
+                                <TextBlock Text="Credit Risk &amp; Aging" FontWeight="Bold" FontSize="16" Foreground="#1E293B" Margin="0,0,0,12"/>
+                                <Border Background="White" BorderBrush="#D8DDE6" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,16">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                            <StackPanel><TextBlock Text="{Binding CustomerSegment, StringFormat='SEGMENT · {0}'}" Foreground="#5E6C84" FontSize="10" FontWeight="Bold"/><TextBlock Text="{Binding RiskLevel, StringFormat='{}{0} Risk'}" Foreground="{Binding RiskColor}" FontSize="18" FontWeight="Bold"/></StackPanel>
+                                            <Border Grid.Column="1" Width="58" Height="58" CornerRadius="29" Background="#F4F6F9" BorderBrush="{Binding RiskColor}" BorderThickness="4"><TextBlock Text="{Binding RiskScore}" Foreground="{Binding RiskColor}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                                        </Grid>
+                                        <Grid Margin="0,0,0,10">
+                                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                            <StackPanel><TextBlock Text="TOTAL OVERDUE" Foreground="#5E6C84" FontSize="10"/><TextBlock Text="{Binding TotalOverdue, StringFormat='₺{0:N2}'}" Foreground="#BA0517" FontWeight="Bold" FontSize="16"/></StackPanel>
+                                            <StackPanel Grid.Column="1"><TextBlock Text="MAXIMUM DELAY" Foreground="#5E6C84" FontSize="10"/><TextBlock Text="{Binding MaximumDaysOverdue, StringFormat='{}{0} days'}" Foreground="#B45309" FontWeight="Bold" FontSize="16"/></StackPanel>
+                                        </Grid>
+                                        <TextBlock Text="{Binding OverdueInvoiceCount, StringFormat='Aging schedule · {0} overdue invoices'}" Foreground="#42526E" FontWeight="SemiBold" Margin="0,0,0,7"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                            <StackPanel Margin="0,0,5,0"><Border Height="5" Background="#107C10" CornerRadius="2"/><TextBlock Text="Current" FontSize="9" Foreground="#5E6C84" Margin="0,4,0,0"/><TextBlock Text="{Binding AgingCurrent, StringFormat=N0}" FontWeight="Bold" FontSize="11"/></StackPanel>
+                                            <StackPanel Grid.Column="1" Margin="0,0,5,0"><Border Height="5" Background="#F4B400" CornerRadius="2"/><TextBlock Text="1–30" FontSize="9" Foreground="#5E6C84" Margin="0,4,0,0"/><TextBlock Text="{Binding Aging1To30, StringFormat=N0}" FontWeight="Bold" FontSize="11"/></StackPanel>
+                                            <StackPanel Grid.Column="2" Margin="0,0,5,0"><Border Height="5" Background="#F28C28" CornerRadius="2"/><TextBlock Text="31–60" FontSize="9" Foreground="#5E6C84" Margin="0,4,0,0"/><TextBlock Text="{Binding Aging31To60, StringFormat=N0}" FontWeight="Bold" FontSize="11"/></StackPanel>
+                                            <StackPanel Grid.Column="3" Margin="0,0,5,0"><Border Height="5" Background="#D83B01" CornerRadius="2"/><TextBlock Text="61–90" FontSize="9" Foreground="#5E6C84" Margin="0,4,0,0"/><TextBlock Text="{Binding Aging61To90, StringFormat=N0}" FontWeight="Bold" FontSize="11"/></StackPanel>
+                                            <StackPanel Grid.Column="4"><Border Height="5" Background="#BA0517" CornerRadius="2"/><TextBlock Text="90+" FontSize="9" Foreground="#5E6C84" Margin="0,4,0,0"/><TextBlock Text="{Binding AgingOver90, StringFormat=N0}" FontWeight="Bold" FontSize="11"/></StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="Sales &amp; Inventory Relationship" FontWeight="Bold" FontSize="16" Foreground="#1E293B" Margin="0,0,0,12"/>
+                                <Border Background="#F4F9FF" BorderBrush="#B3D7F2" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,16">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                            <StackPanel><TextBlock Text="UNITS SOLD" Foreground="#5E6C84" FontSize="10" FontWeight="Bold"/><TextBlock Text="{Binding UnitsSold, StringFormat=N2}" FontSize="18" FontWeight="Bold" Foreground="#0176D3"/></StackPanel>
+                                            <StackPanel Grid.Column="1"><TextBlock Text="STOCK DOCUMENTS" Foreground="#5E6C84" FontSize="10" FontWeight="Bold"/><TextBlock Text="{Binding StockDocumentCount}" FontSize="18" FontWeight="Bold" Foreground="#172B4D"/></StackPanel>
+                                            <StackPanel Grid.Column="2"><TextBlock Text="OPEN INVOICES" Foreground="#5E6C84" FontSize="10" FontWeight="Bold"/><TextBlock Text="{Binding OpenInvoiceBalance, StringFormat='₺{0:N2}'}" FontSize="16" FontWeight="Bold" Foreground="#BA0517"/></StackPanel>
+                                        </Grid>
+                                        <TextBlock Text="Top purchased products" Foreground="#014486" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                        <ItemsControl ItemsSource="{Binding TopProducts}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,4">
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="70"/><ColumnDefinition Width="*"/><ColumnDefinition Width="70"/></Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding Code}" Foreground="#5E6C84" FontSize="11"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Foreground="#172B4D"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding Quantity, StringFormat='{}{0:N2} unit'}" HorizontalAlignment="Right" FontWeight="SemiBold" Foreground="#006644"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="Recent Invoices" FontWeight="Bold" FontSize="16" Foreground="#1E293B" Margin="0,0,0,10"/>
+                                <ItemsControl ItemsSource="{Binding RecentInvoices}" Margin="0,0,0,18">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="#E5E8EC" BorderThickness="0,0,0,1" Padding="0,7">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                                    <StackPanel><TextBlock Text="{Binding DocumentNumber}" FontWeight="SemiBold" Foreground="#0176D3"/><TextBlock FontSize="10" Foreground="#8993A4"><Run Text="{Binding Date, StringFormat='dd.MM.yyyy'}"/><Run Text="{Binding LineCount, StringFormat=' · {0} lines'}"/></TextBlock></StackPanel>
+                                                    <StackPanel Grid.Column="1"><TextBlock Text="{Binding TotalAmount, StringFormat='₺{0:N2}'}" HorizontalAlignment="Right" FontWeight="Bold"/><TextBlock Text="{Binding OpenAmount, StringFormat='Open ₺{0:N2}'}" HorizontalAlignment="Right" FontSize="10" Foreground="#BA0517"/></StackPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <TextBlock Text="Contact Information" FontWeight="Bold" FontSize="16" Foreground="#1E293B" Margin="0,0,0,12"/>
                                 <StackPanel Margin="0,0,0,24">
                                     <Grid Margin="0,0,0,10">
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -319,7 +407,7 @@
                                     <Grid Margin="0,0,0,10">
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                                         <TextBlock Text="✉" Foreground="#94A3B8"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding Email}" Foreground="#C62828" TextWrapping="Wrap"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Email}" Foreground="#0176D3" TextWrapping="Wrap"/>
                                     </Grid>
                                     <Grid Margin="0,0,0,10">
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -329,11 +417,11 @@
                                     <Grid Margin="0,0,0,10">
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                                         <TextBlock Text="🏢" Foreground="#94A3B8"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding TaxNumber, StringFormat='Vergi No: {0}'}" Foreground="#475569" TextWrapping="Wrap"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding TaxNumber, StringFormat='Tax No: {0}'}" Foreground="#475569" TextWrapping="Wrap"/>
                                     </Grid>
                                 </StackPanel>
 
-                                <TextBlock Text="Son İşlemler" FontWeight="Bold" FontSize="16" Foreground="#1E293B" Margin="0,0,0,12"/>
+                                <TextBlock Text="Recent Activity" FontWeight="Bold" FontSize="16" Foreground="#1E293B" Margin="0,0,0,12"/>
                                 <ItemsControl ItemsSource="{Binding Transactions}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -352,10 +440,10 @@
                                                             <Style TargetType="TextBlock">
                                                                 <Setter Property="Foreground" Value="#1E293B"/>
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Type}" Value="Borç">
+                                                                    <DataTrigger Binding="{Binding Type}" Value="Debit">
                                                                         <Setter Property="Foreground" Value="#EF4444"/>
                                                                     </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding Type}" Value="Alacak">
+                                                                    <DataTrigger Binding="{Binding Type}" Value="Credit">
                                                                         <Setter Property="Foreground" Value="#10B981"/>
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
@@ -419,7 +507,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Başlık & Kapat -->
+                        <!-- Başlık & Close -->
                         <Grid Grid.Row="0" Margin="0,0,0,24">
                             <TextBlock Text="{Binding DataContext.FormTitle, RelativeSource={RelativeSource AncestorType=UserControl}}" FontSize="24" FontWeight="Bold" Foreground="#1E293B"/>
                             <Button Content="X" Command="{Binding DataContext.CloseFormCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Right" Background="Transparent" BorderThickness="0" Foreground="#94A3B8" FontSize="18" FontWeight="Bold" Cursor="Hand"/>
@@ -428,7 +516,7 @@
                         <TabControl Grid.Row="1" Margin="0,0,0,16" Background="Transparent" BorderThickness="0">
                             <TabControl.Resources>
                                 <Style TargetType="TabItem">
-                                    <Setter Property="Foreground" Value="#202124"/>
+                                    <Setter Property="Foreground" Value="#0F172A"/>
                                     <Setter Property="Background" Value="#F0F0F0"/>
                                     <Setter Property="FontSize" Value="12"/>
                                     <Setter Property="FontWeight" Value="SemiBold"/>
@@ -442,14 +530,14 @@
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsSelected" Value="True">
-                                                        <Setter TargetName="Border" Property="BorderBrush" Value="#C62828"/>
+                                                        <Setter TargetName="Border" Property="BorderBrush" Value="#0176D3"/>
                                                         <Setter TargetName="Border" Property="Background" Value="White"/>
-                                                        <Setter Property="Foreground" Value="#C62828"/>
+                                                        <Setter Property="Foreground" Value="#0176D3"/>
                                                         <Setter Property="FontWeight" Value="Bold"/>
                                                     </Trigger>
                                                     <Trigger Property="IsSelected" Value="False">
                                                         <Setter TargetName="Border" Property="Background" Value="#F0F0F0"/>
-                                                        <Setter Property="Foreground" Value="#202124"/>
+                                                        <Setter Property="Foreground" Value="#0F172A"/>
                                                         <Setter Property="FontWeight" Value="SemiBold"/>
                                                     </Trigger>
                                                     <Trigger Property="IsMouseOver" Value="True">
@@ -463,8 +551,8 @@
                                 </Style>
                             </TabControl.Resources>
 
-                            <!-- 1. Genel Bilgiler -->
-                            <TabItem Header="Genel Bilgiler">
+                            <!-- 1. Genel Informationler -->
+                            <TabItem Header="General">
                                 <StackPanel Margin="16,24,16,16">
                                     <Grid Margin="0,0,0,16">
                                         <Grid.ColumnDefinitions>
@@ -473,17 +561,17 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Cari Kod" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="Accounts Code" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <TextBox Text="{Binding Code}" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="2">
-                                            <TextBlock Text="Hesap Türü" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="Account Type" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <ComboBox Text="{Binding Type}" IsEditable="True" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                         </StackPanel>
                                     </Grid>
 
                                     <StackPanel Margin="0,0,0,16">
-                                        <TextBlock Text="Firma / Kişi Adı *" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Company / Person Name *" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                         <TextBox Text="{Binding Name}" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                     </StackPanel>
 
@@ -494,19 +582,19 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Vergi No / TCKN" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="Tax No / TCKN" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <TextBox Text="{Binding TaxNumber}" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="2">
-                                            <TextBlock Text="Vergi Dairesi" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="Tax Office" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <TextBox Text="{Binding TaxOffice}" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
                             </TabItem>
 
-                            <!-- 2. İletişim Bilgileri -->
-                            <TabItem Header="İletişim">
+                            <!-- 2. Contact Information -->
+                            <TabItem Header="Contact">
                                 <StackPanel Margin="16,24,16,16">
                                     <Grid Margin="0,0,0,16">
                                         <Grid.ColumnDefinitions>
@@ -545,7 +633,7 @@
                             <TabItem Header="Adresler">
                                 <StackPanel Margin="16,24,16,16">
                                     <StackPanel Margin="0,0,0,16">
-                                        <TextBlock Text="Açık Adres" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Street Address" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                         <TextBox Text="{Binding Address}" TextWrapping="Wrap" Height="60" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                     </StackPanel>
                                     <Grid Margin="0,0,0,16">
@@ -555,19 +643,19 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="İl" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="City" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <TextBox Text="{Binding City}" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="2">
-                                            <TextBlock Text="İlçe" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="District" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <TextBox Text="{Binding District}" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
                             </TabItem>
 
-                            <!-- 4. Finansal Bilgiler -->
-                            <TabItem Header="Finans">
+                            <!-- 4. Financeal Informationler -->
+                            <TabItem Header="Finance">
                                 <StackPanel Margin="16,24,16,16">
                                     <Grid Margin="0,0,0,16">
                                         <Grid.ColumnDefinitions>
@@ -576,11 +664,11 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Risk Limiti" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="Credit Limit" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <TextBox Text="{Binding RiskLimit, StringFormat='N2'}" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="2">
-                                            <TextBlock Text="Başlangıç Bakiyesi" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="Opening Balance" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <TextBox Text="{Binding InitialBalance, StringFormat='N2'}" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                         </StackPanel>
                                     </Grid>
@@ -591,7 +679,7 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Vade Süresi (Gün)" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                            <TextBlock Text="Payment Term (Days)" Foreground="#475569" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                             <TextBox Text="{Binding PaymentTermDays}" Padding="10,8" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" FontSize="14"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="2">
@@ -603,12 +691,12 @@
                             </TabItem>
 
                             <!-- Diğer Sekmeler -->
-                            <TabItem Header="Bakiye / Risk"><StackPanel Margin="16,24,16,16"><TextBlock Text="Bakiye Yaşlandırma Raporları..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
-                            <TabItem Header="Cari Hareketler"><StackPanel Margin="16,24,16,16"><TextBlock Text="Geçmiş İşlemler Dökümü..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
-                            <TabItem Header="Alış / Satış"><StackPanel Margin="16,24,16,16"><TextBlock Text="Satış ve Alış İstatistikleri..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
-                            <TabItem Header="CRM"><StackPanel Margin="16,24,16,16"><TextBlock Text="Müşteri Notları ve Görüşmeler..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
-                            <TabItem Header="Belgeler"><StackPanel Margin="16,24,16,16"><TextBlock Text="Cari Sözleşmeleri ve Belgeler..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
-                            <TabItem Header="E-Dönüşüm"><StackPanel Margin="16,24,16,16"><TextBlock Text="E-Fatura Entegrasyon Ayarları..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
+                            <TabItem Header="Balance / Risk"><StackPanel Margin="16,24,16,16"><TextBlock Text="Balance aging reports..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
+                            <TabItem Header="Account Movements"><StackPanel Margin="16,24,16,16"><TextBlock Text="Transaction history..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
+                            <TabItem Header="Purchases / Sales"><StackPanel Margin="16,24,16,16"><TextBlock Text="Sales and purchase statistics..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
+                            <TabItem Header="CRM"><StackPanel Margin="16,24,16,16"><TextBlock Text="Customer notes and meetings..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
+                            <TabItem Header="Documents"><StackPanel Margin="16,24,16,16"><TextBlock Text="Account agreements and documents..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
+                            <TabItem Header="E-Transformation"><StackPanel Margin="16,24,16,16"><TextBlock Text="E-Invoice integration settings..." FontStyle="Italic" Foreground="#64748B"/></StackPanel></TabItem>
 
                         </TabControl>
 
@@ -618,10 +706,10 @@
                                 <ColumnDefinition Width="12"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="İptal" Command="{Binding DataContext.CloseFormCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Background="#F1F5F9" Foreground="#475569" BorderThickness="0" Padding="0,12" FontSize="15" FontWeight="Bold" Cursor="Hand">
+                            <Button Grid.Column="0" Content="Cancel" Command="{Binding DataContext.CloseFormCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Background="#F1F5F9" Foreground="#475569" BorderThickness="0" Padding="0,12" FontSize="15" FontWeight="Bold" Cursor="Hand">
                                 <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
                             </Button>
-                            <Button Grid.Column="2" Content="Kaydet" Command="{Binding DataContext.SaveAccountCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Background="#C62828" Foreground="White" BorderThickness="0" Padding="0,10" FontSize="13" FontWeight="Bold" Cursor="Hand">
+                            <Button Grid.Column="2" Content="Save" Command="{Binding DataContext.SaveAccountCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Background="#0176D3" Foreground="White" BorderThickness="0" Padding="0,10" FontSize="13" FontWeight="Bold" Cursor="Hand">
                                 <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
                             </Button>
                         </Grid>

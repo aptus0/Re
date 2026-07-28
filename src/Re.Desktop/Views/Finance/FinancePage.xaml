@@ -1,117 +1,582 @@
 <UserControl x:Class="Re.Desktop.Views.Finance.FinancePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:Re.Desktop.Views.Finance"
       xmlns:vm="clr-namespace:Re.Desktop.ViewModels.Finance"
-      mc:Ignorable="d" 
-      d:DesignHeight="768" d:DesignWidth="1024"
-      Background="#F5F7FA">
+      xmlns:conv="clr-namespace:Re.Desktop.Converters"
+      mc:Ignorable="d"
+      d:DesignHeight="768" d:DesignWidth="1280"
+      Background="#F1F4F8"
+      FontFamily="Segoe UI">
 
     <UserControl.DataContext>
         <vm:FinanceViewModel />
     </UserControl.DataContext>
 
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:TurkishAmountConverter x:Key="TurkishAmount"/>
+        <conv:CurrencyConverter x:Key="CurrencyFmt"/>
+
+        <!-- Compact TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Padding" Value="7,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+        </Style>
+
+        <!-- Compact ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Padding" Value="7,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- Compact DatePicker -->
+        <Style TargetType="DatePicker">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+        </Style>
+
+        <!-- Label Style -->
+        <Style x:Key="FormLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="Margin" Value="0,0,0,3"/>
+        </Style>
+
+        <!-- Tab Item Style -->
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Background" Value="#F1F4F8"/>
+            <Setter Property="BorderBrush" Value="#D8DDE6"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Foreground" Value="#0176D3"/>
+                    <Setter Property="Background" Value="White"/>
+                    <Setter Property="BorderThickness" Value="1,1,1,0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- DataGrid Header -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#0F172A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="BorderBrush" Value="#1E293B"/>
+            <Setter Property="BorderThickness" Value="0,0,1,0"/>
+        </Style>
+
+        <!-- DataGrid Row -->
+        <Style TargetType="DataGridRow">
+            <Setter Property="Cursor" Value="Hand"/>
+            <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="ContextMenu">
+                <Setter.Value>
+                    <ContextMenu FontSize="12">
+                        <MenuItem Header="📋  View Details" Command="{Binding DataContext.ViewChequeDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                        <Separator/>
+                        <MenuItem Header="✅  Collect Document" Command="{Binding DataContext.CollectChequeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                        <MenuItem Header="↩  Endorse (Ciro Et)" Command="{Binding DataContext.EndorseChequeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                        <MenuItem Header="⛔  Mark as Bounced" Command="{Binding DataContext.MarkAsBouncedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                        <Separator/>
+                        <MenuItem Header="🗑  Delete Document" Command="{Binding DataContext.DeleteChequeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                    </ContextMenu>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#EFF6FF"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#DBEAFE"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
-        <!-- Overlay for Loading -->
-        <Border Background="#80000000" Panel.ZIndex="1000" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="İşlem Yapılıyor..." Foreground="White" Margin="0,10,0,0" FontSize="16" />
+        <!-- Loading Overlay -->
+        <Border Background="#88000000" Panel.ZIndex="1000"
+                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="220">
+                <Border Background="#1E293B" CornerRadius="10" Padding="24,18">
+                    <StackPanel>
+                        <ProgressBar IsIndeterminate="True" Height="4" Background="#334155" Foreground="#0176D3"/>
+                        <TextBlock Text="Processing..." Foreground="White" FontSize="13" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </Border>
 
-        <Grid Margin="20">
+        <Grid Margin="16,14,16,14">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Başlık -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                <TextBlock Text="Tahsilat / Ödeme" Style="{StaticResource CorporatePageTitle}" />
-                <TextBlock Text="Cari hesaplarınızdan tahsilat alın veya ödeme yapın." FontSize="14" Foreground="#64748B" Margin="0,4,0,0" />
-            </StackPanel>
-
-            <!-- Form Alanı (Windows Form/Kurumsal Tasarım) -->
-            <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="30" 
-                    VerticalAlignment="Top" HorizontalAlignment="Left" MinWidth="500">
-                
+            <!-- Page Header -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Text="İşlem Bilgileri" FontSize="18" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,20" />
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150" />
-                            <ColumnDefinition Width="300" />
-                        </Grid.ColumnDefinitions>
+                    <TextBlock Text="Finance &amp; Documents" FontSize="20" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock FontSize="11" Foreground="#64748B" Margin="0,2,0,0">
+                        <Run Text="Bank / Cash accounts · Collections · Payments · Cheque &amp; Note Portfolio"/>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+
+            <!-- Tab Control -->
+            <TabControl Grid.Row="2" Background="White" BorderBrush="#D8DDE6" BorderThickness="1">
+
+                <!-- ═══════════════════════════════════════════
+                     TAB 1 · Collections &amp; Payments
+                     ═══════════════════════════════════════════ -->
+                <TabItem Header="💰  Collections &amp; Payments">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Margin="20,16,20,16" Orientation="Horizontal" VerticalAlignment="Top">
+
+                            <!-- LEFT: New Transaction Card -->
+                            <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1"
+                                    CornerRadius="8" Padding="18,14" Width="440" VerticalAlignment="Top">
+                                <StackPanel>
+                                    <!-- Card Header -->
+                                    <Border Background="#F8FAFC" CornerRadius="6" Padding="10,7" Margin="0,0,0,14">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="📝" FontSize="13" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="New Transaction" FontSize="13" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Grid Form (compact 2-col) -->
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Transaction Type -->
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Transaction Type *" Style="{StaticResource FormLabel}" VerticalAlignment="Center"/>
+                                        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding TransactionTypes}" SelectedItem="{Binding TransactionType}"/>
+
+                                        <!-- Account -->
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Account (Cari) *" Style="{StaticResource FormLabel}" VerticalAlignment="Center"/>
+                                        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedAccount}" DisplayMemberPath="Name"/>
+
+                                        <!-- Payment Method -->
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Payment Method *" Style="{StaticResource FormLabel}" VerticalAlignment="Center"/>
+                                        <ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding PaymentMethod}"/>
+
+                                        <!-- Cash Register (conditional) -->
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Cash Register *" Style="{StaticResource FormLabel}" VerticalAlignment="Center"
+                                                   Visibility="{Binding IsCashSelected, Converter={StaticResource BoolToVis}}"/>
+                                        <ComboBox Grid.Row="6" Grid.Column="1" ItemsSource="{Binding CashRegisters}" SelectedItem="{Binding SelectedCashRegister}" DisplayMemberPath="DisplayName"
+                                                  Visibility="{Binding IsCashSelected, Converter={StaticResource BoolToVis}}"/>
+
+                                        <!-- Bank Account (conditional) -->
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Bank Account *" Style="{StaticResource FormLabel}" VerticalAlignment="Center"
+                                                   Visibility="{Binding IsBankSelected, Converter={StaticResource BoolToVis}}"/>
+                                        <ComboBox Grid.Row="6" Grid.Column="1" ItemsSource="{Binding BankAccounts}" SelectedItem="{Binding SelectedBankAccount}" DisplayMemberPath="DisplayName"
+                                                  Visibility="{Binding IsBankSelected, Converter={StaticResource BoolToVis}}"/>
+
+                                        <!-- Amount -->
+                                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Amount (₺) *" Style="{StaticResource FormLabel}" VerticalAlignment="Center"/>
+                                        <Grid Grid.Row="8" Grid.Column="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox Text="{Binding Amount, Converter={StaticResource TurkishAmount}, UpdateSourceTrigger=LostFocus}"
+                                                     TextAlignment="Right"/>
+                                            <Border Grid.Column="1" Background="#F1F4F8" BorderBrush="#CBD5E1" BorderThickness="0,1,1,1" Padding="6,0">
+                                                <TextBlock Text="₺" FontSize="12" FontWeight="SemiBold" Foreground="#475569" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- Transaction Date -->
+                                        <TextBlock Grid.Row="10" Grid.Column="0" Text="Date" Style="{StaticResource FormLabel}" VerticalAlignment="Center"/>
+                                        <DatePicker Grid.Row="10" Grid.Column="1" SelectedDate="{Binding TransactionDate}"/>
+
+                                        <!-- Description -->
+                                        <TextBlock Grid.Row="12" Grid.Column="0" Text="Description" Style="{StaticResource FormLabel}" VerticalAlignment="Top" Margin="0,5,0,0"/>
+                                        <TextBox Grid.Row="12" Grid.Column="1" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                                 TextWrapping="Wrap" AcceptsReturn="True" Height="56"
+                                                 VerticalContentAlignment="Top" Padding="7,5"/>
+
+                                        <!-- Save Button -->
+                                        <Button Grid.Row="14" Grid.Column="1" Command="{Binding SaveTransactionCommand}"
+                                                Background="#F97316" Foreground="White" BorderThickness="0"
+                                                Height="30" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"
+                                                Width="130" Cursor="Hand">
+                                            <Button.Resources>
+                                                <Style TargetType="Border"><Setter Property="CornerRadius" Value="5"/></Style>
+                                            </Button.Resources>
+                                            <TextBlock Text="Save Transaction"/>
+                                        </Button>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- RIGHT: Summary Info Panel -->
+                            <StackPanel Margin="16,0,0,0" Width="260" VerticalAlignment="Top">
+                                <TextBlock Text="QUICK SUMMARY" FontSize="10" FontWeight="Bold" Foreground="#94A3B8" Margin="0,0,0,8"/>
+
+                                <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="💵  Cash in Hand" FontSize="11" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,4"/>
+                                        <TextBlock Text="Select a cash register" FontSize="11" Foreground="#94A3B8"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="🏦  Bank Balance" FontSize="11" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,4"/>
+                                        <TextBlock Text="Select a bank account" FontSize="11" Foreground="#94A3B8"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="#F0FDF4" BorderBrush="#86EFAC" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                                    <StackPanel>
+                                        <TextBlock Text="ℹ  Format Note" FontSize="10" FontWeight="Bold" Foreground="#166534" Margin="0,0,0,4"/>
+                                        <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="#15803D">
+                                            <Run Text="Enter amounts using Turkish format:"/>
+                                            <LineBreak/>
+                                            <Run Text="1.250,75 (dot=thousands, comma=decimal)"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ═══════════════════════════════════════════
+                     TAB 2 · Cheques &amp; Notes Portfolio
+                     ═══════════════════════════════════════════ -->
+                <TabItem Header="🎫  Cheques &amp; Notes Portfolio">
+                    <Grid Margin="14,10,14,10">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <!-- İşlem Tipi -->
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="İşlem Tipi:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#334155" Margin="0,0,0,15" />
-                        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding TransactionTypes}" SelectedItem="{Binding TransactionType}" Margin="0,0,0,15" />
+                        <!-- Summary Cards (compact) -->
+                        <UniformGrid Grid.Row="0" Columns="4" Rows="1">
+                            <!-- Cheques Receivable -->
+                            <Border Background="White" CornerRadius="7" Padding="12,8" Margin="0,0,7,0"
+                                    BorderBrush="#BFDBFE" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="4"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="CHEQUES RECEIVABLE" FontSize="9" Foreground="#64748B" FontWeight="Bold"/>
+                                    <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="↑" Foreground="#0176D3" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBlock Text="{Binding TotalChequesReceivable}" FontSize="15" FontWeight="Bold" Foreground="#0176D3"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
 
-                        <!-- Cari Hesap -->
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Cari Hesap:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#334155" Margin="0,0,0,15" />
-                        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Accounts}" SelectedItem="{Binding SelectedAccount}" 
-                                  DisplayMemberPath="Name" Margin="0,0,0,15" />
+                            <!-- Notes Receivable -->
+                            <Border Background="White" CornerRadius="7" Padding="12,8" Margin="0,0,7,0"
+                                    BorderBrush="#BFDBFE" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="4"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="NOTES RECEIVABLE" FontSize="9" Foreground="#64748B" FontWeight="Bold"/>
+                                    <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="↑" Foreground="#0176D3" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBlock Text="{Binding TotalNotesReceivable}" FontSize="15" FontWeight="Bold" Foreground="#0176D3"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
 
-                        <!-- Ödeme Yöntemi -->
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Ödeme Yöntemi:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#334155" Margin="0,0,0,15" />
-                        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding PaymentMethod}" Margin="0,0,0,15" />
+                            <!-- Cheques Payable -->
+                            <Border Background="White" CornerRadius="7" Padding="12,8" Margin="0,0,7,0"
+                                    BorderBrush="#FCA5A5" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="4"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="CHEQUES PAYABLE" FontSize="9" Foreground="#64748B" FontWeight="Bold"/>
+                                    <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="↓" Foreground="#DC2626" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBlock Text="{Binding TotalChequesPayable}" FontSize="15" FontWeight="Bold" Foreground="#DC2626"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
 
-                        <!-- Kasa Seçimi (Sadece Kasa Seçiliyse) -->
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Kasa Seçimi:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#334155" Margin="0,0,0,15" 
-                                   Visibility="{Binding IsCashSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding CashRegisters}" SelectedItem="{Binding SelectedCashRegister}" 
-                                  DisplayMemberPath="DisplayName"
-                                  Visibility="{Binding IsCashSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,15" />
+                            <!-- Notes Payable -->
+                            <Border Background="White" CornerRadius="7" Padding="12,8"
+                                    BorderBrush="#FCA5A5" BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="4"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="NOTES PAYABLE" FontSize="9" Foreground="#64748B" FontWeight="Bold"/>
+                                    <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="↓" Foreground="#DC2626" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBlock Text="{Binding TotalNotesPayable}" FontSize="15" FontWeight="Bold" Foreground="#DC2626"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </UniformGrid>
 
-                        <!-- Banka Seçimi (Sadece Banka Seçiliyse) -->
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Banka Seçimi:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#334155" Margin="0,0,0,15" 
-                                   Visibility="{Binding IsBankSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        <ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{Binding BankAccounts}" SelectedItem="{Binding SelectedBankAccount}" 
-                                  DisplayMemberPath="DisplayName"
-                                  Visibility="{Binding IsBankSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,0,15" />
+                        <!-- Toolbar: Search + Buttons -->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                        <!-- Tutar -->
-                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Tutar (TL):" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#334155" Margin="0,0,0,15" />
-                        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,15" />
+                            <!-- Search Box -->
+                            <Border Background="White" BorderBrush="#CBD5E1" BorderThickness="1"
+                                    CornerRadius="5" Padding="8,0" Height="28" Width="280">
+                                <Grid>
+                                    <TextBox Text="{Binding SearchChequeText, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="Transparent" BorderThickness="0"
+                                             VerticalAlignment="Center" Padding="0" FontSize="12"/>
+                                    <TextBlock Text="🔍  Search doc, bank, drawer..." Foreground="#94A3B8"
+                                               IsHitTestVisible="False" VerticalAlignment="Center" FontSize="11"
+                                               Visibility="{Binding SearchChequeText.Length, Converter={StaticResource BoolToVis}, ConverterParameter=invert}"/>
+                                </Grid>
+                            </Border>
 
-                        <!-- Tarih -->
-                        <TextBlock Grid.Row="6" Grid.Column="0" Text="İşlem Tarihi:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#334155" Margin="0,0,0,15" />
-                        <DatePicker Grid.Row="6" Grid.Column="1" SelectedDate="{Binding TransactionDate}" Margin="0,0,0,15" />
-
-                        <!-- Açıklama -->
-                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Açıklama:" VerticalAlignment="Top" FontWeight="SemiBold" Foreground="#334155" Margin="0,15,0,0" />
-                        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" 
-                                 TextWrapping="Wrap" AcceptsReturn="True" Height="80" Margin="0,0,0,20" />
-                    </Grid>
-
-                    <Separator Margin="0,10,0,20" Background="#E2E8F0" />
-                    
-                    <!-- Butonlar -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Command="{Binding SaveTransactionCommand}" 
-                                Background="#C62828" BorderBrush="#8E1717" Foreground="White"
-                                Width="140" Height="40" FontSize="14" FontWeight="SemiBold">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Kaydet" VerticalAlignment="Center"/>
+                            <!-- Filter Tags -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0" VerticalAlignment="Center">
+                                <Border Background="#EFF6FF" BorderBrush="#BFDBFE" BorderThickness="1" CornerRadius="12" Padding="8,3" Margin="0,0,5,0">
+                                    <TextBlock Text="All Documents" FontSize="11" Foreground="#1D4ED8"/>
+                                </Border>
+                                <Border Background="#F0FDF4" BorderBrush="#86EFAC" BorderThickness="1" CornerRadius="12" Padding="8,3" Margin="0,0,5,0">
+                                    <TextBlock Text="Receivable" FontSize="11" Foreground="#166534"/>
+                                </Border>
+                                <Border Background="#FFF7ED" BorderBrush="#FED7AA" BorderThickness="1" CornerRadius="12" Padding="8,3">
+                                    <TextBlock Text="Payable" FontSize="11" Foreground="#9A3412"/>
+                                </Border>
                             </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
+
+                            <!-- Action Buttons -->
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <Button Content="↻  Refresh" Command="{Binding LoadChequesAndNotesCommand}"
+                                        Background="White" Foreground="#475569" BorderBrush="#CBD5E1" BorderThickness="1"
+                                        Padding="10,0" Height="28" FontSize="12" FontWeight="SemiBold"
+                                        Margin="0,0,6,0" Cursor="Hand">
+                                    <Button.Resources>
+                                        <Style TargetType="Border"><Setter Property="CornerRadius" Value="5"/></Style>
+                                    </Button.Resources>
+                                </Button>
+                                <Button Content="＋  New Document" Command="{Binding CreateChequeCommand}"
+                                        Background="#F97316" Foreground="White" BorderThickness="0"
+                                        Padding="12,0" Height="28" FontSize="12" FontWeight="Bold" Cursor="Hand">
+                                    <Button.Resources>
+                                        <Style TargetType="Border"><Setter Property="CornerRadius" Value="5"/></Style>
+                                    </Button.Resources>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Portfolio DataGrid (compact rows) -->
+                        <DataGrid Grid.Row="4" ItemsSource="{Binding ChequesAndNotes}"
+                                  AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
+                                  RowHeight="30" HeadersVisibility="Column"
+                                  SelectionMode="Single" SelectionUnit="FullRow"
+                                  Background="White" BorderBrush="#E2E8F0" BorderThickness="1"
+                                  RowBackground="White" AlternatingRowBackground="#FAFCFF"
+                                  ColumnHeaderHeight="30">
+
+                            <DataGrid.Columns>
+                                <!-- Doc Number -->
+                                <DataGridTextColumn Header="Doc #" Binding="{Binding Number}" Width="105">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                            <Setter Property="FontFamily" Value="Consolas"/>
+                                            <Setter Property="FontSize" Value="11"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Type -->
+                                <DataGridTextColumn Header="Type" Binding="{Binding TypeDisplay}" Width="160"/>
+
+                                <!-- Account -->
+                                <DataGridTextColumn Header="Account" Binding="{Binding AccountName}" Width="*"/>
+
+                                <!-- Amount (Turkish format) -->
+                                <DataGridTemplateColumn Header="Amount" Width="125" SortMemberPath="Amount">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" TextAlignment="Right"
+                                                       FontWeight="Bold" FontSize="12"
+                                                       Text="{Binding Amount, Converter={StaticResource CurrencyFmt}}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#0176D3"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsPayable}" Value="True">
+                                                                <Setter Property="Foreground" Value="#DC2626"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Due Date -->
+                                <DataGridTextColumn Header="Due Date" Binding="{Binding DueDate, StringFormat='dd.MM.yyyy'}" Width="90">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontFamily" Value="Consolas"/>
+                                            <Setter Property="FontSize" Value="11"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Status Badge -->
+                                <DataGridTemplateColumn Header="Status" Width="125" SortMemberPath="StatusDisplay">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="10" Padding="7,2" Margin="2,4" HorizontalAlignment="Left">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="#F1F5F9"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding StatusDisplay}" Value="In Portfolio">
+                                                                <Setter Property="Background" Value="#DBEAFE"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatusDisplay}" Value="Collected">
+                                                                <Setter Property="Background" Value="#DCFCE7"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatusDisplay}" Value="Paid">
+                                                                <Setter Property="Background" Value="#DCFCE7"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatusDisplay}" Value="Bounced / Unpaid">
+                                                                <Setter Property="Background" Value="#FEE2E2"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StatusDisplay}" Value="Endorsed (Ciro)">
+                                                                <Setter Property="Background" Value="#FEF9C3"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding StatusDisplay}" FontSize="10" FontWeight="SemiBold">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#475569"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding StatusDisplay}" Value="In Portfolio">
+                                                                    <Setter Property="Foreground" Value="#1D4ED8"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding StatusDisplay}" Value="Collected">
+                                                                    <Setter Property="Foreground" Value="#166534"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding StatusDisplay}" Value="Paid">
+                                                                    <Setter Property="Foreground" Value="#166534"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding StatusDisplay}" Value="Bounced / Unpaid">
+                                                                    <Setter Property="Foreground" Value="#991B1B"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding StatusDisplay}" Value="Endorsed (Ciro)">
+                                                                    <Setter Property="Foreground" Value="#92400E"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Bank -->
+                                <DataGridTextColumn Header="Bank" Binding="{Binding BankName}" Width="120">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontSize" Value="11"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- Drawer -->
+                                <DataGridTextColumn Header="Drawer" Binding="{Binding Drawer}" Width="110">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontSize" Value="11"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+
+            </TabControl>
         </Grid>
     </Grid>
 </UserControl>

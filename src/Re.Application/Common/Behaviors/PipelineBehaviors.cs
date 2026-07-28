@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -33,7 +33,7 @@ public sealed class ValidationBehavior<TRequest, TResponse>
 
         if (failures.Count != 0)
             throw new Domain.Exceptions.DomainException(
-                "Doğrulama hatası: " + string.Join("; ", failures.Select(f => f.ErrorMessage)));
+                "Validation error: " + string.Join("; ", failures.Select(f => f.ErrorMessage)));
 
         return await next(cancellationToken);
     }

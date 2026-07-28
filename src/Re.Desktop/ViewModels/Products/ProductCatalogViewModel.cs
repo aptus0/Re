@@ -11,7 +11,7 @@ public partial class ProductCatalogViewModel : ObservableObject
     private readonly ApiClient _api;
     private readonly IDialogService _dialog;
     [ObservableProperty] private bool _isLoading;
-    [ObservableProperty] private string _statusText = "Katalog verileri hazırlanıyor...";
+    [ObservableProperty] private string _statusText = "Preparing catalog data...";
     [ObservableProperty] private CatalogItemResponse? _selectedCategory;
     [ObservableProperty] private CatalogItemResponse? _selectedBrand;
     [ObservableProperty] private CatalogItemResponse? _selectedCollection;
@@ -56,7 +56,7 @@ public partial class ProductCatalogViewModel : ObservableObject
             await LoadList("api/product-catalog/collections", Collections);
             StatusText = $"{Categories.Count} kategori • {Brands.Count} marka • {Collections.Count} koleksiyon";
         }
-        catch (Exception ex) { StatusText = "Katalog yüklenemedi."; _dialog.Error(ex.Message, "Katalog Yönetimi"); }
+        catch (Exception ex) { StatusText = "Catalog could not be loaded."; _dialog.Error(ex.Message, "Catalog Management"); }
         finally { IsLoading = false; }
     }
 
@@ -97,7 +97,7 @@ public partial class ProductCatalogViewModel : ObservableObject
     private async Task SaveCollectionAsync()
     {
         if (!Validate(CollectionCode, CollectionName)) return;
-        if (CollectionStartDate > CollectionEndDate) { _dialog.Error("Bitiş tarihi başlangıç tarihinden önce olamaz."); return; }
+        if (CollectionStartDate > CollectionEndDate) { _dialog.Error("End date cannot be earlier than start date."); return; }
         var body = new SaveCollectionRequest(CollectionCode, CollectionName, CollectionSeason, CollectionStartDate, CollectionEndDate);
         var result = SelectedCollection is null
             ? await _api.PostAsync<CatalogItemResponse>("api/product-catalog/collections", body)
@@ -112,18 +112,18 @@ public partial class ProductCatalogViewModel : ObservableObject
     private bool Validate(string code, string name)
     {
         if (!string.IsNullOrWhiteSpace(code) && !string.IsNullOrWhiteSpace(name)) return true;
-        _dialog.Error("Kod ve ad alanları zorunludur.", "Doğrulama"); return false;
+        _dialog.Error("Code and name are required.", "Validation"); return false;
     }
     private async Task FinishSave(CatalogItemResponse? result, Action reset)
     {
-        if (result is null) { _dialog.Error("Kayıt tamamlanamadı. Kod benzersiz olmalıdır."); return; }
-        reset(); await LoadAsync(); _dialog.Info("Katalog kaydı başarıyla kaydedildi.");
+        if (result is null) { _dialog.Error("The record could not be saved. Code must be unique."); return; }
+        reset(); await LoadAsync(); _dialog.Success("Catalog record saved successfully.");
     }
     private async Task Delete(string segment, CatalogItemResponse? item)
     {
-        if (item is null) { _dialog.Error("Önce bir kayıt seçin."); return; }
-        if (!_dialog.Confirm($"'{item.Name}' pasife alınacak. Devam edilsin mi?")) return;
-        if (!await _api.DeleteAsync($"api/product-catalog/{segment}/{item.Id}")) { _dialog.Error("Kayıt pasife alınamadı."); return; }
+        if (item is null) { _dialog.Error("Select a record first."); return; }
+        if (!_dialog.Confirm($"'{item.Name}' will be deactivated. Continue?")) return;
+        if (!await _api.DeleteAsync($"api/product-catalog/{segment}/{item.Id}")) { _dialog.Error("The record could not be deactivated."); return; }
         await LoadAsync();
     }
 }

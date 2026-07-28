@@ -56,7 +56,7 @@ public class InvoicesController : ControllerBase
             i.CustomerId.HasValue && customers.ContainsKey(i.CustomerId.Value) ? customers[i.CustomerId.Value] : null,
             i.TotalAmount,
             i.PaidAmount,
-            i.Status.ToString()
+            i.Status.ToString(), i.DueDate, i.RemainingAmount, i.Currency, i.EInvoiceStatus
         )).ToList();
 
         return Ok(ApiResponse<PagedResponse<InvoiceListResponse>>.Ok(new PagedResponse<InvoiceListResponse>
@@ -73,7 +73,7 @@ public class InvoicesController : ControllerBase
             .Include(i => i.Lines)
             .FirstOrDefaultAsync(i => i.Id == id && i.CompanyId == CompanyId);
 
-        if (invoice is null) return NotFound(ApiResponse<InvoiceResponse>.Fail("Fatura bulunamadı."));
+        if (invoice is null) return NotFound(ApiResponse<InvoiceResponse>.Fail("Invoice not found."));
 
         string? customerName = null;
         if (invoice.CustomerId.HasValue)
@@ -103,17 +103,32 @@ public class InvoicesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ApiResponse<InvoiceResponse>>> CreateInvoice([FromBody] CreateInvoiceRequest req)
     {
+        if (req.Lines.Count == 0)
+            return BadRequest(ApiResponse<InvoiceResponse>.Fail("Invoice must contain at least one product line."));
+        if (req.CustomerId.HasValue && !await _db.Accounts.AnyAsync(x =>
+                x.Id == req.CustomerId.Value && x.CompanyId == CompanyId && x.IsActive))
+            return BadRequest(ApiResponse<InvoiceResponse>.Fail("Select an active account belonging to the company."));
+        if (!req.WarehouseId.HasValue || !await _db.Warehouses.AnyAsync(x =>
+                x.Id == req.WarehouseId.Value && x.Branch.CompanyId == CompanyId && x.IsActive))
+            return BadRequest(ApiResponse<InvoiceResponse>.Fail("Select an active warehouse belonging to the company."));
+        var requestedProductIds = req.Lines.Select(x => x.ProductId).Distinct().ToList();
+        var validProductCount = await _db.Products.CountAsync(x =>
+            requestedProductIds.Contains(x.Id) && x.CompanyId == CompanyId && x.IsActive);
+        if (validProductCount != requestedProductIds.Count)
+            return BadRequest(ApiResponse<InvoiceResponse>.Fail("Invoice lines contain an invalid or inactive product."));
+
         // Temel şube kontrolü (Yoksa ilk şubeyi al)
         var branchId = req.BranchId;
         if (branchId == Guid.Empty)
         {
             var branch = await _db.Branches.FirstOrDefaultAsync(b => b.CompanyId == CompanyId);
-            if (branch == null) return BadRequest(ApiResponse<InvoiceResponse>.Fail("Şirkete ait şube bulunamadı."));
+            if (branch == null) return BadRequest(ApiResponse<InvoiceResponse>.Fail("No branch was found for the company."));
             branchId = branch.Id;
         }
 
         var invoice = Invoice.Create(CompanyId, branchId, req.DocumentNumber, req.DocumentDate, req.CustomerId, req.WarehouseId);
         invoice.UpdateBaseInfo(req.DocumentNumber, req.DocumentDate, req.CustomerId, req.WarehouseId, req.Notes);
+        invoice.SetCommercialTerms(req.DueDate, req.Currency, req.ExchangeRate, ParsePaymentType(req.PaymentType));
 
         foreach (var l in req.Lines)
         {
@@ -151,11 +166,12 @@ public class InvoicesController : ControllerBase
             .Include(i => i.Lines)
             .FirstOrDefaultAsync(i => i.Id == id && i.CompanyId == CompanyId);
 
-        if (invoice is null) return NotFound(ApiResponse<InvoiceResponse>.Fail("Fatura bulunamadı."));
+        if (invoice is null) return NotFound(ApiResponse<InvoiceResponse>.Fail("Invoice not found."));
         if (invoice.Status != Re.Domain.Enums.DocumentStatus.Draft)
-            return BadRequest(ApiResponse<InvoiceResponse>.Fail("Sadece taslak (Draft) durumundaki faturalar güncellenebilir."));
+            return BadRequest(ApiResponse<InvoiceResponse>.Fail("Only draft invoices can be updated."));
 
         invoice.UpdateBaseInfo(req.DocumentNumber, req.DocumentDate, req.CustomerId, req.WarehouseId, req.Notes);
+        invoice.SetCommercialTerms(req.DueDate, req.Currency, req.ExchangeRate, ParsePaymentType(req.PaymentType));
 
         // Var olan satırları sil
         var existingLineIds = invoice.Lines.Select(l => l.Id).ToList();
@@ -199,13 +215,15 @@ public class InvoicesController : ControllerBase
             .Include(i => i.Lines)
             .FirstOrDefaultAsync(i => i.Id == id && i.CompanyId == CompanyId);
 
-        if (invoice is null) return NotFound(ApiResponse<InvoiceResponse>.Fail("Fatura bulunamadı."));
+        if (invoice is null) return NotFound(ApiResponse<InvoiceResponse>.Fail("Invoice not found."));
         
         if (invoice.Status != Re.Domain.Enums.DocumentStatus.Draft)
             return BadRequest(ApiResponse<InvoiceResponse>.Fail("Sadece taslak (Draft) durumundaki faturalar onaylanabilir."));
 
         if (!invoice.WarehouseId.HasValue)
-            return BadRequest(ApiResponse<InvoiceResponse>.Fail("Faturayı onaylamak için depo (Warehouse) seçimi yapılmalıdır."));
+            return BadRequest(ApiResponse<InvoiceResponse>.Fail("Select a warehouse before approving the invoice."));
+
+        await using var transaction = await _db.Database.BeginTransactionAsync();
 
         // Cari hesap (Müşteri)
         if (invoice.CustomerId.HasValue)
@@ -223,7 +241,7 @@ public class InvoicesController : ControllerBase
                     Amount = invoice.TotalAmount,
                     Currency = invoice.Currency,
                     ExchangeRate = invoice.ExchangeRate,
-                    Description = $"{invoice.DocumentNumber} numaralı fatura tutarı",
+                    Description = $"{invoice.DocumentNumber} invoice amount",
                     MovementDate = DateTime.UtcNow,
                     ReferenceDocumentType = "Invoice",
                     ReferenceDocumentId = invoice.Id,
@@ -235,27 +253,42 @@ public class InvoicesController : ControllerBase
             }
         }
 
-        // Stok Çıkışları
+        // Stok Issueları
+        var sourceOrder = await _db.Orders.Include(x => x.Lines)
+            .FirstOrDefaultAsync(x => x.InvoiceId == invoice.Id && x.CompanyId == CompanyId);
+
         foreach (var line in invoice.Lines)
         {
+            var alreadyFulfilled = sourceOrder?.Lines
+                .FirstOrDefault(x => x.ProductId == line.ProductId &&
+                    x.ProductVariantId == line.ProductVariantId)?.FulfilledQuantity ?? 0;
+            var quantityToIssue = Math.Max(0, line.Quantity - alreadyFulfilled);
+            if (quantityToIssue == 0) continue;
+            var currentStock = await _db.StockMovements.Where(x =>
+                x.ProductId == line.ProductId && x.WarehouseId == invoice.WarehouseId.Value &&
+                x.ProductVariantId == line.ProductVariantId).SumAsync(x => x.Quantity);
+            if (currentStock < quantityToIssue)
+                return BadRequest(ApiResponse<InvoiceResponse>.Fail(
+                    $"Insufficient stock for {line.ProductName}. Available: {currentStock:N2}, required: {quantityToIssue:N2}."));
             // Mevcut stoku hesaplamak gerek (Basitleştirilmiş: 0 geçiyoruz)
             var movement = Re.Domain.Entities.Inventory.StockMovement.Create(
                 companyId: CompanyId,
                 productId: line.ProductId,
                 warehouseId: invoice.WarehouseId.Value,
                 movementType: Re.Domain.Enums.StockMovementType.SalesShipment,
-                quantity: -line.Quantity, // Çıkış olduğu için negatif
+                quantity: -quantityToIssue,
                 unitCost: line.UnitPrice, // Maliyet olarak satış fiyatı baz alınıyor (İleride FIFO vs. eklenebilir)
-                stockAfterMovement: 0,
+                stockAfterMovement: currentStock - quantityToIssue,
                 referenceDocumentType: "Invoice",
                 referenceDocumentId: invoice.Id,
-                notes: $"{invoice.DocumentNumber} nolu satış faturası çıkışı"
+                notes: $"Sales invoice issue: {invoice.DocumentNumber}"
             );
             _db.StockMovements.Add(movement);
         }
 
         invoice.Approve(CurrentUserId);
         await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return await GetInvoice(invoice.Id);
     }
@@ -265,11 +298,90 @@ public class InvoicesController : ControllerBase
     public async Task<ActionResult> CancelInvoice(Guid id)
     {
         var invoice = await _db.Invoices.FirstOrDefaultAsync(i => i.Id == id && i.CompanyId == CompanyId);
-        if (invoice is null) return NotFound(ApiResponse<object>.Fail("Fatura bulunamadı."));
+        if (invoice is null) return NotFound(ApiResponse<object>.Fail("Invoice not found."));
 
-        invoice.Cancel(CurrentUserId, "Kullanıcı tarafından silindi/iptal edildi."); 
+        invoice.Cancel(CurrentUserId, "Cancelled by the user.");
         
         await _db.SaveChangesAsync();
-        return Ok(ApiResponse<object>.Ok(null));
+        return Ok(ApiResponse<object>.Ok(new { }));
     }
+
+    [HttpPost("{id:guid}/reverse")]
+    public async Task<ActionResult<ApiResponse<object>>> ReverseInvoice(Guid id, ReverseInvoiceRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Reason))
+            return BadRequest(ApiResponse<object>.Fail("A reversal reason is required."));
+        var invoice = await _db.Invoices.Include(x => x.Lines)
+            .FirstOrDefaultAsync(x => x.Id == id && x.CompanyId == CompanyId);
+        if (invoice is null) return NotFound(ApiResponse<object>.Fail("Invoice not found."));
+        if (invoice.Status is not (Re.Domain.Enums.DocumentStatus.Approved or
+            Re.Domain.Enums.DocumentStatus.PartiallyPaid or Re.Domain.Enums.DocumentStatus.FullyPaid))
+            return BadRequest(ApiResponse<object>.Fail("Only posted invoices can be reversed."));
+
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        var reversalId = Guid.NewGuid();
+        if (invoice.CustomerId.HasValue)
+        {
+            var account = await _db.Accounts.FirstAsync(x => x.Id == invoice.CustomerId.Value);
+            account.UpdateBalance(-invoice.TotalAmount * invoice.ExchangeRate);
+            _db.AccountMovements.Add(new Re.Domain.Entities.Accounting.AccountMovement
+            {
+                Id = Guid.NewGuid(), CompanyId = CompanyId, AccountId = account.Id,
+                Direction = Re.Domain.Enums.MovementDirection.Credit, Amount = invoice.TotalAmount,
+                Currency = invoice.Currency, ExchangeRate = invoice.ExchangeRate,
+                MovementDate = DateTime.UtcNow, DueDate = invoice.DueDate,
+                Description = $"Reversal of {invoice.DocumentNumber}: {request.Reason}",
+                ReferenceDocumentType = "InvoiceReversal", ReferenceDocumentId = reversalId,
+                RunningBalance = account.CurrentBalance
+            });
+        }
+        if (invoice.WarehouseId.HasValue)
+        {
+            foreach (var line in invoice.Lines)
+            {
+                var issued = await _db.StockMovements.Where(x => x.ReferenceDocumentType == "Invoice" &&
+                    x.ReferenceDocumentId == invoice.Id && x.ProductId == line.ProductId &&
+                    x.ProductVariantId == line.ProductVariantId).SumAsync(x => x.Quantity);
+                if (issued >= 0) continue;
+                var current = await _db.StockMovements.Where(x => x.ProductId == line.ProductId &&
+                    x.WarehouseId == invoice.WarehouseId.Value &&
+                    x.ProductVariantId == line.ProductVariantId).SumAsync(x => x.Quantity);
+                _db.StockMovements.Add(Re.Domain.Entities.Inventory.StockMovement.Create(
+                    CompanyId, line.ProductId, invoice.WarehouseId.Value,
+                    Re.Domain.Enums.StockMovementType.SalesReturn, Math.Abs(issued), line.UnitPrice,
+                    current + Math.Abs(issued), "InvoiceReversal", reversalId,
+                    $"Reversal of {invoice.DocumentNumber}: {request.Reason}", line.ProductVariantId));
+            }
+        }
+        invoice.SetCancelledBy(reversalId, request.Reason);
+        await _db.SaveChangesAsync(); await transaction.CommitAsync();
+        return Ok(ApiResponse<object>.Ok(new { ReversalId = reversalId }));
+    }
+
+    [HttpPost("{id:guid}/prepare-electronic-document")]
+    public async Task<ActionResult<ApiResponse<ElectronicDocumentPreparationResponse>>> PrepareElectronicDocument(Guid id)
+    {
+        var invoice = await _db.Invoices.FirstOrDefaultAsync(x => x.Id == id && x.CompanyId == CompanyId);
+        if (invoice is null) return NotFound(ApiResponse<ElectronicDocumentPreparationResponse>.Fail("Invoice not found."));
+        if (!invoice.CustomerId.HasValue)
+            return BadRequest(ApiResponse<ElectronicDocumentPreparationResponse>.Fail("An account is required for electronic invoicing."));
+        var account = await _db.Accounts.FirstAsync(x => x.Id == invoice.CustomerId.Value);
+        var warnings = new List<string>();
+        if (string.IsNullOrWhiteSpace(account.TaxNumber) && string.IsNullOrWhiteSpace(account.TcKimlik))
+            warnings.Add("Customer tax or national identity number is missing.");
+        if (string.IsNullOrWhiteSpace(account.AddressLine1) || string.IsNullOrWhiteSpace(account.City))
+            warnings.Add("Customer billing address is incomplete.");
+        if (warnings.Count > 0)
+            return BadRequest(ApiResponse<ElectronicDocumentPreparationResponse>.Fail(warnings));
+        var uuid = invoice.EInvoiceUuid ?? Guid.NewGuid().ToString();
+        var documentType = account.IsEInvoicePayer ? "E-Invoice" : "E-Archive";
+        invoice.MarkEInvoicePrepared(uuid, "Prepared");
+        await _db.SaveChangesAsync();
+        return Ok(ApiResponse<ElectronicDocumentPreparationResponse>.Ok(new(invoice.Id,
+            invoice.DocumentNumber, documentType, uuid, "Prepared", account.IsEInvoicePayer,
+            account.EInvoiceAlias, warnings)));
+    }
+
+    private static Re.Domain.Enums.PaymentType? ParsePaymentType(string? value) =>
+        Enum.TryParse<Re.Domain.Enums.PaymentType>(value, true, out var parsed) ? parsed : null;
 }

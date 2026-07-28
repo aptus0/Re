@@ -30,7 +30,7 @@ public partial class TreasuryViewModel(ApiClient api, IDialogService dialog, INa
         try
         {
             var result = await api.GetAsync<TreasuryDashboardResponse>("api/finance/treasury-dashboard");
-            if (result is null) { dialog.Error("Kasa ve banka bilgileri alınamadı."); return; }
+            if (result is null) { dialog.Error("Cash and bank information could not be loaded."); return; }
             Replace(CashRegisters, result.CashRegisters); Replace(BankAccounts, result.BankAccounts);
             Replace(CashMovements, result.CashMovements); Replace(BankMovements, result.BankMovements);
             TotalCash = result.TotalCashTRY; TotalBank = result.TotalBankTRY;
