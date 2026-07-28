@@ -84,3 +84,41 @@ public record AccountListResponse(
     string? TaxNumber,
     decimal CurrentBalance,
     bool IsActive);
+
+public record AccountActivityResponse(
+    Guid Id, DateTime Date, string Type, string Description, decimal Amount,
+    decimal RunningBalance, string? ReferenceType, Guid? ReferenceId);
+
+public record AccountInvoiceSummaryResponse(
+    int InvoiceCount, decimal TotalInvoiced, decimal TotalPaid, decimal OpenBalance,
+    IReadOnlyCollection<AccountActivityResponse> RecentActivities,
+    decimal UnitsSold,
+    int StockDocumentCount,
+    IReadOnlyCollection<AccountProductSummaryResponse> TopProducts,
+    IReadOnlyCollection<AccountInvoiceLinkResponse> RecentInvoices,
+    AccountAgingSummaryResponse Aging,
+    string CustomerSegment,
+    int RiskScore,
+    string RiskLevel);
+
+public record AccountAgingSummaryResponse(
+    decimal Current, decimal Days1To30, decimal Days31To60,
+    decimal Days61To90, decimal Over90, decimal TotalOverdue,
+    int OverdueInvoiceCount, int MaximumDaysOverdue);
+
+public record AccountProductSummaryResponse(
+    Guid ProductId, string ProductCode, string ProductName,
+    decimal Quantity, decimal NetAmount);
+
+public record AccountInvoiceLinkResponse(
+    Guid InvoiceId, string DocumentNumber, DateTime DocumentDate,
+    string Status, decimal TotalAmount, decimal PaidAmount, int LineCount);
+
+public record CreateAccountOperationRequest(
+    string OperationType, decimal Amount, string Currency, decimal ExchangeRate,
+    DateTime MovementDate, DateTime? DueDate, string Description,
+    string? ReferenceNumber);
+
+public record AccountOperationResponse(
+    Guid MovementId, string OperationNumber, decimal PreviousBalance,
+    decimal Amount, decimal CurrentBalance, string Direction);

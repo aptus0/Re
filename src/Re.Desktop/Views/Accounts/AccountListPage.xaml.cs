@@ -8,5 +8,16 @@ public partial class AccountListPage : UserControl
         InitializeComponent();
         DataContext = viewModel;
     }
+
+    private void DataGridRow_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is DataGridRow row && row.DataContext is AccountItem item)
+        {
+            if (DataContext is AccountListViewModel vm)
+            {
+                vm.ShowAccountDetailWindowCommand.Execute(item);
+            }
+        }
+    }
 }
 
