@@ -1,0 +1,39 @@
+<template>
+    <lightning-card title="Re ERP — Hızlı Fatura Giriş Paneli" icon-name="standard:invoice">
+        <div class="slds-m-around_medium">
+            <div class="slds-form slds-form_stacked slds-m-bottom_medium">
+                <lightning-combobox label="Fatura Yönü" value={invoiceDirection} options={directionOptions} onchange={handleDirectionChange}></lightning-combobox>
+                <lightning-input label="Fatura Tarihi" type="date" value={invoiceDate}></lightning-input>
+            </div>
+
+            <h3 class="slds-text-heading_small slds-m-bottom_small">Fatura Satırları</h3>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <thead>
+                    <tr class="slds-text-title_caps">
+                        <th scope="col">Açıklama</th>
+                        <th scope="col">Miktar</th>
+                        <th scope="col">Birim Fiyat (₺)</th>
+                        <th scope="col">KDV (%)</th>
+                        <th scope="col">Toplam (₺)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={lines} for:item="line" for:index="index">
+                        <tr key={line.id}>
+                            <td><lightning-input value={line.description} variant="label-hidden"></lightning-input></td>
+                            <td><lightning-input type="number" value={line.quantity} variant="label-hidden"></lightning-input></td>
+                            <td><lightning-input type="number" value={line.unitPrice} formatter="currency" variant="label-hidden"></lightning-input></td>
+                            <td><lightning-input type="number" value={line.vatRate} variant="label-hidden"></lightning-input></td>
+                            <td><lightning-formatted-number value={line.total} format-style="currency" currency-code="TRY"></lightning-formatted-number></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+
+            <div class="slds-m-top_medium slds-text-align_right">
+                <lightning-button label="Satır Ekle" icon-name="utility:add" onclick={handleAddLine} class="slds-m-right_small"></lightning-button>
+                <lightning-button label="Faturayı Onayla &amp; Post Et" variant="brand" onclick={handlePostInvoice}></lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,29 @@
+<template>
+    <lightning-card title="Çek &amp; Senet Portföy Yönetimi" icon-name="custom:custom17">
+        <div class="slds-m-around_medium">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-3">
+                    <div class="slds-box slds-theme_default">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Portföydeki Çekler</h3>
+                        <p class="slds-text-body_regular">Son İşlem: Portföye Alındı</p>
+                        <lightning-button class="slds-m-top_small" label="Ciro Et" variant="neutral" onclick={handleEndorse}></lightning-button>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                    <div class="slds-box slds-theme_default">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Bankaya Verilenler</h3>
+                        <p class="slds-text-body_regular">Son İşlem: Banka Takasında</p>
+                        <lightning-button class="slds-m-top_small" label="Tahsil Et" variant="brand" onclick={handleCollect}></lightning-button>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                    <div class="slds-box slds-theme_default">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Karşılıksız / İade</h3>
+                        <p class="slds-text-body_regular">Son İşlem: İşlem Yok</p>
+                        <lightning-button class="slds-m-top_small" label="Karşılıksız İşle" variant="destructive" onclick={handleBounce}></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+</template>

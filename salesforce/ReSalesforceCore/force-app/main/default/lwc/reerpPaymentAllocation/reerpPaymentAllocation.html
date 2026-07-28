@@ -1,0 +1,29 @@
+<template>
+    <lightning-card title="Borç / Alacak Tahsilat Kapatma Paneli" icon-name="custom:custom40">
+        <div class="slds-m-around_medium">
+            <p class="slds-m-bottom_small">Açık faturalar ile yapılan tahsilatları eşleştirerek kapatınız.</p>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-2">
+                    <div class="slds-box slds-theme_default">
+                        <h4 class="slds-text-heading_small slds-m-bottom_small">Açık Faturalar (Borç)</h4>
+                        <ul class="slds-has-dividers_bottom-space">
+                            <li class="slds-item">Fatura #SI2026000001 — ₺12.000,00</li>
+                            <li class="slds-item">Fatura #SI2026000002 — ₺5.400,00</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <div class="slds-box slds-theme_default">
+                        <h4 class="slds-text-heading_small slds-m-bottom_small">Kapanmamış Tahsilatlar (Alacak)</h4>
+                        <ul class="slds-has-dividers_bottom-space">
+                            <li class="slds-item">Tahsilat #TH2026000001 — ₺12.000,00</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-m-top_medium slds-text-align_right">
+                <lightning-button label="Birebir Otomatik Kapat (Auto Allocate)" variant="brand" onclick={handleAutoAllocate}></lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+</template>

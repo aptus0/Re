@@ -1,0 +1,22 @@
+<template>
+    <lightning-card title="Re ERP for Salesforce — Kurulum Sihirbazı" icon-name="custom:custom67">
+        <div class="slds-m-around_medium">
+            <div class="slds-wizard slds-m-bottom_medium">
+                <p class="slds-text-heading_small slds-m-bottom_small">
+                    Hoş geldiniz! Re ERP Managed Package kurulumu tamamlandı. Lütfen aşağıdaki bilgileri doldurarak şirket konfigürasyonunuzu aktif ediniz.
+                </p>
+            </div>
+
+            <div class="slds-form slds-form_stacked">
+                <lightning-input label="Firma Unvanı (Legal Name)" value={companyName} onchange={handleCompanyChange} required></lightning-input>
+                <lightning-input label="Vergi Numarası / TCKN" value={taxNumber} onchange={handleTaxChange} required></lightning-input>
+                <lightning-input label="Vergi Dairesi" value={taxOffice} onchange={handleTaxOfficeChange}></lightning-input>
+                <lightning-combobox label="Varsayılan Para Birimi" value={currencyCode} options={currencyOptions} onchange={handleCurrencyChange}></lightning-combobox>
+            </div>
+
+            <div class="slds-m-top_large slds-text-align_right">
+                <lightning-button label="Kurulumu Tamamla &amp; Aktif Et" variant="brand" onclick={handleCompleteSetup}></lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+</template>
