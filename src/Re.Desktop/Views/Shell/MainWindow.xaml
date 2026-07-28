@@ -68,7 +68,7 @@
             <Setter Property="Padding" Value="0"/>
         </Style>
 
-        <!-- MDI (Çalışma Alanı) TabItem Stili (Sekme + Kapat Butonu) -->
+        <!-- MDI (Çalışma Alanı) TabItem Stili (Sekme + Close Butonu) -->
         <Style x:Key="MdiTabItemStyle" TargetType="TabItem">
             <Setter Property="Background" Value="#E5E5E5"/>
             <Setter Property="Foreground" Value="#333333"/>
@@ -97,11 +97,11 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="{Binding Title}" Margin="0,0,10,0" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                            <Button Content="✕" 
+                            <Button Content="✕"
                                     Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                     CommandParameter="{Binding}"
                                     Visibility="{Binding IsCloseable, Converter={StaticResource BoolToVisibilityConverter}}"
-                                    Background="Transparent" BorderThickness="0" Foreground="#999999" 
+                                    Background="Transparent" BorderThickness="0" Foreground="#999999"
                                     FontWeight="Bold" FontSize="10" Cursor="Hand" Width="16" Height="16"
                                     VerticalAlignment="Center">
                                 <Button.Style>
@@ -132,7 +132,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="32" />     <!-- Pencere Başlığı -->
-                <RowDefinition Height="100" />    <!-- Ribbon Menü (TabControl) -->
+                <RowDefinition Height="54" />     <!-- Modern Salesforce Header Bar -->
                 <RowDefinition Height="*" />      <!-- Sekmeli Çalışma Alanı (MDI TabControl) -->
                 <RowDefinition Height="25" />
             </Grid.RowDefinitions>
@@ -167,160 +167,183 @@
                 </Grid>
             </Border>
 
-            <!-- ── SALESFORCE APPLAUNCHER-STYLE RIBBON MENÜ ── -->
-            <TabControl Grid.Row="1" Background="#FAFBFC" BorderThickness="0,0,0,1" BorderBrush="#D8DCE2">
-                <TabControl.Resources>
-                    <!-- Salesforce Lightning Sekme Başlıkları Stili -->
-                    <Style TargetType="TabItem">
-                        <Setter Property="Padding" Value="18,6"/>
-                        <Setter Property="FontSize" Value="13"/>
-                        <Setter Property="FontWeight" Value="SemiBold"/>
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="Foreground" Value="#3E3E3C"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#FAFBFC"/>
-                                <Setter Property="Foreground" Value="#0070D2"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TabControl.Resources>
+            <!-- ── SALESFORCE LIGHTNING NAV BAR (Modern Top Navigation with Submenus) ── -->
+            <Border Grid.Row="1" Background="White" BorderBrush="#D8DCE2" BorderThickness="0,0,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/> <!-- App Launcher Grid -->
+                        <ColumnDefinition Width="*"/>    <!-- Navigation Menus -->
+                    </Grid.ColumnDefinitions>
 
-                <!-- ☁️ Sales Cloud (ERP + CRM Harmanı) -->
-                <TabItem Header="☁ Sales Cloud">
-                    <StackPanel Orientation="Horizontal" Margin="8,4">
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#0070D2" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M13,3V11H21V3H13M3,13V21H11V13H3M3,3V11H11V3H3M13,13V21H21V13H13Z"/>
-                                <TextBlock Text="Dashboard" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Accounts" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#7C3AED" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
-                                <TextBlock Text="Accounts" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#D83B01" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M16,11V13H8V11H16M16,15V17H8V15H16Z"/>
-                                <TextBlock Text="Invoices" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="POS" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#107C10" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M17,18C15.89,18 15,18.89 15,20A2,2 0 0,0 17,22A2,2 0 0,0 19,20C19,18.89 18.1,18 17,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75L7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5.5C20.95,5.34 21,5.17 21,5A1,1 0 0,0 20,4H5.21L4.27,2M7,18C5.89,18 5,18.89 5,20A2,2 0 0,0 7,22A2,2 0 0,0 9,20C9,18.89 8.1,18 7,18Z"/>
-                                <TextBlock Text="Quick Sale" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="6,8"/>
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Agenda" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#E3008C" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M19,4H18V2H16V4H8V2H6V4H5C3.89,4 3.01,4.9 3.01,6L3,20C3,21.1 3.89,22 5,22H19C20.1,22 21,21.1 21,20V6C21,4.9 20.1,4 19,4M19,20H5V10H19V20M19,8H5V6H19V8M14,14H12V12H14V14M18,14H16V12H18V14M10,14H8V12H10V14M14,18H12V16H14V18M18,18H16V16H18V18M10,18H8V16H10V18Z"/>
-                                <TextBlock Text="Calendar" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </TabItem>
+                    <!-- Left: 9-Dot App Launcher -->
+                    <Button Width="48" Height="53" Padding="0" Cursor="Hand" Background="Transparent" BorderThickness="0"
+                            Command="{Binding NavigateCommand}" CommandParameter="Dashboard" ToolTip="App Launcher (Dashboard)">
+                        <Path Fill="#0070D2" Stretch="Uniform" Width="20" Height="20"
+                              Data="M2,2 H4 V4 H2 z M8,2 H10 V4 H8 z M14,2 H16 V4 H14 z M2,8 H4 V10 H2 z M8,8 H10 V10 H8 z M14,8 H16 V10 H14 z M2,14 H4 V16 H2 z M8,14 H10 V16 H8 z M14,14 H16 V16 H14 z"/>
+                    </Button>
 
-                <!-- 📦 Stok & Ürün Yönetimi -->
-                <TabItem Header="📦 Inventory">
-                    <StackPanel Orientation="Horizontal" Margin="8,4">
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="ProductDashboard" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#0070D2" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M13,3V11H21V3H13M3,13V21H11V13H3M3,3V11H11V3H3M13,13V21H21V13H13Z"/>
-                                <TextBlock Text="Stock Panel" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Products" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#2B579A" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M12,3L1,9L4,10.63V17L12,21.5L20,17V10.63L23,9M12,5.16L19.85,9.33L12,13.5L4.15,9.33M5.5,12.2V16.03L12,19.68L18.5,16.03V12.2L12,15.85Z"/>
-                                <TextBlock Text="Products" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="StockMovements" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#217346" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M12,18A6,6 0 0,1 6,12C6,11 6.25,10.03 6.7,9.2L5.24,7.74C4.46,8.97 4,10.43 4,12A8,8 0 0,0 12,20V23L16,19L12,15M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12C18,13 17.75,13.97 17.3,14.8L18.76,16.26C19.54,15.03 20,13.57 20,12A8,8 0 0,0 12,4Z"/>
-                                <TextBlock Text="Movements" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </TabItem>
+                    <!-- Center: Navigation Menus with Sub-menus -->
+                    <Menu Grid.Column="1" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Height="53">
+                        <Menu.Resources>
+                            <!-- Dropdown Arrow Icon -->
+                            <ControlTemplate x:Key="DropdownArrowTemplate">
+                                <Path Data="M0,0 L3.5,3.5 L7,0 Z" Fill="#54698D" Margin="6,2,0,0" VerticalAlignment="Center"/>
+                            </ControlTemplate>
 
-                <!-- 💰 Finans -->
-                <TabItem Header="💰 Finance">
-                    <StackPanel Orientation="Horizontal" Margin="8,4">
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Cash" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#107C10" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M3,6H21V18H3V6M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M7,8A2,2 0 0,1 5,10V14A2,2 0 0,1 7,16H17A2,2 0 0,1 19,14V10A2,2 0 0,1 17,8H7Z"/>
-                                <TextBlock Text="Cash" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Bank" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#C62828" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M11.5,1L2,6V8H21V6M16,10V17H19V10M2,22H21V19H2M10,10V17H13V10M4,10V17H7V10Z"/>
-                                <TextBlock Text="Bank" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Finance" Width="90">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#D83B01" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M11,17H13V16H14A1,1 0 0,0 15,15V12A1,1 0 0,0 14,11H11V9H15V7H13V6H11V7H10A1,1 0 0,0 9,8V11A1,1 0 0,0 10,12H13V14H9V16H11V17Z"/>
-                                <TextBlock Text="Payments" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </TabItem>
+                            <!-- Top Menu Item Style -->
+                            <Style TargetType="MenuItem" x:Key="TopMenuItemStyle">
+                                <Setter Property="FontSize" Value="13.5"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="Foreground" Value="#1E293B"/>
+                                <Setter Property="Padding" Value="16,16"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="MenuItem">
+                                            <Border x:Name="Border" Background="Transparent" BorderThickness="0" SnapsToDevicePixels="True">
+                                                <Grid>
+                                                    <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" Margin="{TemplateBinding Padding}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    <Popup x:Name="PART_Popup" AllowsTransparency="True" Focusable="False" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" Placement="Bottom" PopupAnimation="Slide">
+                                                        <Border Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6" Padding="6" SnapsToDevicePixels="True" Margin="0,4,0,0">
+                                                            <Border.Effect>
+                                                                <DropShadowEffect BlurRadius="12" Color="Black" Opacity="0.08" ShadowDepth="3" Direction="270"/>
+                                                            </Border.Effect>
+                                                            <ScrollViewer CanContentScroll="True">
+                                                                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" KeyboardNavigation.TabNavigation="Cycle"/>
+                                                            </ScrollViewer>
+                                                        </Border>
+                                                    </Popup>
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Border" Property="Background" Value="#F1F5F9"/>
+                                                    <Setter Property="Foreground" Value="#0070D2"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSubmenuOpen" Value="True">
+                                                    <Setter TargetName="Border" Property="Background" Value="#E2E8F0"/>
+                                                    <Setter Property="Foreground" Value="#0070D2"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
 
-                <!-- ☁ Salesforce Cloud (CRM) -->
-                <TabItem Header="☁ Salesforce CRM">
-                    <StackPanel Orientation="Horizontal" Margin="8,4">
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="SalesforceCloud" Width="110" ToolTip="Salesforce Lightning LWC Workspace">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#00A1E0" Stretch="Uniform" Width="28" Height="24" Margin="0,0,0,4" Data="M19.35,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14C0,17.31 2.69,20 6,20H19C21.76,20 24,17.76 24,15C24,12.36 21.95,10.22 19.35,10.04Z"/>
-                                <TextBlock Text="Salesforce Cloud" FontSize="10" FontWeight="Bold" Foreground="#0070D2" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </TabItem>
+                            <!-- Sub Menu Item Style -->
+                            <Style TargetType="MenuItem" x:Key="SubMenuItemStyle">
+                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="FontWeight" Value="Medium"/>
+                                <Setter Property="Foreground" Value="#334155"/>
+                                <Setter Property="Padding" Value="16,10"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="MenuItem">
+                                            <Border x:Name="SubBorder" Background="Transparent" CornerRadius="4" Margin="2" SnapsToDevicePixels="True" MinWidth="185">
+                                                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="SubBorder" Property="Background" Value="#F1F5F9"/>
+                                                    <Setter Property="Foreground" Value="#0070D2"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Menu.Resources>
 
-                <!-- 📊 Raporlar & Analytics -->
-                <TabItem Header="📊 Reports">
-                    <StackPanel Orientation="Horizontal" Margin="8,4">
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Reports" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#444444" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M22,21H2V3H4V19H22V21M18,17H14V11H18V17M12,17H8V5H12V17M6,17H2V14H6V17Z"/>
-                                <TextBlock Text="Reports" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </TabItem>
+                        <!-- Menu 1: Sales Cloud -->
+                        <MenuItem Style="{StaticResource TopMenuItemStyle}">
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="☁  Sales Cloud" VerticalAlignment="Center"/>
+                                    <Control Template="{StaticResource DropdownArrowTemplate}"/>
+                                </StackPanel>
+                            </MenuItem.Header>
+                            <MenuItem Header="Dashboard" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard"/>
+                            <MenuItem Header="Accounts (Cari Kartlar)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Accounts"/>
+                            <MenuItem Header="Orders (Siparişler)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Orders"/>
+                            <MenuItem Header="Calendar (Ajanda)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Agenda"/>
+                            <MenuItem Header="Quick Sale (POS)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="POS" Visibility="{Binding IsPosInstalled, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        </MenuItem>
 
-                <!-- ⚙ Setup -->
-                <TabItem Header="⚙ Setup">
-                    <StackPanel Orientation="Horizontal" Margin="8,4">
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Settings" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#54698D" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.98C19.47,12.66 19.5,12.34 19.5,12C19.5,11.66 19.47,11.34 19.43,11.02L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.65 15.48,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.52,5.32 7.96,5.65 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11.02C4.53,11.34 4.5,11.66 4.5,12C4.5,12.34 4.53,12.66 4.57,12.98L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.04 4.95,18.95L7.44,17.95C7.96,18.35 8.52,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.48,18.68 16.04,18.35 16.56,17.95L19.05,18.95C19.27,19.04 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.98Z"/>
-                                <TextBlock Text="Settings" FontSize="10" Foreground="#3E3E3C" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="6,8"/>
-                        <Button Style="{StaticResource RibbonButtonStyle}" Command="{Binding LogoutCommand}" Width="82">
-                            <StackPanel HorizontalAlignment="Center">
-                                <Path Fill="#C23934" Stretch="Uniform" Width="24" Height="24" Margin="0,0,0,4" Data="M17,17.25V14H10V10H17V6.75L22.25,12L17,17.25M13,2A2,2 0 0,1 15,4V8H13V4H4V20H13V16H15V20A2,2 0 0,1 13,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2H13Z"/>
-                                <TextBlock Text="Sign Out" FontSize="10" Foreground="#C23934" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </TabItem>
-            </TabControl>
+                        <!-- Menu 2: Invoices -->
+                        <MenuItem Style="{StaticResource TopMenuItemStyle}">
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="📄  Invoices" VerticalAlignment="Center"/>
+                                    <Control Template="{StaticResource DropdownArrowTemplate}"/>
+                                </StackPanel>
+                            </MenuItem.Header>
+                            <MenuItem Header="Sales Invoices (Satış)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
+                            <MenuItem Header="Purchase Invoices (Alış)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
+                            <MenuItem Header="Return Invoices (İade)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
+                            <MenuItem Header="Exchange Invoices (Değişim)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
+                            <MenuItem Header="Price Difference (Fiyat Farkı)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
+                        </MenuItem>
+
+                        <!-- Menu 3: Inventory -->
+                        <MenuItem Style="{StaticResource TopMenuItemStyle}">
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="📦  Inventory" VerticalAlignment="Center"/>
+                                    <Control Template="{StaticResource DropdownArrowTemplate}"/>
+                                </StackPanel>
+                            </MenuItem.Header>
+                            <MenuItem Header="Stock Panel (Özet)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="ProductDashboard"/>
+                            <MenuItem Header="Products (Ürün Kartları)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Products"/>
+                            <MenuItem Header="Stock Movements" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="StockMovements"/>
+                            <MenuItem Header="Purchases (Alış İrsaliyeleri)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="PurchaseInvoices"/>
+                        </MenuItem>
+
+                        <!-- Menu 4: Finance -->
+                        <MenuItem Style="{StaticResource TopMenuItemStyle}">
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="💰  Finance" VerticalAlignment="Center"/>
+                                    <Control Template="{StaticResource DropdownArrowTemplate}"/>
+                                </StackPanel>
+                            </MenuItem.Header>
+                            <MenuItem Header="Cash Register (Kasa)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Cash"/>
+                            <MenuItem Header="Bank Accounts (Banka)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Bank"/>
+                            <MenuItem Header="Collections &amp; Payments" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Finance"/>
+                            <MenuItem Header="Funding Intelligence AI" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="FundingIntelligence" Visibility="{Binding IsFundingInstalled, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        </MenuItem>
+
+                        <!-- Menu 5: Salesforce CRM -->
+                        <MenuItem Style="{StaticResource TopMenuItemStyle}">
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="☁  Salesforce CRM" VerticalAlignment="Center"/>
+                                    <Control Template="{StaticResource DropdownArrowTemplate}"/>
+                                </StackPanel>
+                            </MenuItem.Header>
+                            <MenuItem Header="Salesforce LWC Cloud" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="SalesforceCloud"/>
+                        </MenuItem>
+
+                        <!-- Menu 6: Setup -->
+                        <MenuItem Style="{StaticResource TopMenuItemStyle}">
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="⚙  Setup" VerticalAlignment="Center"/>
+                                    <Control Template="{StaticResource DropdownArrowTemplate}"/>
+                                </StackPanel>
+                            </MenuItem.Header>
+                            <MenuItem Header="Settings" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Settings"/>
+                            <MenuItem Header="Packages" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="PackageCenter"/>
+                            <MenuItem Header="Updates" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="UpdateCenter"/>
+                            <Separator/>
+                            <MenuItem Header="Sign Out" Style="{StaticResource SubMenuItemStyle}" Command="{Binding LogoutCommand}"/>
+                        </MenuItem>
+                    </Menu>
+                </Grid>
+            </Border>
 
             <!-- ── ÇALIŞMA ALANI (MDI Tabs) ── -->
             <TabControl Grid.Row="2" Style="{StaticResource MdiTabControlStyle}" ItemContainerStyle="{StaticResource MdiTabItemStyle}"
                         ItemsSource="{Binding OpenTabs}" SelectedItem="{Binding ActiveTab}">
-                
+
                 <TabControl.ContentTemplate>
                     <DataTemplate>
                         <!-- İçerik burada (Page/UserControl) gösterilecek -->
@@ -331,12 +354,54 @@
 
             <Border Grid.Row="3" Background="#032D60" BorderBrush="#021B3D" BorderThickness="0,1,0,0">
                 <Grid Margin="10,0">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding ConnectionStatus}" Foreground="White" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="1" Text="{Binding SessionUsername, StringFormat='  User: {0}'}" Foreground="White" FontSize="11" VerticalAlignment="Center" Margin="16,0,0,0"/>
-                    <TextBlock Grid.Column="2" Text="{Binding WindowsUser, StringFormat='  Windows: {0}'}" Foreground="#FFE5E5" FontSize="11" VerticalAlignment="Center" Margin="16,0,0,0"/>
-                    <TextBlock Grid.Column="4" Text="{Binding LocalIpAddress, StringFormat='IP: {0}'}" Foreground="#FFE5E5" FontSize="11" VerticalAlignment="Center" Margin="0,0,18,0"/>
-                    <TextBlock Grid.Column="5" Text="{Binding LiveClock}" Foreground="White" FontFamily="Consolas" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/> <!-- Connection Status Pill -->
+                        <ColumnDefinition Width="Auto"/> <!-- Session User Pill -->
+                        <ColumnDefinition Width="Auto"/> <!-- Windows User Pill -->
+                        <ColumnDefinition Width="*"/>    <!-- Spacer -->
+                        <ColumnDefinition Width="Auto"/> <!-- Local IP Pill -->
+                        <ColumnDefinition Width="Auto"/> <!-- Live Clock Pill -->
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Connection Status Pill -->
+                    <Border Background="#10B981" CornerRadius="4" Padding="8,2" Margin="0,3,10,3" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="6" Height="6" Fill="White" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="{Binding ConnectionStatus}" Foreground="White" FontSize="10.5" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Session User Pill -->
+                    <Border Background="#1E293B" CornerRadius="4" Padding="8,2" Margin="0,3,10,3" VerticalAlignment="Center" Grid.Column="1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👤" Foreground="#94A3B8" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Text="{Binding SessionUsername}" Foreground="#E2E8F0" FontSize="10.5" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Windows User Pill -->
+                    <Border Background="#1E293B" CornerRadius="4" Padding="8,2" Margin="0,3,10,3" VerticalAlignment="Center" Grid.Column="2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="💻" Foreground="#94A3B8" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Text="{Binding WindowsUser}" Foreground="#E2E8F0" FontSize="10.5"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Local IP Pill -->
+                    <Border Background="#1E293B" CornerRadius="4" Padding="8,2" Margin="0,3,10,3" VerticalAlignment="Center" Grid.Column="4">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🌐" Foreground="#94A3B8" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Text="{Binding LocalIpAddress, StringFormat='IP: {0}'}" Foreground="#E2E8F0" FontSize="10.5"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Live Clock Pill -->
+                    <Border Background="#014486" CornerRadius="4" Padding="8,2" Margin="0,3,0,3" VerticalAlignment="Center" Grid.Column="5">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🕒" Foreground="#9ED7FF" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Text="{Binding LiveClock}" Foreground="White" FontFamily="Consolas" FontSize="10.5" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Border>
 

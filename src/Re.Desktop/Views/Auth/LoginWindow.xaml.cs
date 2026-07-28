@@ -17,7 +17,7 @@ public partial class LoginWindow : Window
         _vm = vm;
         DataContext = vm;
 
-        // Giriş başarılı olduğunda ana ekrana geç
+        // Receipt başarılı olduğunda ana ekrana geç
         _vm.LoginSucceeded += OnLoginSucceeded;
 
         // Varsayılan şifreyi UI'a yansıt

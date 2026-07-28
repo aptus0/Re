@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
@@ -28,16 +28,38 @@ public class InverseBoolToVisibilityConverter : IValueConverter
         => value is not Visibility.Visible;
 }
 
-/// <summary>decimal → Para formatı (₺1.234,56)</summary>
+/// <summary>decimal → Para formatı Türk kültürüyle (1.234,56 ₺)</summary>
 public class CurrencyConverter : IValueConverter
 {
     public static readonly CurrencyConverter Instance = new();
+    private static readonly CultureInfo TrCulture = new("tr-TR");
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        => value is decimal d ? d.ToString("N2") + " ₺" : "-";
+        => value is decimal d ? d.ToString("N2", TrCulture) + " ₺" : "-";
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        => decimal.TryParse(value?.ToString()?.Replace("₺", "").Trim(), out var d) ? d : 0m;
+    {
+        var s = value?.ToString()?.Replace("₺", "").Replace(" ", "").Trim() ?? "";
+        return decimal.TryParse(s, NumberStyles.Number, TrCulture, out var d) ? d : 0m;
+    }
+}
+
+/// <summary>decimal ↔ TextBox için Türkçe para girişi (1.234,56)</summary>
+public class TurkishAmountConverter : IValueConverter
+{
+    public static readonly TurkishAmountConverter Instance = new();
+    private static readonly CultureInfo TrCulture = new("tr-TR");
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        => value is decimal d && d != 0 ? d.ToString("N2", TrCulture) : string.Empty;
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        var s = value?.ToString()?.Replace(" ", "").Replace("₺", "").Trim() ?? "";
+        if (decimal.TryParse(s, NumberStyles.Number, TrCulture, out var d)) return d;
+        if (decimal.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var d2)) return d2;
+        return 0m;
+    }
 }
 
 /// <summary>DateTime → Kısa tarih (dd.MM.yyyy)</summary>
@@ -52,20 +74,20 @@ public class ShortDateConverter : IValueConverter
         => DateTime.TryParse(value?.ToString(), out var d) ? d : DateTime.MinValue;
 }
 
-/// <summary>DocumentStatus enum → Türkçe etiket</summary>
+/// <summary>Converts DocumentStatus values to English labels.</summary>
 public class DocumentStatusConverter : IValueConverter
 {
     public static readonly DocumentStatusConverter Instance = new();
 
     private static readonly Dictionary<string, string> Labels = new()
     {
-        ["Draft"]         = "Taslak",
-        ["Approved"]      = "Onaylı",
-        ["Posted"]        = "Muhasebeleşti",
-        ["Cancelled"]     = "İptal",
-        ["Reversed"]      = "Ters Kayıt",
-        ["PartiallyPaid"] = "Kısmi Ödeme",
-        ["FullyPaid"]     = "Tam Ödeme",
+        ["Draft"]         = "Draft",
+        ["Approved"]      = "Approved",
+        ["Posted"]        = "Posted",
+        ["Cancelled"]     = "Cancelled",
+        ["Reversed"]      = "Reversed",
+        ["PartiallyPaid"] = "Partially Paid",
+        ["FullyPaid"]     = "Fully Paid",
     };
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

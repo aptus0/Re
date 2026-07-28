@@ -23,10 +23,10 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty] private bool _isLoading = false;
     [ObservableProperty] private string _errorMessage = string.Empty;
     [ObservableProperty] private string _loginButtonText = "API Bekleniyor...";
-    
-    // API Durum Yönetimi
+
+    // API Status Directionetimi
     [ObservableProperty] private bool _isApiReady = false;
-    [ObservableProperty] private string _apiStatusMessage = "API Sunucusu Başlatılıyor...";
+    [ObservableProperty] private string _apiStatusMessage = "Starting API server...";
     [ObservableProperty] private string _apiStatusColor = "#FF9900"; // Turuncu (Bekliyor)
 
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
@@ -38,7 +38,7 @@ public partial class LoginViewModel : ObservableObject
         OnPropertyChanged(nameof(CanLogin));
         if (IsApiReady)
         {
-            LoginButtonText = value ? "Giriş yapılıyor..." : "Giriş Yap";
+            LoginButtonText = value ? "Signing in..." : "Sign In";
         }
     }
 
@@ -47,13 +47,13 @@ public partial class LoginViewModel : ObservableObject
         OnPropertyChanged(nameof(CanLogin));
         if (value)
         {
-            ApiStatusMessage = "Hazır";
+            ApiStatusMessage = "Ready";
             ApiStatusColor = "#4CAF50"; // Yeşil
-            LoginButtonText = IsLoading ? "Giriş yapılıyor..." : "Giriş Yap";
+            LoginButtonText = IsLoading ? "Signing in..." : "Sign In";
         }
         else
         {
-            ApiStatusMessage = "API Sunucusu Başlatılıyor...";
+            ApiStatusMessage = "Starting API server...";
             ApiStatusColor = "#FF9900"; // Turuncu
             LoginButtonText = "API Bekleniyor...";
         }
@@ -75,7 +75,7 @@ public partial class LoginViewModel : ObservableObject
         }
         catch
         {
-            // Eğer zaten çalışıyorsa veya başlatılamadıysa hata fırlatma, polling işlemine devam et.
+            // Eğer zaten çalışıyorsa or başlatılamadıysa hata fırlatma, polling işlemine devam et.
         }
 
         _isPolling = true;
@@ -95,9 +95,9 @@ public partial class LoginViewModel : ObservableObject
                 }
                 catch
                 {
-                    // Hata olursa (henüz kalkmadıysa) devam et
+                    // Error olursa (henüz kalkmadıysa) devam et
                 }
-                
+
                 if (!IsApiReady)
                     await Task.Delay(2000); // 2 saniyede bir kontrol et
             }
@@ -125,12 +125,12 @@ public partial class LoginViewModel : ObservableObject
 
         if (string.IsNullOrWhiteSpace(Username))
         {
-            ErrorMessage = "Kullanıcı adı boş olamaz.";
+            ErrorMessage = "Username is required.";
             return;
         }
         if (string.IsNullOrWhiteSpace(Password))
         {
-            ErrorMessage = "Şifre boş olamaz.";
+            ErrorMessage = "Password is required.";
             return;
         }
 
@@ -150,18 +150,18 @@ public partial class LoginViewModel : ObservableObject
             }
             else
             {
-                ErrorMessage = "Kullanıcı adı veya şifre hatalı.";
+                ErrorMessage = "Invalid username or password.";
             }
         }
         catch (HttpRequestException)
         {
-            ErrorMessage = "API sunucusuyla bağlantı koptu. Lütfen tekrar deneyin.";
+            ErrorMessage = "Connection to the API server was lost. Please try again.";
             IsApiReady = false; // Tekrar beklemeye al
             StartApiHealthCheck();
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Giriş hatası: {ex.Message}";
+            ErrorMessage = $"Sign-in error: {ex.Message}";
         }
         finally
         {
@@ -172,6 +172,6 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     private void ForgotPassword()
     {
-        ErrorMessage = "Şifre sıfırlama için sistem yöneticinize başvurun.";
+        ErrorMessage = "Contact your system administrator to reset your password.";
     }
 }

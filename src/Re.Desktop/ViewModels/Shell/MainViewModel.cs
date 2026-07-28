@@ -23,15 +23,19 @@ public partial class MainViewModel : ObservableObject
     private readonly ProductListViewModel _productListVm;
     private readonly AccountListViewModel _accountListVm;
     private readonly InvoiceListViewModel _invoiceListVm;
+    private readonly IPackageCenterService _packages;
 
-    [ObservableProperty] private string _userFullName = "Kullanıcı";
+    [ObservableProperty] private string _userFullName = "User";
     [ObservableProperty] private string _userInitials = "K";
     [ObservableProperty] private string _companyName = "Firma";
     [ObservableProperty] private string _windowsUser = Environment.UserName;
-    [ObservableProperty] private string _localIpAddress = "IP: hesaplanıyor";
+    [ObservableProperty] private string _localIpAddress = "IP: calculating";
     [ObservableProperty] private string _liveClock = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
-    [ObservableProperty] private string _connectionStatus = "● API BAĞLI";
+    [ObservableProperty] private string _connectionStatus = "● API CONNECTED";
     [ObservableProperty] private string _sessionUsername = "-";
+    [ObservableProperty] private bool _isPosInstalled;
+    [ObservableProperty] private bool _isReportsInstalled;
+    [ObservableProperty] private bool _isFundingInstalled;
     private readonly DispatcherTimer _clockTimer = new() { Interval = TimeSpan.FromSeconds(1) };
 
     // Sekmeler (Tabs) Koleksiyonu
@@ -42,27 +46,37 @@ public partial class MainViewModel : ObservableObject
 
     private static readonly Dictionary<string, string> RouteNames = new()
     {
-        ["Dashboard"]      = "Genel Bakış",
-        ["Agenda"]         = "Ajanda",
-        ["Products"]       = "Stok Yönetimi",
-        ["StockMovements"] = "Stok Hareketleri",
-        ["Invoices"]       = "Satış Faturaları",
-        ["POS"]            = "Hızlı Satış (POS)",
-        ["Accounts"]       = "Cari Hesaplar",
-        ["Cash"]           = "Kasa Yönetimi",
-        ["Bank"]           = "Banka Hesapları",
-        ["Finance"]        = "Finans",
-        ["Reports"]        = "Raporlar",
-        ["Settings"]       = "Sistem Ayarları",
+        ["Dashboard"]      = "Overview",
+        ["Agenda"]         = "Calendar",
+        ["Products"]       = "Inventory Management",
+        ["StockMovements"] = "Stock Movements",
+        ["Invoices"]       = "Sales Invoices",
+        ["PurchaseInvoices"] = "Purchase Invoices",
+        ["Orders"]         = "Order Management",
+        ["POS"]            = "Quick Sales (POS)",
+        ["Accounts"]       = "Accounts",
+        ["Cash"]           = "Cash Management",
+        ["Bank"]           = "Bank Accounts",
+        ["Finance"]        = "Finance",
+        ["FundingIntelligence"] = "Funding Intelligence",
+        ["Reports"]        = "Reports",
+        ["Settings"]       = "System Settings",
+        ["PackageCenter"]  = "Package Center",
+        ["UpdateCenter"]   = "Update Center",
     };
 
-    public MainViewModel(ISessionService session, INavigationService navigation, ProductListViewModel productListVm, AccountListViewModel accountListVm, InvoiceListViewModel invoiceListVm)
+    public MainViewModel(ISessionService session, INavigationService navigation,
+        ProductListViewModel productListVm, AccountListViewModel accountListVm,
+        InvoiceListViewModel invoiceListVm, IPackageCenterService packages)
     {
         _session = session;
         _navigation = navigation;
         _productListVm = productListVm;
         _accountListVm = accountListVm;
         _invoiceListVm = invoiceListVm;
+        _packages = packages;
+        RefreshPackageState();
+        _packages.PackagesChanged += RefreshPackageState;
 
         if (session.CurrentUser is { } user)
         {
@@ -81,8 +95,15 @@ public partial class MainViewModel : ObservableObject
         // Navigation Servisinden gelen sekme açma isteklerini dinle
         _navigation.PageRequested += OnPageRequested;
 
-        // Başlangıçta Dashboard'u aç
+        // Startta Dashboard'u aç
         _navigation.NavigateTo("Dashboard");
+    }
+
+    private void RefreshPackageState()
+    {
+        IsPosInstalled = _packages.IsRouteEnabled("POS");
+        IsReportsInstalled = _packages.IsRouteEnabled("Reports");
+        IsFundingInstalled = _packages.IsRouteEnabled("FundingIntelligence");
     }
 
     private static string ResolveLocalIp()
@@ -91,9 +112,9 @@ public partial class MainViewModel : ObservableObject
         {
             return Dns.GetHostEntry(Dns.GetHostName()).AddressList
                 .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork)?.ToString()
-                ?? "IP bulunamadı";
+                ?? "IP not found";
         }
-        catch { return "IP bulunamadı"; }
+        catch { return "IP not found"; }
     }
 
     private void OnPageRequested(string route, object pageContent)
@@ -106,7 +127,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        // Yeni sekme oluştur
+        // New sekme oluştur
         var newTab = new WorkspaceTab
         {
             Title = RouteNames.GetValueOrDefault(route, route),
@@ -135,9 +156,9 @@ public partial class MainViewModel : ObservableObject
     private void CloseTab(WorkspaceTab tab)
     {
         if (tab == null || !tab.IsCloseable) return;
-        
+
         OpenTabs.Remove(tab);
-        
+
         if (ActiveTab == tab)
         {
             ActiveTab = OpenTabs.LastOrDefault();
@@ -163,7 +184,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void Logout()
     {
-        if (MessageBox.Show("Çıkış yapmak istiyor musunuz?", "Çıkış",
+        if (MessageBox.Show("Issue yapmak istiyor musunuz?", "Issue",
             MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
             return;
 
