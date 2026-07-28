@@ -40,12 +40,12 @@ public class AuthController : ControllerBase
         {
             if (user is not null) user.RecordFailedLogin();
             await _db.SaveChangesAsync();
-            return Unauthorized(ApiResponse<AuthResponse>.Fail("Kullanıcı adı veya şifre hatalı."));
+            return Unauthorized(ApiResponse<AuthResponse>.Fail("Invalid username or password."));
         }
 
         if (user.IsLocked)
             return Unauthorized(ApiResponse<AuthResponse>.Fail(
-                $"Hesabınız kilitli. {user.LockedUntil:HH:mm}'e kadar bekleyin."));
+                $"Your account is locked. Wait until {user.LockedUntil:HH:mm}."));
 
         var permissions = user.UserRoles
             .SelectMany(ur => ur.Role.RolePermissions)
@@ -82,7 +82,7 @@ public class AuthController : ControllerBase
                 user.Id, user.CompanyId, user.BranchId,
                 user.Username, user.Email, user.FullName, permissions));
 
-        return Ok(ApiResponse<AuthResponse>.Ok(response, "Giriş başarılı."));
+        return Ok(ApiResponse<AuthResponse>.Ok(response, "Sign-in successful."));
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public class AuthController : ControllerBase
             .FirstOrDefaultAsync(t => t.Token == request.RefreshToken && !t.IsRevoked);
 
         if (token is null || !token.IsActive)
-            return Unauthorized(ApiResponse<AuthResponse>.Fail("Geçersiz veya süresi dolmuş yenileme tokeni."));
+            return Unauthorized(ApiResponse<AuthResponse>.Fail("Invalid or expired refresh token."));
 
         // Eski token'ı iptal et, yeni oluştur
         token.IsRevoked  = true;
@@ -127,7 +127,7 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Çıkış – refresh token iptal et.
+    /// Issue – refresh token iptal et.
     /// </summary>
     [HttpPost("logout")]
     public async Task<ActionResult> Logout([FromBody] RefreshTokenRequest request)
@@ -142,7 +142,7 @@ public class AuthController : ControllerBase
             await _db.SaveChangesAsync();
         }
 
-        return Ok(new { success = true, message = "Çıkış başarılı." });
+        return Ok(new { success = true, message = "Sign-out successful." });
     }
 }
 
