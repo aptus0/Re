@@ -1,27 +1,128 @@
 <Window x:Class="Re.Desktop.Views.Accounts.AccountOperationWindow"
- xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
- xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- Title="Account Operation" Width="650" Height="620" WindowStartupLocation="CenterOwner"
- ResizeMode="NoResize" Background="#F4F6F9">
- <Grid>
-  <Grid.RowDefinitions><RowDefinition Height="82"/><RowDefinition Height="*"/><RowDefinition Height="66"/></Grid.RowDefinitions>
-  <Border Background="#032D60" Padding="22,15"><Grid><StackPanel><TextBlock Text="ACCOUNT OPERATION" Foreground="#9ED7FF" FontWeight="Bold" FontSize="11"/><TextBlock Text="{Binding Account.Name}" Foreground="White" FontWeight="Bold" FontSize="20"/><TextBlock Text="{Binding Account.Code}" Foreground="#C9E6FA" FontSize="11"/></StackPanel><StackPanel HorizontalAlignment="Right"><TextBlock Text="CURRENT BALANCE" Foreground="#9ED7FF" FontSize="10"/><TextBlock Text="{Binding Account.Balance, StringFormat='₺{0:N2}'}" Foreground="White" FontWeight="Bold" FontSize="19" HorizontalAlignment="Right"/></StackPanel></Grid></Border>
-  <Border Grid.Row="1" Background="White" BorderBrush="#D8DDE6" BorderThickness="1" CornerRadius="8" Padding="22" Margin="20">
-   <StackPanel>
-    <TextBlock Text="Operation Type *" FontWeight="SemiBold"/><ComboBox ItemsSource="{Binding OperationTypes}" SelectedItem="{Binding SelectedOperationType}" Height="35" Margin="0,5,0,8"/>
-    <Border Background="#F4F9FF" BorderBrush="#B3D7F2" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,0,0,12"><TextBlock Text="{Binding EffectText}" Foreground="#014486"/></Border>
-    <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
-     <StackPanel><TextBlock Text="Amount *" FontWeight="SemiBold"/><TextBox Text="{Binding Amount}" Height="35" Margin="0,5,0,12"/></StackPanel>
-     <StackPanel Grid.Column="2"><TextBlock Text="Currency / Exchange Rate"/><Grid Margin="0,5,0,12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="8"/><ColumnDefinition/></Grid.ColumnDefinitions><ComboBox ItemsSource="{Binding Currencies}" SelectedItem="{Binding Currency}" Height="35"/><TextBox Grid.Column="2" Text="{Binding ExchangeRate}" Height="35"/></Grid></StackPanel>
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Cari Hesap İşlemi" Width="680" Height="640" WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize" Background="#F8FAFC"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+    
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI, Inter"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+        <Style TargetType="DatePicker">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="84"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="64"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Account Header Banner -->
+        <Border Background="#0F172A" Padding="24,16">
+            <Grid>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="CARİ HESAP BAKIYE İŞLEMİ" Foreground="#38BDF8" FontWeight="Bold" FontSize="11"/>
+                    <TextBlock Text="{Binding Account.Name}" Foreground="White" FontWeight="Bold" FontSize="20" Margin="0,2,0,0"/>
+                    <TextBlock Text="{Binding Account.Code, StringFormat='KOD: {0}'}" Foreground="#94A3B8" FontSize="11.5"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="GÜNCEL BAKİYE" Foreground="#94A3B8" FontSize="10.5" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    <TextBlock Text="{Binding Account.Balance, StringFormat='₺{0:N2}'}" Foreground="#10B981" FontWeight="Bold" FontSize="22" HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Form Area -->
+        <Border Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="24" Margin="20">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="İşlem Türü *" FontWeight="Bold" FontSize="11.5" Foreground="#475569" Margin="0,0,0,4"/>
+                    <ComboBox ItemsSource="{Binding OperationTypes}" SelectedItem="{Binding SelectedOperationType}" Margin="0,0,0,10"/>
+
+                    <Border Background="#F0F9FF" BorderBrush="#BAE6FD" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,14">
+                        <TextBlock Text="{Binding EffectText}" Foreground="#0369A1" FontWeight="SemiBold" FontSize="12"/>
+                    </Border>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="İşlem Tutarı (₺) *" FontWeight="Bold" FontSize="11.5" Foreground="#475569" Margin="0,0,0,4"/>
+                            <TextBox Text="{Binding Amount}" Margin="0,0,0,14"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Para Birimi / Kur" FontWeight="Bold" FontSize="11.5" Foreground="#475569" Margin="0,0,0,4"/>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <ComboBox ItemsSource="{Binding Currencies}" SelectedItem="{Binding Currency}"/>
+                                <TextBox Grid.Column="2" Text="{Binding ExchangeRate}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="İşlem Tarihi" FontWeight="Bold" FontSize="11.5" Foreground="#475569" Margin="0,0,0,4"/>
+                            <DatePicker SelectedDate="{Binding MovementDate}" Margin="0,0,0,14"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Vade Tarihi" FontWeight="Bold" FontSize="11.5" Foreground="#475569" Margin="0,0,0,4"/>
+                            <DatePicker SelectedDate="{Binding DueDate}" Margin="0,0,0,14"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Evrak / Referans Numarası" FontWeight="Bold" FontSize="11.5" Foreground="#475569" Margin="0,0,0,4"/>
+                    <TextBox Text="{Binding ReferenceNumber}" Margin="0,0,0,14"/>
+
+                    <TextBlock Text="İşlem Açıklaması *" FontWeight="Bold" FontSize="11.5" Foreground="#475569" Margin="0,0,0,4"/>
+                    <TextBox Text="{Binding Description}" Height="60" AcceptsReturn="True" TextWrapping="Wrap"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Bottom Action Bar -->
+        <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0" Padding="24,12">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Vazgeç" Click="Cancel_Click" Background="White" Foreground="#475569" BorderBrush="#CBD5E1" BorderThickness="1" Height="36" Width="100" FontWeight="SemiBold" Cursor="Hand" Margin="0,0,10,0"/>
+                <Button Content="💾 İşlemi Kaydet" Command="{Binding SaveCommand}" Background="#0070D2" Foreground="White" BorderThickness="0" Height="36" Width="140" FontWeight="Bold" Cursor="Hand"/>
+            </StackPanel>
+        </Border>
     </Grid>
-    <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
-     <StackPanel><TextBlock Text="Movement Date"/><DatePicker SelectedDate="{Binding MovementDate}" Height="35" Margin="0,5,0,12"/></StackPanel>
-     <StackPanel Grid.Column="2"><TextBlock Text="Due Date"/><DatePicker SelectedDate="{Binding DueDate}" Height="35" Margin="0,5,0,12"/></StackPanel>
-    </Grid>
-    <TextBlock Text="Reference Number"/><TextBox Text="{Binding ReferenceNumber}" Height="35" Margin="0,5,0,12"/>
-    <TextBlock Text="Description *" FontWeight="SemiBold"/><TextBox Text="{Binding Description}" Height="55" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,5,0,0"/>
-   </StackPanel>
-  </Border>
-  <Border Grid.Row="2" Background="White" BorderBrush="#D8DDE6" BorderThickness="0,1,0,0" Padding="20,12"><StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="Cancel" Click="Cancel_Click" Padding="20,9" Margin="0,0,8,0"/><Button Content="Post Operation" Command="{Binding SaveCommand}" Background="#0176D3" Foreground="White" BorderThickness="0" Padding="22,9"/></StackPanel></Border>
- </Grid>
 </Window>

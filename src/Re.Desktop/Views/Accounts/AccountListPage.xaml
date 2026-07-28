@@ -50,30 +50,30 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Text="Account Management" FontSize="28" FontWeight="Bold" Foreground="#1E293B" />
-                    <TextBlock Text="{Binding TotalCount, StringFormat='{}{0} records listed'}"
-                               FontSize="14" Foreground="#64748B" Margin="0,4,0,0" />
+                    <TextBlock Text="Cari Hesap Yönetimi" FontSize="26" FontWeight="Bold" Foreground="#0F172A" />
+                    <TextBlock Text="{Binding TotalCount, StringFormat='{}{0} cari kayıt listelendi'}"
+                               FontSize="13" Foreground="#64748B" Margin="0,4,0,0" />
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <ComboBox Width="170" Height="34" Margin="0,0,10,0"
+                    <ComboBox Width="170" Height="36" Margin="0,0,10,0"
                               ItemsSource="{Binding AccountGroups}" SelectedItem="{Binding SelectedAccountGroup}"/>
-                    <Border Background="White" CornerRadius="8" Padding="12,8" Margin="0,0,16,0" BorderBrush="#E2E8F0" BorderThickness="1">
+                    <Border Background="White" CornerRadius="8" Padding="12,6" Margin="0,0,14,0" BorderBrush="#CBD5E1" BorderThickness="1">
                         <Grid>
-                            <TextBlock Text="🔍" FontSize="16" Foreground="#94A3B8" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="🔍" FontSize="14" Foreground="#94A3B8" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                                     Width="200" Background="Transparent" BorderThickness="0" Margin="24,0,0,0"
-                                     VerticalAlignment="Center" FontSize="14"/>
-                            <TextBlock Text="Search account, code or tax number..." Foreground="#94A3B8" FontSize="14" IsHitTestVisible="False" Margin="24,0,0,0" VerticalAlignment="Center"
+                                     Width="220" Background="Transparent" BorderThickness="0" Margin="24,0,0,0"
+                                     VerticalAlignment="Center" FontSize="13"/>
+                            <TextBlock Text="Cari ünvan, kod veya vergi no ara..." Foreground="#94A3B8" FontSize="13" IsHitTestVisible="False" Margin="24,0,0,0" VerticalAlignment="Center"
                                        Visibility="{Binding IsSearchEmpty, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         </Grid>
                     </Border>
-                    <Button Content="+ Account Operation" Command="{Binding NewOperationCommand}" CommandParameter="{Binding SelectedAccount}"
-                            Background="#107C10" Foreground="White" BorderThickness="0" Padding="14,8"
-                            FontSize="13" FontWeight="SemiBold" Cursor="Hand" Margin="0,0,8,0"/>
-                    <Button Content="+ New Account" Command="{Binding NewAccountCommand}"
-                            Background="#0176D3" Foreground="White" BorderThickness="0" Padding="14,8"
-                            FontSize="14" FontWeight="SemiBold" Cursor="Hand">
+                    <Button Content="💳 Bakiye İşlemi" Command="{Binding NewOperationCommand}" CommandParameter="{Binding SelectedAccount}"
+                            Background="#047857" Foreground="White" BorderThickness="0" Padding="14,0" Height="36"
+                            FontSize="12.5" FontWeight="Bold" Cursor="Hand" Margin="0,0,8,0"/>
+                    <Button Content="+ Yeni Cari Eklem" Command="{Binding NewAccountCommand}"
+                            Background="#0070D2" Foreground="White" BorderThickness="0" Padding="16,0" Height="36"
+                            FontSize="13" FontWeight="Bold" Cursor="Hand">
                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="8"/></Style></Button.Resources>
                     </Button>
                 </StackPanel>
@@ -81,22 +81,22 @@
 
             <!-- Özet Kartları -->
             <UniformGrid Grid.Row="2" Columns="5" Rows="1">
-                <Border Background="White" CornerRadius="3" Padding="12" Margin="0,0,6,0" BorderBrush="#C8C8C8" BorderThickness="1">
+                <Border Background="White" CornerRadius="8" Padding="14" Margin="0,0,10,0" BorderBrush="#E2E8F0" BorderThickness="1">
                     <StackPanel>
-                        <TextBlock Text="TOTAL ACCOUNTS" FontSize="10" Foreground="#666" FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding TotalCount}" FontSize="20" FontWeight="Bold" Foreground="#171717" Margin="0,5,0,0"/>
+                        <TextBlock Text="TOPLAM CARİ KART" FontSize="10.5" Foreground="#64748B" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding TotalCount}" FontSize="20" FontWeight="Bold" Foreground="#0F172A" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
-                <Border Background="White" CornerRadius="3" Padding="12" Margin="0,0,6,0" BorderBrush="#C8C8C8" BorderThickness="1">
+                <Border Background="White" CornerRadius="8" Padding="14" Margin="0,0,10,0" BorderBrush="#E2E8F0" BorderThickness="1">
                     <StackPanel>
-                        <TextBlock Text="TOTAL RECEIVABLES" FontSize="10" Foreground="#666" FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding TotalReceivables}" FontSize="20" FontWeight="Bold" Foreground="#BA0517" Margin="0,5,0,0"/>
+                        <TextBlock Text="TOPLAM ALACAKIMIZ" FontSize="10.5" Foreground="#64748B" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding TotalReceivables}" FontSize="20" FontWeight="Bold" Foreground="#DC2626" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
-                <Border Background="White" CornerRadius="3" Padding="12" Margin="0,0,6,0" BorderBrush="#C8C8C8" BorderThickness="1">
+                <Border Background="White" CornerRadius="8" Padding="14" Margin="0,0,10,0" BorderBrush="#E2E8F0" BorderThickness="1">
                     <StackPanel>
-                        <TextBlock Text="TOTAL PAYABLES" FontSize="10" Foreground="#666" FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding TotalPayables}" FontSize="20" FontWeight="Bold" Foreground="#107C10" Margin="0,5,0,0"/>
+                        <TextBlock Text="TOPLAM BORCUMUZ" FontSize="10.5" Foreground="#64748B" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding TotalPayables}" FontSize="20" FontWeight="Bold" Foreground="#047857" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
                 <Border Background="White" CornerRadius="3" Padding="12" Margin="0,0,6,0" BorderBrush="#C8C8C8" BorderThickness="1">

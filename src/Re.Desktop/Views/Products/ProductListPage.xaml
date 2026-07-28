@@ -50,35 +50,35 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Text="Inventory &amp; Product Management" FontSize="28" FontWeight="Bold" Foreground="#1E293B" />
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                        <TextBlock Text="{Binding TotalCount, StringFormat='{}{0} products'}" FontSize="13" Foreground="#64748B"/>
-                        <TextBlock Text="{Binding LowStockCount, StringFormat='  ·  {0} low stock'}" FontSize="13" Foreground="#B45309"/>
-                        <TextBlock Text="{Binding OutOfStockCount, StringFormat='  ·  {0} out of stock'}" FontSize="13" Foreground="#BA0517"/>
-                        <TextBlock Text="{Binding InventoryValue, StringFormat='  ·  Inventory value ₺{0:N2}'}" FontSize="13" Foreground="#006644" FontWeight="SemiBold"/>
+                    <TextBlock Text="Stok &amp; Ürün Kataloğu Yönetimi" FontSize="26" FontWeight="Bold" Foreground="#0F172A" />
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <TextBlock Text="{Binding TotalCount, StringFormat='{}{0} kayıtlı ürün'}" FontSize="12.5" Foreground="#64748B"/>
+                        <TextBlock Text="{Binding LowStockCount, StringFormat='  ·  {0} kritik stok'}" FontSize="12.5" Foreground="#D97706" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding OutOfStockCount, StringFormat='  ·  {0} tükenen ürün'}" FontSize="12.5" Foreground="#DC2626" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding InventoryValue, StringFormat='  ·  Toplam stok değeri ₺{0:N2}'}" FontSize="12.5" Foreground="#047857" FontWeight="Bold"/>
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button Content="Stock Adjustment" Command="{Binding AdjustStockCommand}" CommandParameter="{Binding SelectedProduct}"
-                            Background="#107C10" Foreground="White" BorderThickness="0" Padding="12,8" Margin="0,0,10,0"
-                            FontSize="13" FontWeight="SemiBold" Cursor="Hand"/>
-                    <Button Content="Print Barcodes" Command="{Binding PrintBarcodesCommand}"
-                            Background="White" Foreground="#475569" BorderThickness="1" BorderBrush="#E2E8F0" Padding="12,8" Margin="0,0,10,0"
-                            FontSize="13" FontWeight="SemiBold" Cursor="Hand">
+                    <Button Content="⚡ Stok Düzeltme" Command="{Binding AdjustStockCommand}" CommandParameter="{Binding SelectedProduct}"
+                            Background="#047857" Foreground="White" BorderThickness="0" Padding="12,0" Height="36" Margin="0,0,8,0"
+                            FontSize="12.5" FontWeight="Bold" Cursor="Hand"/>
+                    <Button Content="🏷 Barkod Basımı" Command="{Binding PrintBarcodesCommand}"
+                            Background="White" Foreground="#475569" BorderThickness="1" BorderBrush="#CBD5E1" Padding="12,0" Height="36" Margin="0,0,8,0"
+                            FontSize="12.5" FontWeight="SemiBold" Cursor="Hand">
                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
                     </Button>
-                    <Button Content="Export" Command="{Binding ExportCommand}"
-                            Background="White" Foreground="#475569" BorderThickness="1" BorderBrush="#E2E8F0" Padding="12,8" Margin="0,0,10,0"
-                            FontSize="13" FontWeight="SemiBold" Cursor="Hand">
+                    <Button Content="📥 Dışa Aktar" Command="{Binding ExportCommand}"
+                            Background="White" Foreground="#475569" BorderThickness="1" BorderBrush="#CBD5E1" Padding="12,0" Height="36" Margin="0,0,8,0"
+                            FontSize="12.5" FontWeight="SemiBold" Cursor="Hand">
                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
                     </Button>
-                    <Button Content="Catalog Management" Command="{Binding ManageCatalogCommand}"
-                            Background="#0F172A" Foreground="White" BorderThickness="0" Padding="14,8"
-                            FontSize="14" FontWeight="SemiBold" Cursor="Hand" Margin="0,0,8,0"/>
-                    <Button Content="+ New Product" Command="{Binding NewProductCommand}"
-                            Background="#0176D3" Foreground="White" BorderThickness="0" Padding="14,8"
-                            FontSize="14" FontWeight="SemiBold" Cursor="Hand">
+                    <Button Content="🗂 Kategori &amp; Marka" Command="{Binding ManageCatalogCommand}"
+                            Background="#0F172A" Foreground="White" BorderThickness="0" Padding="14,0" Height="36"
+                            FontSize="12.5" FontWeight="Bold" Cursor="Hand" Margin="0,0,8,0"/>
+                    <Button Content="+ Yeni Ürün Ekle" Command="{Binding NewProductCommand}"
+                            Background="#0070D2" Foreground="White" BorderThickness="0" Padding="16,0" Height="36"
+                            FontSize="13" FontWeight="Bold" Cursor="Hand">
                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
                     </Button>
                 </StackPanel>
