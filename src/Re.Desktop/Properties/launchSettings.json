@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Re Desktop .NET 10 (CoreCLR)": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "bin\\Debug\\net10.0-windows\\Re.dll",
+      "workingDirectory": "..",
+      "nativeDebugging": false,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

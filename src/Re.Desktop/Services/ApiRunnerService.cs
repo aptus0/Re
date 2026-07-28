@@ -1,109 +1,206 @@
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 
 namespace Re.Desktop.Services;
 
 public static class ApiRunnerService
 {
-    private static Process? _apiProcess;
+    private static readonly object Sync = new();
+    private static Process? apiProcess;
+    private static readonly Uri HealthUri = new("http://localhost:5188/health");
 
-    public static void StartApi()
+    public static bool StartApi()
     {
-        // Önce Windows Servis kontrolü yap
-        if (IsServiceRunning("Re.Api"))
+        lock (Sync)
         {
-            return; // Servis zaten çalışıyor
-        }
+            if (IsApiReady()) return true;
+            if (IsServiceRunning("Re.Api") && WaitUntilReady(TimeSpan.FromSeconds(8))) return true;
+            if (IsServiceInstalled("Re.Api"))
+            {
+                TryStartService("Re.Api");
+                if (WaitUntilReady(TimeSpan.FromSeconds(12))) return true;
 
-        // Eğer servis kurulu değilse veya çalışmıyorsa yerel process olarak başlatmayı dene
-        StartLocalProcess();
+                // Installed builds must use the managed Windows Service. Never open a
+                // second console/API process beside a failed service installation.
+                if (Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Api")))
+                {
+                    WriteLog("Installed Re.Api Windows Service could not be started.", null);
+                    return false;
+                }
+            }
+
+            var apiPath = ResolveApiPath();
+            if (apiPath is null)
+            {
+                WriteLog("Re.Api executable could not be found.", null);
+                return false;
+            }
+
+            try
+            {
+                var logDirectory = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "ReSoft", "Re", "Logs");
+                Directory.CreateDirectory(logDirectory);
+                var outputPath = Path.Combine(logDirectory, "api-process.log");
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = apiPath,
+                    WorkingDirectory = Path.GetDirectoryName(apiPath)!,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    Arguments = $"--parent-pid {Environment.ProcessId} --urls \"http://localhost:5188\""
+                };
+                startInfo.Environment["ASPNETCORE_ENVIRONMENT"] = "Development";
+                apiProcess = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
+                apiProcess.OutputDataReceived += (_, e) => AppendProcessOutput(outputPath, e.Data);
+                apiProcess.ErrorDataReceived += (_, e) => AppendProcessOutput(outputPath, e.Data);
+                apiProcess.Exited += (_, _) =>
+                    WriteLog($"Local API exited with code {apiProcess?.ExitCode}.", null);
+                if (!apiProcess.Start()) return false;
+                apiProcess.BeginOutputReadLine();
+                apiProcess.BeginErrorReadLine();
+                return WaitUntilReady(TimeSpan.FromSeconds(15));
+            }
+            catch (Exception ex)
+            {
+                WriteLog("Local API could not be started.", ex);
+                return false;
+            }
+        }
+    }
+
+    private static string? ResolveApiPath()
+    {
+        var baseDirectory = new DirectoryInfo(AppContext.BaseDirectory);
+        var directCandidates = new[]
+        {
+            Path.Combine(baseDirectory.FullName, "Api", "Re.Api.exe"),
+            Path.Combine(baseDirectory.FullName, "Re.Api.exe")
+        };
+        foreach (var candidate in directCandidates)
+            if (File.Exists(candidate)) return candidate;
+
+        for (var directory = baseDirectory; directory is not null; directory = directory.Parent)
+        {
+            var apiProject = Path.Combine(directory.FullName, "Re.Api");
+            if (!Directory.Exists(apiProject)) continue;
+            foreach (var configuration in new[] { "Debug", "Release" })
+            {
+                var candidate = Path.Combine(apiProject, "bin", configuration, "net10.0", "Re.Api.exe");
+                if (File.Exists(candidate)) return candidate;
+            }
+        }
+        return null;
+    }
+
+    private static bool WaitUntilReady(TimeSpan timeout)
+    {
+        var deadline = DateTime.UtcNow + timeout;
+        while (DateTime.UtcNow < deadline)
+        {
+            if (IsApiReady()) return true;
+            if (apiProcess is { HasExited: true }) return false;
+            Thread.Sleep(200);
+        }
+        WriteLog("Local API health check timed out.", null);
+        return false;
+    }
+
+    private static bool IsApiReady()
+    {
+        try
+        {
+            using var client = new HttpClient { Timeout = TimeSpan.FromMilliseconds(700) };
+            return client.GetAsync(HealthUri).GetAwaiter().GetResult().IsSuccessStatusCode;
+        }
+        catch { return false; }
     }
 
     private static bool IsServiceRunning(string serviceName)
     {
         try
         {
-            var p = new Process();
-            p.StartInfo.FileName = "sc.exe";
-            p.StartInfo.Arguments = $"query {serviceName}";
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.CreateNoWindow = true;
-            p.Start();
-            
-            string output = p.StandardOutput.ReadToEnd();
-            p.WaitForExit();
-
-            return output.Contains("RUNNING");
+            using var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "sc.exe", Arguments = $"query {serviceName}", UseShellExecute = false,
+                RedirectStandardOutput = true, CreateNoWindow = true
+            });
+            if (process is null) return false;
+            var output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit(3000);
+            return output.Contains("RUNNING", StringComparison.OrdinalIgnoreCase);
         }
-        catch
-        {
-            return false;
-        }
+        catch { return false; }
     }
 
-    private static void StartLocalProcess()
+    private static bool IsServiceInstalled(string serviceName)
     {
-        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        var apiExeName = "Re.Api.exe";
-        var apiPath = Path.Combine(baseDir, "Api", apiExeName);
-
-        // Compatibility fallback for older portable builds.
-        if (!File.Exists(apiPath))
+        try
         {
-            apiPath = Path.Combine(baseDir, apiExeName);
+            using var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "sc.exe", Arguments = $"query {serviceName}", UseShellExecute = false,
+                RedirectStandardOutput = true, RedirectStandardError = true,
+                CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden
+            });
+            if (process is null) return false;
+            process.WaitForExit(3000);
+            return process.ExitCode == 0;
         }
+        catch { return false; }
+    }
 
-        // Fallback for development environment
-        if (!File.Exists(apiPath))
+    private static void TryStartService(string serviceName)
+    {
+        try
         {
-            var devPath = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "Re.Api", "bin", "Debug", "net10.0", apiExeName));
-            if (File.Exists(devPath))
+            using var process = Process.Start(new ProcessStartInfo
             {
-                apiPath = devPath;
-            }
+                FileName = "sc.exe", Arguments = $"start {serviceName}", UseShellExecute = false,
+                RedirectStandardOutput = true, RedirectStandardError = true,
+                CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden
+            });
+            process?.WaitForExit(5000);
         }
-
-        if (File.Exists(apiPath))
-        {
-            // Visual Studio (veya başka bir şekilde) tarafından zaten başlatılmışsa, öldürme!
-            var existingProcesses = Process.GetProcessesByName("Re.Api");
-            if (existingProcesses.Length > 0)
-            {
-                return; // Zaten çalışıyor, yeni bir tane başlatmaya gerek yok.
-            }
-
-            var currentProcessId = Environment.ProcessId;
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = apiPath,
-                WorkingDirectory = Path.GetDirectoryName(apiPath) ?? baseDir,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                Arguments = $"--parent-pid {currentProcessId} --urls \"http://localhost:5188\""
-            };
-
-            try
-            {
-                _apiProcess = Process.Start(startInfo);
-            }
-            catch
-            {
-                // Ignore errors
-            }
-        }
+        catch (Exception ex) { WriteLog("Windows Service start request failed.", ex); }
     }
 
     public static void StopApi()
     {
-        if (_apiProcess != null && !_apiProcess.HasExited)
+        lock (Sync)
         {
             try
             {
-                _apiProcess.Kill();
-                _apiProcess.Dispose();
+                if (apiProcess is { HasExited: false }) apiProcess.Kill(true);
+                apiProcess?.Dispose();
             }
             catch { }
+            finally { apiProcess = null; }
         }
+    }
+
+    private static void AppendProcessOutput(string path, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return;
+        try { File.AppendAllText(path, $"[{DateTimeOffset.Now:O}] {value}{Environment.NewLine}"); }
+        catch { }
+    }
+
+    private static void WriteLog(string message, Exception? exception)
+    {
+        try
+        {
+            var directory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ReSoft", "Re", "Logs");
+            Directory.CreateDirectory(directory);
+            File.AppendAllText(Path.Combine(directory, "api-runner.log"),
+                $"[{DateTimeOffset.Now:O}] {message}{Environment.NewLine}{exception}{Environment.NewLine}");
+        }
+        catch { }
     }
 }
