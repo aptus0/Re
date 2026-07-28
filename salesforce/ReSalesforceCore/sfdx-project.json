@@ -2,11 +2,15 @@
   "packageDirectories": [
     {
       "path": "force-app",
-      "default": true
+      "default": true,
+      "package": "Re ERP for Salesforce",
+      "versionName": "Version 1.0",
+      "versionNumber": "1.0.0.NEXT",
+      "postInstallScript": "ReERPInstallHandler"
     }
   ],
-  "name": "ReSalesforceCore",
-  "namespace": "resoft",
+  "name": "Re ERP for Salesforce",
+  "namespace": "reerp",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "65.0"
+  "sourceApiVersion": "66.0"
 }
