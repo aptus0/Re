@@ -8,6 +8,7 @@
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
                 <ResourceDictionary Source="Resources/Themes/ReTheme.xaml" />
+                <ResourceDictionary Source="Resources/Localization/Strings.tr-TR.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
