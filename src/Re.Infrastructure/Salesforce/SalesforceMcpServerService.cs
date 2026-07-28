@@ -9,9 +9,9 @@ public sealed class SalesforceMcpServerService : ISalesforceMcpServerService
         await Task.Delay(20, cancellationToken);
         return new List<McpToolDefinition>
         {
-            new("salesforce_create_custom_object", "Gemini AI desteğiyle yeni Salesforce özel nesnesi (Custom Object) JSON ve SFDX yapısı üretir.", "{ \"label\": \"string\", \"apiName\": \"string\" }"),
-            new("salesforce_create_validation_rule", "Salesforce nesnelerine formül bazlı veri doğrulama kuralı tanımlar.", "{ \"objectName\": \"string\", \"formula\": \"string\" }"),
-            new("salesforce_create_flow", "Salesforce Record-Triggered Flow otomasyonu oluşturur.", "{ \"flowName\": \"string\", \"triggerObject\": \"string\" }")
+            new("salesforce_create_custom_object", "Generates JSON and SFDX structure for a Salesforce custom object with Gemini AI.", "{ \"label\": \"string\", \"apiName\": \"string\" }"),
+            new("salesforce_create_validation_rule", "Defines a formula-based validation rule for Salesforce objects.", "{ \"objectName\": \"string\", \"formula\": \"string\" }"),
+            new("salesforce_create_flow", "Creates Salesforce record-triggered flow automation.", "{ \"flowName\": \"string\", \"triggerObject\": \"string\" }")
         };
     }
 
@@ -32,12 +32,12 @@ public sealed class SalesforceMcpServerService : ISalesforceMcpServerService
             "mcpServerStatus": "ReadyForDeployment"
         }
         """;
-        return new McpExecutionResult(true, jsonOutput, $"Gemini AI isteği işlendi. Prompt: '{prompt}'. JSON şeması başarıyla üretildi.", DateTime.UtcNow);
+        return new McpExecutionResult(true, jsonOutput, $"Gemini AI request processed. Prompt: '{prompt}'. JSON schema generated successfully.", DateTime.UtcNow);
     }
 
     public async Task<McpExecutionResult> ExecuteMcpToolAsync(string toolName, string inputJson, CancellationToken cancellationToken = default)
     {
         await Task.Delay(50, cancellationToken);
-        return new McpExecutionResult(true, inputJson, $"MCP Tool ({toolName}) başarıyla çalıştırıldı ve Salesforce Metadata API'ye iletildi.", DateTime.UtcNow);
+        return new McpExecutionResult(true, inputJson, $"MCP Tool ({toolName}) executed successfully and sent to the Salesforce Metadata API.", DateTime.UtcNow);
     }
 }

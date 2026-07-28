@@ -16,7 +16,7 @@ public sealed class SalesforceAgentforceService : ISalesforceAgentforceService
         await Task.Delay(100, cancellationToken);
         return new AgentforceRecommendationResult(
             true,
-            "Agentforce Önerisi: Cari hesap risk skoru Düşük (Low Risk). %5 özel müşteri indirimi ve 30 gün vade uygundur. Otomatik onay akışı başlatılabilir.",
+            "Agentforce Recommendation: Account risk is low. A 5% customer discount and 30-day payment term are appropriate. The automatic approval flow can be started.",
             "LOW_RISK",
             5.0m,
             DateTime.UtcNow

@@ -14,15 +14,15 @@ public sealed class LocalizationService : ILocalizationService
         ["tr-TR"] = new()
         {
             ["SalesforceCloud"] = "Salesforce Cloud & LWC Workspace",
-            ["DeveloperStudio"] = "Geliştirici Stüdyosu",
-            ["GeminiStudio"] = "Gemini AI Prompt Stüdyosu",
+            ["DeveloperStudio"] = "Developer Studio",
+            ["GeminiStudio"] = "Gemini AI Prompt Studio",
             ["Refresh"] = "Yenile",
-            ["CreateProposal"] = "Yeni Teklif Hazırla",
+            ["CreateProposal"] = "Create New Proposal",
             ["OrgBadge"] = "Org Durumu",
             ["AutoDeploy"] = "Otomatik Deploy",
             ["JobWorkerStatus"] = "Job Worker Senkronize",
-            ["SettingsTitle"] = "Sistem & Salesforce Entegrasyon Ayarları",
-            ["Environment"] = "Ortam Türü",
+            ["SettingsTitle"] = "System & Salesforce Integration Settings",
+            ["Environment"] = "Environment Type",
             ["LanguageSelect"] = "Uygulama Dili (Language)"
         },
         ["en-US"] = new()
