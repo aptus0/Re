@@ -19,6 +19,13 @@ and local browser cache are retained in the current Windows user profile, which
 avoids repeated sign-ins and improves subsequent loading speed. Closing the
 desktop application also shuts down its bundled local API.
 
+### 🇹🇷 %100 Türkçe Kurumsal Arayüz ve Özellikler (v1.1.0)
+ReSoft ERP platformu, tüm masaüstü sekmelerinde, modal pencerelerinde, navigasyon çubuklarında ve hata bildirimlerinde %100 Türkçe yerelleştirme desteğine sahiptir:
+- **Kurumsal Giriş Portalı:** Şube, mağaza, kullanıcı ve şifre girişleri için Türkçe arayüz, görsel ikonlar ve net hata uyarı kutuları.
+- **Salesforce Org Connect:** Salesforce kurumsal web hesabıyla doğrudan OAuth SSO bağlantısı.
+- **Paket & Modül Merkezi:** Çekirdek modüller, perakende POS, barkod yazıcı, AI nakit akış tahminleme ve Salesforce 2GP entegratörü için görsel ikonlu paket yönetimi.
+- **Cari & Ürün Yönetim Portalı:** Ürün kartı oluşturma, bakiye hareket kayıtları, stok kartı yönetimi ve hızlı arama mekanizmaları.
+
 ReSoft Adaptive CRM & Retail ERP is an integrated retail operations platform that
 connects Salesforce Sales Cloud with the ReSoft ERP ecosystem. It gives retail
 stores, regional teams, finance departments, warehouse operators, and sales
