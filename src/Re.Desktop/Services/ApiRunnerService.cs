@@ -33,7 +33,7 @@ public static class ApiRunnerService
             var apiPath = ResolveApiPath();
             if (apiPath is null || !File.Exists(apiPath))
             {
-                WriteLog("Re.Api executable not present. Running desktop in independent mode.", null);
+                WriteLog("Yerel Re.Api çalıştırılabilir dosyası bulunamadı. Masaüstü uygulaması bağımsız modda devam ediyor.", null);
                 return false;
             }
 
