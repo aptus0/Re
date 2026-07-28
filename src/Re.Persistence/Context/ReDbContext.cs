@@ -68,6 +68,9 @@ public class ReDbContext : DbContext
     public DbSet<BankAccount>        BankAccounts        => Set<BankAccount>();
     public DbSet<BankAccountMovement> BankAccountMovements => Set<BankAccountMovement>();
     public DbSet<ChequeNote>          ChequeNotes          => Set<ChequeNote>();
+    public DbSet<AccountMovementAllocation> AccountMovementAllocations => Set<AccountMovementAllocation>();
+    public DbSet<DocumentApproval> DocumentApprovals => Set<DocumentApproval>();
+    public DbSet<DocumentStatusHistory> DocumentStatusHistories => Set<DocumentStatusHistory>();
 
     // Salesforce control plane
     public DbSet<SalesforceTenant> SalesforceTenants => Set<SalesforceTenant>();
@@ -92,7 +95,8 @@ public class ReDbContext : DbContext
             typeof(InvoiceLine),
             typeof(PurchaseInvoiceLine),
             typeof(OrderLine),
-            typeof(AccountMovement)
+            typeof(AccountMovement),
+            typeof(DocumentStatusHistory)
         };
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
@@ -152,12 +156,35 @@ public class ReDbContext : DbContext
 
         ConfigureIdentity(modelBuilder);
         ConfigureCompany(modelBuilder);
+        ConfigureDocumentGovernance(modelBuilder);
         var supportsTemporalTables = Database.IsSqlServer();
         ConfigureInventory(modelBuilder, supportsTemporalTables);
         ConfigureSales(modelBuilder, supportsTemporalTables);
-          ConfigureAccounting(modelBuilder, supportsTemporalTables);
-          ConfigureSalesforce(modelBuilder, supportsTemporalTables);
-      }
+        ConfigurePurchasing(modelBuilder, supportsTemporalTables);
+        ConfigureAccounting(modelBuilder, supportsTemporalTables);
+        ConfigureSalesforce(modelBuilder, supportsTemporalTables);
+    }
+
+    private static void ConfigureDocumentGovernance(ModelBuilder m)
+    {
+        m.Entity<DocumentApproval>(e =>
+        {
+            e.ToTable("DocumentApprovals");
+            e.Property(x => x.DocumentType).HasMaxLength(60).IsRequired();
+            e.Property(x => x.Decision).HasConversion<string>().HasMaxLength(20);
+            e.Property(x => x.DecisionNote).HasMaxLength(1000);
+            e.HasIndex(x => new { x.CompanyId, x.DocumentType, x.DocumentId, x.ApprovalLevel }).IsUnique();
+        });
+        m.Entity<DocumentStatusHistory>(e =>
+        {
+            e.ToTable("DocumentStatusHistories");
+            e.Property(x => x.DocumentType).HasMaxLength(60).IsRequired();
+            e.Property(x => x.PreviousStatus).HasMaxLength(40);
+            e.Property(x => x.NewStatus).HasMaxLength(40).IsRequired();
+            e.Property(x => x.Description).HasMaxLength(1000);
+            e.HasIndex(x => new { x.CompanyId, x.DocumentType, x.DocumentId, x.ChangedAt });
+        });
+    }
 
     private static void ConfigureSalesforce(ModelBuilder m, bool isSqlServer)
     {
@@ -466,6 +493,17 @@ public class ReDbContext : DbContext
             e.HasIndex(x => new { x.CompanyId, x.DocumentNumber }).IsUnique();
         });
 
+        m.Entity<AccountMovementAllocation>(e =>
+        {
+            e.ToTable("AccountMovementAllocations");
+            e.Property(x => x.Amount).HasPrecision(18, 4);
+            e.Property(x => x.Currency).HasMaxLength(3).IsRequired();
+            e.Property(x => x.ExchangeRate).HasPrecision(18, 6);
+            e.Property(x => x.ReversalReason).HasMaxLength(1000);
+            e.HasIndex(x => new { x.CompanyId, x.AccountId, x.AllocationDate });
+            e.HasIndex(x => new { x.SourceMovementId, x.TargetMovementId });
+        });
+
         m.Entity<InvoiceLine>(e =>
         {
             e.ToTable("InvoiceLines");
@@ -514,6 +552,34 @@ public class ReDbContext : DbContext
         });
     }
 
+    // ── Purchasing ────────────────────────────────────────────────────────
+    private static void ConfigurePurchasing(ModelBuilder m, bool supportsTemporalTables)
+    {
+        m.Entity<PurchaseInvoice>(e =>
+        {
+            e.ToTable("PurchaseInvoices");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.SubTotal).HasPrecision(18, 4);
+            e.Property(x => x.TaxAmount).HasPrecision(18, 4);
+            e.Property(x => x.TotalAmount).HasPrecision(18, 4);
+            e.Property(x => x.ExchangeRate).HasPrecision(18, 6);
+        });
+
+        m.Entity<PurchaseInvoiceLine>(e =>
+        {
+            e.ToTable("PurchaseInvoiceLines");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Quantity).HasPrecision(18, 4);
+            e.Property(x => x.UnitPrice).HasPrecision(18, 4);
+            e.Property(x => x.DiscountPercent).HasPrecision(5, 2);
+            e.Property(x => x.VatRate).HasPrecision(5, 2);
+            e.HasOne(x => x.PurchaseInvoice)
+             .WithMany(i => i.Lines)
+             .HasForeignKey(x => x.PurchaseInvoiceId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
     // ── Accounting ────────────────────────────────────────────────────────
     private static void ConfigureAccounting(ModelBuilder m, bool supportsTemporalTables)
     {
@@ -538,6 +604,9 @@ public class ReDbContext : DbContext
             e.Property(x => x.Amount).HasPrecision(18, 4);
             e.Property(x => x.RunningBalance).HasPrecision(18, 4);
             e.Property(x => x.ExchangeRate).HasPrecision(18, 6);
+            e.Property(x => x.AllocatedAmount).HasPrecision(18, 4);
+            e.Property(x => x.RemainingAmount).HasPrecision(18, 4);
+            e.Property(x => x.PaymentStatus).HasMaxLength(30);
             e.HasOne(x => x.Account)
              .WithMany(a => a.Movements)
              .HasForeignKey(x => x.AccountId)
