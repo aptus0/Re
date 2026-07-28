@@ -28,7 +28,7 @@ public sealed class ProductVariantsController(ReDbContext db) : ControllerBase
     {
         if (!await db.Products.AnyAsync(x => x.Id == productId && x.CompanyId == CompanyId)) return NotFound();
         if (await db.ProductVariants.AnyAsync(x => x.ProductId == productId && x.Code == request.Code))
-            return Conflict(ApiResponse<object>.Fail("Bu varyant kodu üründe zaten kullanılıyor."));
+            return Conflict(ApiResponse<object>.Fail("This variant code is already used by the product."));
         var x = new ProductVariant { ProductId = productId, Code = request.Code.Trim().ToUpperInvariant(), Color = request.Color, Size = request.Size, Attribute1 = request.Attribute1, Attribute2 = request.Attribute2, SalePrice = request.SalePrice, IsActive = request.IsActive };
         db.Add(x); await db.SaveChangesAsync();
         return Ok(ApiResponse<ProductVariantResponse>.Ok(Map(x)));
@@ -37,9 +37,15 @@ public sealed class ProductVariantsController(ReDbContext db) : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid productId, Guid id, SaveProductVariantRequest request)
     {
+        var normalizedCode = request.Code.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(normalizedCode))
+            return BadRequest(ApiResponse<object>.Fail("Variant code is required."));
+        if (await db.ProductVariants.AnyAsync(x =>
+                x.ProductId == productId && x.Id != id && x.Code == normalizedCode))
+            return Conflict(ApiResponse<object>.Fail("This variant code is already used by the product."));
         var x = await db.ProductVariants.Include(x => x.Product).FirstOrDefaultAsync(x => x.Id == id && x.ProductId == productId && x.Product.CompanyId == CompanyId);
         if (x is null) return NotFound();
-        x.Code = request.Code.Trim().ToUpperInvariant(); x.Color = request.Color; x.Size = request.Size;
+        x.Code = normalizedCode; x.Color = request.Color; x.Size = request.Size;
         x.Attribute1 = request.Attribute1; x.Attribute2 = request.Attribute2; x.SalePrice = request.SalePrice; x.IsActive = request.IsActive;
         await db.SaveChangesAsync(); return Ok(ApiResponse<ProductVariantResponse>.Ok(Map(x)));
     }

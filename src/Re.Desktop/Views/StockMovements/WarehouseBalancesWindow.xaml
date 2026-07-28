@@ -1,0 +1,23 @@
+<Window x:Class="Re.Desktop.Views.StockMovements.WarehouseBalancesWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="Warehouse Stock Balances" Width="1050" Height="620"
+ WindowStartupLocation="CenterOwner" Background="#F4F6F9">
+ <Grid Margin="18">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="14"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+  <Grid><StackPanel><TextBlock Text="Warehouse Stock Balances" FontSize="25" FontWeight="Bold" Foreground="#172B4D"/><TextBlock Text="On-hand quantity and inventory value by product and warehouse" Foreground="#5E6C84" Margin="0,4,0,0"/></StackPanel><Button Content="Close" Click="Close_Click" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="18,8"/></Grid>
+  <DataGrid Grid.Row="2" ItemsSource="{Binding WarehouseBalances}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" RowHeight="37" AlternatingRowBackground="#F5F7FA">
+   <DataGrid.Columns>
+    <DataGridTextColumn Header="PRODUCT CODE" Binding="{Binding ProductCode}" Width="120"/>
+    <DataGridTextColumn Header="PRODUCT" Binding="{Binding ProductName}" Width="*"/>
+    <DataGridTextColumn Header="BARCODE" Binding="{Binding Barcode}" Width="130"/>
+    <DataGridTextColumn Header="WAREHOUSE CODE" Binding="{Binding WarehouseCode}" Width="120"/>
+    <DataGridTextColumn Header="WAREHOUSE" Binding="{Binding WarehouseName}" Width="150"/>
+    <DataGridTextColumn Header="ON HAND" Binding="{Binding OnHand, StringFormat=N3}" Width="90"/>
+    <DataGridTextColumn Header="MINIMUM" Binding="{Binding MinStockLevel, StringFormat=N3}" Width="90"/>
+    <DataGridTextColumn Header="STOCK VALUE" Binding="{Binding StockValue, StringFormat=₺N2}" Width="115"/>
+    <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="105"/>
+   </DataGrid.Columns>
+  </DataGrid>
+ </Grid>
+</Window>

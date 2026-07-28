@@ -20,7 +20,7 @@ public sealed class ProductCatalogController(ReDbContext db) : ControllerBase
     [HttpPost("categories")]
     public async Task<IActionResult> CreateCategory(SaveCategoryRequest r)
     {
-        if (await db.Categories.AnyAsync(x => x.CompanyId == CompanyId && x.Code == r.Code)) return Conflict(ApiResponse<object>.Fail("Kategori kodu zaten kullanılıyor."));
+        if (await db.Categories.AnyAsync(x => x.CompanyId == CompanyId && x.Code == r.Code)) return Conflict(ApiResponse<object>.Fail("Category code is already in use."));
         var x = new Category { CompanyId = CompanyId, Code = r.Code.Trim().ToUpperInvariant(), Name = r.Name.Trim(), Description = r.Description, ParentCategoryId = r.ParentCategoryId, IsActive = r.IsActive };
         db.Add(x); await db.SaveChangesAsync(); return Ok(ApiResponse<CatalogItemResponse>.Ok(new(x.Id, x.Code, x.Name, x.Description, x.IsActive)));
     }
@@ -39,7 +39,7 @@ public sealed class ProductCatalogController(ReDbContext db) : ControllerBase
         Ok(ApiResponse<IReadOnlyCollection<CatalogItemResponse>>.Ok(await db.Brands.Where(x => x.CompanyId == CompanyId).OrderBy(x => x.Name)
             .Select(x => new CatalogItemResponse(x.Id, x.Code ?? "", x.Name, x.LogoPath, x.IsActive)).ToListAsync()));
     [HttpPost("brands")]
-    public async Task<IActionResult> CreateBrand(SaveBrandRequest r) { var code = r.Code.Trim().ToUpperInvariant(); if (await db.Brands.AnyAsync(x => x.CompanyId == CompanyId && x.Code == code)) return Conflict(ApiResponse<object>.Fail("Marka kodu zaten kullanılıyor.")); var x = new Brand { CompanyId = CompanyId, Code = code, Name = r.Name.Trim(), LogoPath = r.LogoPath, IsActive = r.IsActive }; db.Add(x); await db.SaveChangesAsync(); return Ok(ApiResponse<CatalogItemResponse>.Ok(new(x.Id, x.Code ?? code, x.Name, x.LogoPath, x.IsActive))); }
+    public async Task<IActionResult> CreateBrand(SaveBrandRequest r) { var code = r.Code.Trim().ToUpperInvariant(); if (await db.Brands.AnyAsync(x => x.CompanyId == CompanyId && x.Code == code)) return Conflict(ApiResponse<object>.Fail("Brand code is already in use.")); var x = new Brand { CompanyId = CompanyId, Code = code, Name = r.Name.Trim(), LogoPath = r.LogoPath, IsActive = r.IsActive }; db.Add(x); await db.SaveChangesAsync(); return Ok(ApiResponse<CatalogItemResponse>.Ok(new(x.Id, x.Code ?? code, x.Name, x.LogoPath, x.IsActive))); }
     [HttpPut("brands/{id:guid}")]
     public async Task<IActionResult> UpdateBrand(Guid id, SaveBrandRequest r) { var x = await db.Brands.FirstOrDefaultAsync(x => x.Id == id && x.CompanyId == CompanyId); if (x is null) return NotFound(); x.Code = r.Code.Trim().ToUpperInvariant(); x.Name = r.Name.Trim(); x.LogoPath = r.LogoPath; x.IsActive = r.IsActive; await db.SaveChangesAsync(); return Ok(ApiResponse<CatalogItemResponse>.Ok(new(x.Id, x.Code ?? "", x.Name, x.LogoPath, x.IsActive))); }
     [HttpDelete("brands/{id:guid}")]

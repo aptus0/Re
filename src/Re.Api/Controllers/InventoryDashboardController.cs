@@ -68,21 +68,21 @@ public sealed class InventoryDashboardController(ReDbContext db) : ControllerBas
                 x.Product.Id, x.Product.Code, x.Product.Name, x.Product.ImagePath,
                 x.Product.CategoryName, x.Product.BrandName, x.Stock, x.Product.MinStockLevel,
                 Math.Max(0, x.Product.MinStockLevel - x.Stock),
-                x.Stock < 0 ? "Negatif" : x.Stock == 0 ? "Tükendi" : "Kritik")).ToList(),
+                x.Stock < 0 ? "Negative" : x.Stock == 0 ? "Out of Stock" : "Critical")).ToList(),
             recentRaw.Select(x => new RecentStockMovementItem(
-                x.Id, x.MovementDate, TypeName(x.MovementType), x.Quantity >= 0 ? "Giriş" : "Çıkış",
-                x.Code, x.Name, x.Barcode1, warehouses.GetValueOrDefault(x.WarehouseId, "Tanımsız Depo"),
+                x.Id, x.MovementDate, TypeName(x.MovementType), x.Quantity >= 0 ? "Receipt" : "Issue",
+                x.Code, x.Name, x.Barcode1, warehouses.GetValueOrDefault(x.WarehouseId, "Unknown Warehouse"),
                 x.Quantity, x.StockAfterMovement, x.ReferenceDocumentType)).ToList());
         return Ok(ApiResponse<InventoryDashboardResponse>.Ok(response));
     }
 
     private static string TypeName(StockMovementType type) => type switch
     {
-        StockMovementType.PurchaseReceipt => "Alış Kabul", StockMovementType.SalesShipment => "Satış Sevkiyat",
-        StockMovementType.PurchaseReturn => "Alış İade", StockMovementType.SalesReturn => "Satış İade",
-        StockMovementType.WarehouseTransfer => "Transfer", StockMovementType.Counting => "Sayım",
-        StockMovementType.Waste => "Fire", StockMovementType.Production => "Üretim Girişi",
-        StockMovementType.ProductionConsumption => "Üretim Tüketimi", StockMovementType.Opening => "Açılış",
+        StockMovementType.PurchaseReceipt => "Purchase Receipt", StockMovementType.SalesShipment => "Sales Shipment",
+        StockMovementType.PurchaseReturn => "Purchase Return", StockMovementType.SalesReturn => "Sales Return",
+        StockMovementType.WarehouseTransfer => "Transfer", StockMovementType.Counting => "Stock Count",
+        StockMovementType.Waste => "Waste", StockMovementType.Production => "Production Receipt",
+        StockMovementType.ProductionConsumption => "Production Consumption", StockMovementType.Opening => "Opening Balance",
         _ => type.ToString()
     };
 }
