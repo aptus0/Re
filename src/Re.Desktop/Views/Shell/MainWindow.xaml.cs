@@ -35,7 +35,7 @@ public partial class MainWindow : Window
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
-        if (MessageBox.Show("Çıkmak istiyor musunuz?", "Re ERP",
+        if (MessageBox.Show("Are you sure you want to exit?", "Re ERP",
             MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             Application.Current.Shutdown();
     }

@@ -1,0 +1,31 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+    <sys:String x:Key="Dialog.Information">Bilgi</sys:String>
+    <sys:String x:Key="Dialog.Success">Başarılı</sys:String>
+    <sys:String x:Key="Dialog.Warning">Uyarı</sys:String>
+    <sys:String x:Key="Dialog.Error">Hata</sys:String>
+    <sys:String x:Key="Dialog.Confirmation">Onay</sys:String>
+    <sys:String x:Key="Dialog.OK">Tamam</sys:String>
+    <sys:String x:Key="Dialog.Yes">Evet</sys:String>
+    <sys:String x:Key="Dialog.No">Hayır</sys:String>
+
+    <sys:String x:Key="Settings.Language">Arayüz Dili</sys:String>
+    <sys:String x:Key="Settings.English">İngilizce (ABD)</sys:String>
+    <sys:String x:Key="Settings.Turkish">Türkçe (Türkiye)</sys:String>
+    <sys:String x:Key="Settings.LanguageApplied">Dil tercihi uygulandı.</sys:String>
+
+    <sys:String x:Key="Salesforce.Title">Salesforce Çalışma Alanı</sys:String>
+    <sys:String x:Key="Salesforce.Subtitle">Güvenli gömülü Lightning masaüstü çalışma alanı</sys:String>
+    <sys:String x:Key="Salesforce.Gemini">Gemini AI Stüdyosu</sys:String>
+    <sys:String x:Key="Salesforce.Developer">Geliştirici Stüdyosu</sys:String>
+    <sys:String x:Key="Salesforce.NewProposal">Yeni Teklif</sys:String>
+    <sys:String x:Key="Salesforce.Refresh">Yenile</sys:String>
+    <sys:String x:Key="Salesforce.ResetSession">Oturumu Sıfırla</sys:String>
+    <sys:String x:Key="Salesforce.ConnectionReady">Salesforce Bağlantısı Hazır</sys:String>
+    <sys:String x:Key="Salesforce.ConnectionHelp">Lightning çalışma alanını açmak için bir kez giriş yapın. Güvenli tarayıcı profiliniz, çerezleriniz ve yerel önbelleğiniz bu Windows hesabında korunur.</sys:String>
+    <sys:String x:Key="Salesforce.Connect">Salesforce'a Bağlan</sys:String>
+    <sys:String x:Key="Salesforce.ResetPrompt">Kaydedilmiş Salesforce oturumu ve çerezleri temizlenecek. Devam edilsin mi?</sys:String>
+    <sys:String x:Key="Salesforce.SessionCleared">Salesforce oturumu temizlendi.</sys:String>
+    <sys:String x:Key="Salesforce.DesktopMode">Masaüstü modu</sys:String>
+</ResourceDictionary>

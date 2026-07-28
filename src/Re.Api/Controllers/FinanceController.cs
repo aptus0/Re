@@ -66,21 +66,21 @@ public class FinanceController : ControllerBase
         var cashMovements = await _context.CashRegisterMovements.Include(x => x.CashRegister)
             .Where(x => x.CompanyId == companyId.Value).OrderByDescending(x => x.MovementDate).Take(100)
             .Select(x => new TreasuryMovementResponse(x.Id, x.MovementDate, x.CashRegister.Name,
-                x.Direction == MovementDirection.Debit ? "Giriş" : "Çıkış", x.Amount, x.Currency,
+                x.Direction == MovementDirection.Debit ? "Receipt" : "Issue", x.Amount, x.Currency,
                 x.Amount * x.ExchangeRate, x.RunningBalance, x.Description, x.ReferenceDocumentType)).ToListAsync();
         var bankMovements = await _context.BankAccountMovements.Include(x => x.BankAccount)
             .Where(x => x.CompanyId == companyId.Value).OrderByDescending(x => x.MovementDate).Take(100)
             .Select(x => new TreasuryMovementResponse(x.Id, x.MovementDate, x.BankAccount.BankName + " / " + x.BankAccount.AccountName,
-                x.Direction == MovementDirection.Debit ? "Giriş" : "Çıkış", x.Amount, x.Currency,
+                x.Direction == MovementDirection.Debit ? "Receipt" : "Issue", x.Amount, x.Currency,
                 x.Amount * x.ExchangeRate, x.RunningBalance, x.Description, x.ReferenceDocumentType)).ToListAsync();
         var today = DateTime.Today;
         var response = new TreasuryDashboardResponse(cash, banks, cashMovements, bankMovements,
             cash.Where(x => x.Currency == "TRY").Sum(x => x.CurrentBalance),
             banks.Where(x => x.Currency == "TRY").Sum(x => x.CurrentBalance),
-            cashMovements.Where(x => x.Date >= today && x.Direction == "Giriş").Sum(x => x.AmountTRY),
-            cashMovements.Where(x => x.Date >= today && x.Direction == "Çıkış").Sum(x => x.AmountTRY),
-            bankMovements.Where(x => x.Date >= today && x.Direction == "Giriş").Sum(x => x.AmountTRY),
-            bankMovements.Where(x => x.Date >= today && x.Direction == "Çıkış").Sum(x => x.AmountTRY));
+            cashMovements.Where(x => x.Date >= today && x.Direction == "Receipt").Sum(x => x.AmountTRY),
+            cashMovements.Where(x => x.Date >= today && x.Direction == "Issue").Sum(x => x.AmountTRY),
+            bankMovements.Where(x => x.Date >= today && x.Direction == "Receipt").Sum(x => x.AmountTRY),
+            bankMovements.Where(x => x.Date >= today && x.Direction == "Issue").Sum(x => x.AmountTRY));
         return Ok(ApiResponse<TreasuryDashboardResponse>.Ok(response));
     }
 
@@ -91,7 +91,7 @@ public class FinanceController : ControllerBase
         if (!companyId.HasValue || companyId == Guid.Empty) return Unauthorized();
 
         var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == request.AccountId && a.CompanyId == companyId);
-        if (account == null) return NotFound("Cari hesap bulunamadı.");
+        if (account == null) return NotFound("Account not found.");
 
         // Cari hesap için Alacak kaydı (Borcunu düşürür)
         var accountMovement = new AccountMovement
@@ -102,7 +102,7 @@ public class FinanceController : ControllerBase
             Amount = request.Amount,
             Currency = request.Currency,
             ExchangeRate = request.ExchangeRate,
-            Description = request.Description ?? "Tahsilat İşlemi",
+            Description = request.Description ?? "Collection Transaction",
             MovementDate = request.Date,
             RunningBalance = account.CurrentBalance - request.Amount,
             ReferenceDocumentType = "Collection"
@@ -114,7 +114,7 @@ public class FinanceController : ControllerBase
         if (request.CashRegisterId.HasValue)
         {
             var cash = await _context.CashRegisters.FirstOrDefaultAsync(c => c.Id == request.CashRegisterId.Value);
-            if (cash == null) return NotFound("Kasa bulunamadı.");
+            if (cash == null) return NotFound("Cash register not found.");
             
             var cashMovement = new CashRegisterMovement
             {
@@ -136,7 +136,7 @@ public class FinanceController : ControllerBase
         else if (request.BankAccountId.HasValue)
         {
             var bank = await _context.BankAccounts.FirstOrDefaultAsync(b => b.Id == request.BankAccountId.Value);
-            if (bank == null) return NotFound("Banka hesabı bulunamadı.");
+            if (bank == null) return NotFound("Bank account not found.");
             
             var bankMovement = new BankAccountMovement
             {
@@ -173,7 +173,7 @@ public class FinanceController : ControllerBase
         if (!companyId.HasValue || companyId == Guid.Empty) return Unauthorized();
 
         var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == request.AccountId && a.CompanyId == companyId);
-        if (account == null) return NotFound("Cari hesap bulunamadı.");
+        if (account == null) return NotFound("Account not found.");
 
         // Cari hesap için Borç kaydı (Tedarikçiye ödeme yaptık, bizim alacağımız arttı veya borcumuz azaldı, 
         // ancak pozitif bakiye = borçlu diyoruz, bu yüzden ödeme yaptığımızda borcu artar (Debit) şeklinde kurgulanabilir.)
@@ -186,7 +186,7 @@ public class FinanceController : ControllerBase
             Amount = request.Amount,
             Currency = request.Currency,
             ExchangeRate = request.ExchangeRate,
-            Description = request.Description ?? "Ödeme İşlemi",
+            Description = request.Description ?? "Payment Transaction",
             MovementDate = request.Date,
             RunningBalance = account.CurrentBalance + request.Amount,
             ReferenceDocumentType = "Payment"
@@ -198,7 +198,7 @@ public class FinanceController : ControllerBase
         if (request.CashRegisterId.HasValue)
         {
             var cash = await _context.CashRegisters.FirstOrDefaultAsync(c => c.Id == request.CashRegisterId.Value);
-            if (cash == null) return NotFound("Kasa bulunamadı.");
+            if (cash == null) return NotFound("Cash register not found.");
             
             var cashMovement = new CashRegisterMovement
             {
@@ -208,7 +208,7 @@ public class FinanceController : ControllerBase
                 Amount = request.Amount,
                 Currency = request.Currency,
                 ExchangeRate = request.ExchangeRate,
-                Description = request.Description ?? "Ödeme (Cari)",
+                Description = request.Description ?? "Account Payment",
                 MovementDate = request.Date,
                 RunningBalance = cash.CurrentBalance - request.Amount,
                 ReferenceDocumentType = "Payment"
@@ -220,7 +220,7 @@ public class FinanceController : ControllerBase
         else if (request.BankAccountId.HasValue)
         {
             var bank = await _context.BankAccounts.FirstOrDefaultAsync(b => b.Id == request.BankAccountId.Value);
-            if (bank == null) return NotFound("Banka hesabı bulunamadı.");
+            if (bank == null) return NotFound("Bank account not found.");
             
             var bankMovement = new BankAccountMovement
             {
@@ -230,7 +230,7 @@ public class FinanceController : ControllerBase
                 Amount = request.Amount,
                 Currency = request.Currency,
                 ExchangeRate = request.ExchangeRate,
-                Description = request.Description ?? "Ödeme (Cari)",
+                Description = request.Description ?? "Account Payment",
                 MovementDate = request.Date,
                 RunningBalance = bank.CurrentBalance - request.Amount,
                 ReferenceDocumentType = "Payment"
