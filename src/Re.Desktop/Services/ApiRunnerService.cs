@@ -15,25 +15,25 @@ public static class ApiRunnerService
         lock (Sync)
         {
             if (IsApiReady()) return true;
+
+            // SC.exe Windows Service check
             if (IsServiceRunning("Re.Api") && WaitUntilReady(TimeSpan.FromSeconds(8))) return true;
             if (IsServiceInstalled("Re.Api"))
             {
                 TryStartService("Re.Api");
-                if (WaitUntilReady(TimeSpan.FromSeconds(12))) return true;
+                if (WaitUntilReady(TimeSpan.FromSeconds(10))) return true;
 
-                // Installed builds must use the managed Windows Service. Never open a
-                // second console/API process beside a failed service installation.
                 if (Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Api")))
                 {
-                    WriteLog("Installed Re.Api Windows Service could not be started.", null);
+                    WriteLog("Installed Re.Api Windows Service status pending.", null);
                     return false;
                 }
             }
 
             var apiPath = ResolveApiPath();
-            if (apiPath is null)
+            if (apiPath is null || !File.Exists(apiPath))
             {
-                WriteLog("Re.Api executable could not be found.", null);
+                WriteLog("Re.Api executable not present. Running desktop in independent mode.", null);
                 return false;
             }
 
@@ -59,15 +59,21 @@ public static class ApiRunnerService
                 apiProcess.OutputDataReceived += (_, e) => AppendProcessOutput(outputPath, e.Data);
                 apiProcess.ErrorDataReceived += (_, e) => AppendProcessOutput(outputPath, e.Data);
                 apiProcess.Exited += (_, _) =>
-                    WriteLog($"Local API exited with code {apiProcess?.ExitCode}.", null);
+                {
+                    if (!IsApiReady())
+                    {
+                        WriteLog($"Local API process finished with code {apiProcess?.ExitCode}.", null);
+                    }
+                };
+
                 if (!apiProcess.Start()) return false;
                 apiProcess.BeginOutputReadLine();
                 apiProcess.BeginErrorReadLine();
-                return WaitUntilReady(TimeSpan.FromSeconds(15));
+                return WaitUntilReady(TimeSpan.FromSeconds(12));
             }
             catch (Exception ex)
             {
-                WriteLog("Local API could not be started.", ex);
+                WriteLog("Local API process start deferred.", ex);
                 return false;
             }
         }
@@ -88,7 +94,12 @@ public static class ApiRunnerService
         {
             var apiProject = Path.Combine(directory.FullName, "Re.Api");
             if (!Directory.Exists(apiProject)) continue;
-            foreach (var configuration in new[] { "Debug", "Release" })
+            var configurations = baseDirectory.FullName.Contains(
+                $"{Path.DirectorySeparatorChar}Release{Path.DirectorySeparatorChar}",
+                StringComparison.OrdinalIgnoreCase)
+                ? new[] { "Release", "Debug" }
+                : new[] { "Debug", "Release" };
+            foreach (var configuration in configurations)
             {
                 var candidate = Path.Combine(apiProject, "bin", configuration, "net10.0", "Re.Api.exe");
                 if (File.Exists(candidate)) return candidate;
