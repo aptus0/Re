@@ -57,6 +57,13 @@ public partial class InvoiceListViewModel : ObservableObject
         _ = LoadInvoicesAsync();
     }
 
+    public void ConfigureWorkspace(string mode)
+    {
+        WorkspaceMode = mode;
+        WorkspaceTitle = mode == "Returns" ? "İade Faturaları Yönetimi" : "Satış Faturaları Yönetimi";
+        NewButtonText = mode == "Returns" ? "+ Yeni İade Faturası" : "+ Yeni Satış Faturası";
+    }
+
     [RelayCommand]
     private async Task LoadInvoicesAsync()
     {

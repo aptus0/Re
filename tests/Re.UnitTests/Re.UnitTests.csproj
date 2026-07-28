@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Re.Domain\Re.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Re.Contracts\Re.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Re.Application\Re.Application.csproj" />
   </ItemGroup>
 
