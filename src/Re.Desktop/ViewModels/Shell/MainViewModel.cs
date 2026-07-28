@@ -25,13 +25,13 @@ public partial class MainViewModel : ObservableObject
     private readonly InvoiceListViewModel _invoiceListVm;
     private readonly IPackageCenterService _packages;
 
-    [ObservableProperty] private string _userFullName = "User";
+    [ObservableProperty] private string _userFullName = "Kullanıcı";
     [ObservableProperty] private string _userInitials = "K";
     [ObservableProperty] private string _companyName = "Firma";
     [ObservableProperty] private string _windowsUser = Environment.UserName;
-    [ObservableProperty] private string _localIpAddress = "IP: calculating";
+    [ObservableProperty] private string _localIpAddress = "IP: Hesaplanıyor";
     [ObservableProperty] private string _liveClock = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
-    [ObservableProperty] private string _connectionStatus = "● API CONNECTED";
+    [ObservableProperty] private string _connectionStatus = "● API SUNUCUSU AKTİF";
     [ObservableProperty] private string _sessionUsername = "-";
     [ObservableProperty] private bool _isPosInstalled;
     [ObservableProperty] private bool _isReportsInstalled;
@@ -46,23 +46,27 @@ public partial class MainViewModel : ObservableObject
 
     private static readonly Dictionary<string, string> RouteNames = new()
     {
-        ["Dashboard"]      = "Overview",
-        ["Agenda"]         = "Calendar",
-        ["Products"]       = "Inventory Management",
-        ["StockMovements"] = "Stock Movements",
-        ["Invoices"]       = "Sales Invoices",
-        ["PurchaseInvoices"] = "Purchase Invoices",
-        ["Orders"]         = "Order Management",
-        ["POS"]            = "Quick Sales (POS)",
-        ["Accounts"]       = "Accounts",
-        ["Cash"]           = "Cash Management",
-        ["Bank"]           = "Bank Accounts",
-        ["Finance"]        = "Finance",
-        ["FundingIntelligence"] = "Funding Intelligence",
-        ["Reports"]        = "Reports",
-        ["Settings"]       = "System Settings",
-        ["PackageCenter"]  = "Package Center",
-        ["UpdateCenter"]   = "Update Center",
+        ["Dashboard"]           = "Gösterge Paneli",
+        ["Agenda"]              = "Takvim & Ajanda",
+        ["Products"]            = "Ürün Kataloğu & Kartlar",
+        ["ProductDashboard"]    = "Stok Özet Paneli",
+        ["StockMovements"]      = "Stok Hareket Kayıtları",
+        ["Invoices"]            = "Satış Faturaları",
+        ["ReturnInvoices"]      = "İade Faturaları",
+        ["PurchaseInvoices"]    = "Alış Faturaları",
+        ["Orders"]              = "Sipariş Yönetimi",
+        ["POS"]                 = "Hızlı Satış (POS)",
+        ["Accounts"]            = "Cari Hesap Kartları",
+        ["Cash"]                = "Kasa Yönetimi",
+        ["Bank"]                = "Banka Hesapları",
+        ["Finance"]             = "Tahsilat & Ödemeler",
+        ["Accounting"]          = "Genel Muhasebe & Yevmiye",
+        ["FundingIntelligence"] = "AI Finansal Tahminleme",
+        ["SalesforceCloud"]     = "Salesforce LWC Bulut Kontrol",
+        ["Reports"]             = "Yönetim Raporları",
+        ["Settings"]            = "Sistem Ayarları",
+        ["PackageCenter"]       = "Paket Merkezi",
+        ["UpdateCenter"]        = "Güncelleme Merkezi",
     };
 
     public MainViewModel(ISessionService session, INavigationService navigation,
@@ -112,9 +116,9 @@ public partial class MainViewModel : ObservableObject
         {
             return Dns.GetHostEntry(Dns.GetHostName()).AddressList
                 .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork)?.ToString()
-                ?? "IP not found";
+                ?? "IP bulunamadı";
         }
-        catch { return "IP not found"; }
+        catch { return "IP bulunamadı"; }
     }
 
     private void OnPageRequested(string route, object pageContent)
@@ -127,7 +131,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        // New sekme oluştur
+        // Yeni sekme oluştur
         var newTab = new WorkspaceTab
         {
             Title = RouteNames.GetValueOrDefault(route, route),
@@ -184,7 +188,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void Logout()
     {
-        if (MessageBox.Show("Issue yapmak istiyor musunuz?", "Issue",
+        if (MessageBox.Show("Oturumu kapatmak istediğinize emin misiniz?", "Oturumu Kapat",
             MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
             return;
 

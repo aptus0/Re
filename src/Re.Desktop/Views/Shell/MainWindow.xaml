@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Re.Desktop.ViewModels.Shell"
         mc:Ignorable="d"
-        Title="Re Business Platform"
+        Title="Re Kurumsal İş Platformu"
         Width="1400" Height="820"
         MinWidth="1100" MinHeight="680"
         WindowStartupLocation="CenterScreen"
@@ -30,6 +30,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
         <!-- Ribbon Buton Stili (Büyük İkon + Alt Metin) -->
         <Style x:Key="RibbonButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
@@ -80,14 +81,14 @@
             <Setter Property="ContextMenu">
                 <Setter.Value>
                     <ContextMenu>
-                        <MenuItem Header="Close This Tab"
+                        <MenuItem Header="Bu Sekmeyi Kapat"
                                   Command="{Binding PlacementTarget.Tag.CloseTabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                        <MenuItem Header="Close Other Tabs"
+                        <MenuItem Header="Diğer Sekmeleri Kapat"
                                   Command="{Binding PlacementTarget.Tag.CloseOtherTabsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                         <Separator/>
-                        <MenuItem Header="Close All Tabs"
+                        <MenuItem Header="Tüm Sekmeleri Kapat"
                                   Command="{Binding PlacementTarget.Tag.CloseAllTabsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                     </ContextMenu>
                 </Setter.Value>
@@ -138,7 +139,7 @@
             </Grid.RowDefinitions>
 
             <!-- ── PENCERE BAŞLIĞI (Title Bar) ── -->
-            <Border Grid.Row="0" Background="#3A3E45" MouseDown="TitleBar_MouseDown">
+            <Border Grid.Row="0" Background="#1E293B" MouseDown="TitleBar_MouseDown">
                 <Grid Margin="10,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -148,21 +149,21 @@
 
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                         <Image Source="file:///C:/Users/ttsy/source/repos/Envanzo/Re_ERP_Logo.ico" Width="16" Height="16" Margin="0,0,8,0" />
-                        <TextBlock Text="Re Business Platform" FontSize="12" FontWeight="Bold" Foreground="#E0E0E0" VerticalAlignment="Center" />
+                        <TextBlock Text="Re Kurumsal İş Platformu" FontSize="12" FontWeight="Bold" Foreground="#F8FAFC" VerticalAlignment="Center" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0">
-                        <TextBlock Text="{Binding UserFullName}" FontSize="12" Foreground="#CCCCCC" Margin="0,0,5,0" />
-                        <TextBlock Text="{Binding CompanyName, StringFormat='[{0}]'}" FontSize="11" Foreground="#999999" />
+                        <TextBlock Text="{Binding UserFullName}" FontSize="12" Foreground="#CBD5E1" FontWeight="SemiBold" Margin="0,0,5,0" />
+                        <TextBlock Text="{Binding CompanyName, StringFormat='[{0}]'}" FontSize="11" Foreground="#94A3B8" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,-1,-10,-1">
                         <Button Content="—" Style="{StaticResource WindowCommandButton}" Click="MinimizeButton_Click"
-                                ToolTip="Minimize"/>
+                                ToolTip="Simge Durumuna Küçült"/>
                         <Button Content="□" Style="{StaticResource WindowCommandButton}" Click="MaximizeButton_Click"
-                                ToolTip="Maximize / Restore"/>
-                        <Button Content="X" Style="{StaticResource WindowCommandButton}" Click="CloseButton_Click"
-                                ToolTip="Close" Background="#B94444" Foreground="White" FontWeight="Bold"/>
+                                ToolTip="Ekranı Kapla / Geri Yükle"/>
+                        <Button Content="✕" Style="{StaticResource WindowCommandButton}" Click="CloseButton_Click"
+                                ToolTip="Uygulamayı Kapat" Background="#DC2626" Foreground="White" FontWeight="Bold"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -177,7 +178,7 @@
 
                     <!-- Left: 9-Dot App Launcher -->
                     <Button Width="48" Height="53" Padding="0" Cursor="Hand" Background="Transparent" BorderThickness="0"
-                            Command="{Binding NavigateCommand}" CommandParameter="Dashboard" ToolTip="App Launcher (Dashboard)">
+                            Command="{Binding NavigateCommand}" CommandParameter="Dashboard" ToolTip="Uygulama Başlatıcı (Gösterge Paneli)">
                         <Path Fill="#0070D2" Stretch="Uniform" Width="20" Height="20"
                               Data="M2,2 H4 V4 H2 z M8,2 H10 V4 H8 z M14,2 H16 V4 H14 z M2,8 H4 V10 H2 z M8,8 H10 V10 H8 z M14,8 H16 V10 H14 z M2,14 H4 V16 H2 z M8,14 H10 V16 H8 z M14,14 H16 V16 H14 z"/>
                     </Button>
@@ -253,88 +254,89 @@
                             </Style>
                         </Menu.Resources>
 
-                        <!-- Menu 1: Sales Cloud -->
+                        <!-- Menu 1: Satış Bulutu -->
                         <MenuItem Style="{StaticResource TopMenuItemStyle}">
                             <MenuItem.Header>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="☁  Sales Cloud" VerticalAlignment="Center"/>
+                                    <TextBlock Text="☁  Satış Bulutu" VerticalAlignment="Center"/>
                                     <Control Template="{StaticResource DropdownArrowTemplate}"/>
                                 </StackPanel>
                             </MenuItem.Header>
-                            <MenuItem Header="Dashboard" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard"/>
-                            <MenuItem Header="Accounts (Cari Kartlar)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Accounts"/>
-                            <MenuItem Header="Orders (Siparişler)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Orders"/>
-                            <MenuItem Header="Calendar (Ajanda)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Agenda"/>
-                            <MenuItem Header="Quick Sale (POS)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="POS" Visibility="{Binding IsPosInstalled, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <MenuItem Header="Gösterge Paneli" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard"/>
+                            <MenuItem Header="Cari Hesap Kartları" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Accounts"/>
+                            <MenuItem Header="Sipariş Yönetimi" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Orders"/>
+                            <MenuItem Header="Takvim &amp; Ajanda" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Agenda"/>
+                            <MenuItem Header="Hızlı Satış (POS)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="POS" Visibility="{Binding IsPosInstalled, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         </MenuItem>
 
-                        <!-- Menu 2: Invoices -->
+                        <!-- Menu 2: Fatura Yönetimi -->
                         <MenuItem Style="{StaticResource TopMenuItemStyle}">
                             <MenuItem.Header>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="📄  Invoices" VerticalAlignment="Center"/>
+                                    <TextBlock Text="📄  Fatura Yönetimi" VerticalAlignment="Center"/>
                                     <Control Template="{StaticResource DropdownArrowTemplate}"/>
                                 </StackPanel>
                             </MenuItem.Header>
-                            <MenuItem Header="Sales Invoices (Satış)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
-                            <MenuItem Header="Purchase Invoices (Alış)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
-                            <MenuItem Header="Return Invoices (İade)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
-                            <MenuItem Header="Exchange Invoices (Değişim)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
-                            <MenuItem Header="Price Difference (Fiyat Farkı)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
+                            <MenuItem Header="Satış Faturaları" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
+                            <MenuItem Header="Alış Faturaları" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="PurchaseInvoices"/>
+                            <MenuItem Header="İade Faturaları" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="ReturnInvoices"/>
+                            <MenuItem Header="Değişim Faturaları" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
+                            <MenuItem Header="Fiyat Farkı Faturaları" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Invoices"/>
                         </MenuItem>
 
-                        <!-- Menu 3: Inventory -->
+                        <!-- Menu 3: Stok & Depo -->
                         <MenuItem Style="{StaticResource TopMenuItemStyle}">
                             <MenuItem.Header>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="📦  Inventory" VerticalAlignment="Center"/>
+                                    <TextBlock Text="📦  Stok &amp; Depo" VerticalAlignment="Center"/>
                                     <Control Template="{StaticResource DropdownArrowTemplate}"/>
                                 </StackPanel>
                             </MenuItem.Header>
-                            <MenuItem Header="Stock Panel (Özet)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="ProductDashboard"/>
-                            <MenuItem Header="Products (Ürün Kartları)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Products"/>
-                            <MenuItem Header="Stock Movements" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="StockMovements"/>
-                            <MenuItem Header="Purchases (Alış İrsaliyeleri)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="PurchaseInvoices"/>
+                            <MenuItem Header="Stok Özet Paneli" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="ProductDashboard"/>
+                            <MenuItem Header="Ürün Kataloğu &amp; Kartlar" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Products"/>
+                            <MenuItem Header="Stok Hareket Kayıtları" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="StockMovements"/>
+                            <MenuItem Header="Alış İrsaliyeleri" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="PurchaseInvoices"/>
                         </MenuItem>
 
-                        <!-- Menu 4: Finance -->
+                        <!-- Menu 4: Finans & Muhasebe -->
                         <MenuItem Style="{StaticResource TopMenuItemStyle}">
                             <MenuItem.Header>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="💰  Finance" VerticalAlignment="Center"/>
+                                    <TextBlock Text="💰  Finans &amp; Muhasebe" VerticalAlignment="Center"/>
                                     <Control Template="{StaticResource DropdownArrowTemplate}"/>
                                 </StackPanel>
                             </MenuItem.Header>
-                            <MenuItem Header="Cash Register (Kasa)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Cash"/>
-                            <MenuItem Header="Bank Accounts (Banka)" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Bank"/>
-                            <MenuItem Header="Collections &amp; Payments" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Finance"/>
-                            <MenuItem Header="Funding Intelligence AI" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="FundingIntelligence" Visibility="{Binding IsFundingInstalled, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <MenuItem Header="Kasa Yönetimi" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Cash"/>
+                            <MenuItem Header="Banka Hesapları" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Bank"/>
+                            <MenuItem Header="Tahsilat &amp; Ödemeler" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Finance"/>
+                            <MenuItem Header="Genel Muhasebe &amp; Yevmiye" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Accounting"/>
+                            <MenuItem Header="AI Finansal Tahminleme" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="FundingIntelligence" Visibility="{Binding IsFundingInstalled, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         </MenuItem>
 
-                        <!-- Menu 5: Salesforce CRM -->
+                        <!-- Menu 5: Salesforce Bulut -->
                         <MenuItem Style="{StaticResource TopMenuItemStyle}">
                             <MenuItem.Header>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="☁  Salesforce CRM" VerticalAlignment="Center"/>
+                                    <TextBlock Text="☁  Salesforce Bulut" VerticalAlignment="Center"/>
                                     <Control Template="{StaticResource DropdownArrowTemplate}"/>
                                 </StackPanel>
                             </MenuItem.Header>
-                            <MenuItem Header="Salesforce LWC Cloud" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="SalesforceCloud"/>
+                            <MenuItem Header="Salesforce LWC Bulut Kontrol" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="SalesforceCloud"/>
                         </MenuItem>
 
-                        <!-- Menu 6: Setup -->
+                        <!-- Menu 6: Sistem & Yapılandırma -->
                         <MenuItem Style="{StaticResource TopMenuItemStyle}">
                             <MenuItem.Header>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="⚙  Setup" VerticalAlignment="Center"/>
+                                    <TextBlock Text="⚙  Sistem &amp; Yapılandırma" VerticalAlignment="Center"/>
                                     <Control Template="{StaticResource DropdownArrowTemplate}"/>
                                 </StackPanel>
                             </MenuItem.Header>
-                            <MenuItem Header="Settings" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Settings"/>
-                            <MenuItem Header="Packages" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="PackageCenter"/>
-                            <MenuItem Header="Updates" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="UpdateCenter"/>
+                            <MenuItem Header="Sistem Ayarları" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="Settings"/>
+                            <MenuItem Header="Paket Merkezi" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="PackageCenter"/>
+                            <MenuItem Header="Güncelleme Merkezi" Style="{StaticResource SubMenuItemStyle}" Command="{Binding NavigateCommand}" CommandParameter="UpdateCenter"/>
                             <Separator/>
-                            <MenuItem Header="Sign Out" Style="{StaticResource SubMenuItemStyle}" Command="{Binding LogoutCommand}"/>
+                            <MenuItem Header="Oturumu Kapat" Style="{StaticResource SubMenuItemStyle}" Command="{Binding LogoutCommand}"/>
                         </MenuItem>
                     </Menu>
                 </Grid>

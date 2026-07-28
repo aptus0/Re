@@ -14,7 +14,10 @@ public sealed class RePackage : ObservableObject
     public required string Description { get; init; }
     public required string Version { get; init; }
     public required PackageKind Kind { get; init; }
+    public required string Icon { get; init; }
+    public required string Category { get; init; }
     public string? Route { get; init; }
+
     private bool _isInstalled;
     public bool IsInstalled
     {
@@ -26,9 +29,10 @@ public sealed class RePackage : ObservableObject
             OnPropertyChanged(nameof(ActionText));
         }
     }
+
     public bool IsCore => Kind == PackageKind.Core;
-    public string StatusText => IsCore ? "Built-in" : IsInstalled ? "Installed" : "Available";
-    public string ActionText => IsInstalled ? "Uninstall" : "Install";
+    public string StatusText => IsCore ? "Dahili Çekirdek (Korumalı)" : IsInstalled ? "Yüklü & Aktif" : "Kullanılabilir";
+    public string ActionText => IsInstalled ? "Kaldır" : "Yükle";
 }
 
 public interface IPackageCenterService
@@ -57,15 +61,17 @@ public sealed class PackageCenterService : IPackageCenterService
 
         _packages =
         [
-            Core("core.accounts", "Accounts", "Customer and supplier current accounts, balances and risk tracking."),
-            Core("core.inventory", "Inventory", "Products, warehouses, stock balances and stock movements."),
-            Core("core.invoices", "Invoicing", "Sales invoices, taxes, approval and financial posting."),
-            Core("core.finance", "Finance", "Cash, bank and finance operations."),
-            Optional("retail.pos", "Retail POS", "Fast checkout and cashier workspace.", "POS", installed),
-            Optional("barcode.professional", "Barcode Professional", "Barcode lookup, label printing and scanner workflows.", null, installed),
-            Optional("analytics.reports", "Advanced Reports", "Management reports and operational analytics.", "Reports", installed),
-            Optional("finance.funding", "Funding Intelligence", "AI-assisted funding and underwriting workspace.", "FundingIntelligence", installed),
-            Optional("salesforce.managedpackage", "Re ERP for Salesforce 2GP", "Native Salesforce Managed 2GP Package with bi-directional sync (reerp namespace).", "SalesforceCloud", installed)
+            Core("core.accounts", "Cari Hesap Yönetimi Modülü", "Müşteri ve tedarikçi cari hesapları, bakiye, ekstresi ve risk takip sistemi.", "👤", "Çekirdek Modüller"),
+            Core("core.inventory", "Stok & Depo Kontrol Modülü", "Ürün kartları, depolar, stok bakiyeleri, barkodlama ve hareket kayıtları.", "📦", "Çekirdek Modüller"),
+            Core("core.invoices", "Kurumsal Fatura Modülü", "Satış faturaları, KDV matrah hesaplamaları, onay mekanizmaları ve otomatik muhasebe entegrasyonu.", "📄", "Çekirdek Modüller"),
+            Core("core.finance", "Finans & Kasa Yönetimi", "Nakit kasa işlemleri, banka hesap hareketleri, çek/senet takibi ve ödeme planlama.", "💰", "Çekirdek Modüller"),
+            Optional("retail.pos", "Perakende Hızlı Satış (POS)", "Dokunmatik ekran uyumlu hızlı kasa satışı, fiş/makbuz basımı ve terazi entegrasyonu.", "🛒", "POS & Satış", "POS", installed),
+            Optional("barcode.professional", "Barkod & Etiket Profesyonel", "Otomatik barkod üretimi, termal etiket yazıcı desteği ve barkod okuyucu iş akışları.", "🏷️", "Stok & Depo", null, installed),
+            Optional("analytics.reports", "Gelişmiş Yönetim Raporları", "Yönetici özet raporları, karlılık analizleri ve operasyonel iş zekası veri panelleri.", "📊", "İş Zekası", "Reports", installed),
+            Optional("finance.funding", "AI Yapay Zeka Finansal Tahminleme", "AI destekli nakit akış tahminleme, kredi riski analiz motoru ve finansal yapay zeka.", "🧠", "Finans & AI", "FundingIntelligence", installed),
+            Optional("salesforce.managedpackage", "Salesforce 2GP Entegratörü", "Yerel Salesforce Managed 2GP Paketi ile (reerp) çift yönlü nesne senkronizasyonu.", "☁️", "Entegrasyonlar", "SalesforceCloud", installed),
+            Optional("efatura.integrator", "e-Fatura & e-Arşiv Entegratörü", "GİB uyumlu e-Fatura, e-Arşiv ve e-İrsaliye doğrudan entegratör gönderim servisi.", "⚡", "Entegrasyonlar", null, installed),
+            Optional("bank.mt940", "SWIFT MT940 Banka Aktarıcı", "Banka hesap ekstrelerinin (MT940/OFX) otomatik işlenmesi ve cari hesap eşleştirmesi.", "🏦", "Entegrasyonlar", null, installed)
         ];
         Packages = new(_packages);
         Save();
@@ -88,17 +94,17 @@ public sealed class PackageCenterService : IPackageCenterService
         return true;
     }
 
-    private static RePackage Core(string id, string name, string description) => new()
+    private static RePackage Core(string id, string name, string description, string icon, string category) => new()
     {
         Id = id, Name = name, Description = description, Version = "1.1.0",
-        Kind = PackageKind.Core, IsInstalled = true
+        Kind = PackageKind.Core, Icon = icon, Category = category, IsInstalled = true
     };
 
-    private static RePackage Optional(string id, string name, string description, string? route,
+    private static RePackage Optional(string id, string name, string description, string icon, string category, string? route,
         HashSet<string> installed) => new()
     {
         Id = id, Name = name, Description = description, Version = "1.1.0",
-        Kind = PackageKind.Optional, Route = route,
+        Kind = PackageKind.Optional, Icon = icon, Category = category, Route = route,
         IsInstalled = installed.Contains(id) || id == "barcode.professional"
     };
 

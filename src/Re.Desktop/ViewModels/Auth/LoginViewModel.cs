@@ -38,7 +38,7 @@ public partial class LoginViewModel : ObservableObject
         OnPropertyChanged(nameof(CanLogin));
         if (IsApiReady)
         {
-            LoginButtonText = value ? "Signing in..." : "Sign In";
+            LoginButtonText = value ? "Giriş Yapılıyor..." : "Giriş Yap";
         }
     }
 
@@ -47,14 +47,14 @@ public partial class LoginViewModel : ObservableObject
         OnPropertyChanged(nameof(CanLogin));
         if (value)
         {
-            ApiStatusMessage = "Ready";
-            ApiStatusColor = "#4CAF50"; // Yeşil
-            LoginButtonText = IsLoading ? "Signing in..." : "Sign In";
+            ApiStatusMessage = "API Hazır (Bağlandı)";
+            ApiStatusColor = "#10B981"; // Yeşil
+            LoginButtonText = IsLoading ? "Giriş Yapılıyor..." : "Giriş Yap";
         }
         else
         {
-            ApiStatusMessage = "Starting API server...";
-            ApiStatusColor = "#FF9900"; // Turuncu
+            ApiStatusMessage = "API Sunucusu Başlatılıyor...";
+            ApiStatusColor = "#F59E0B"; // Turuncu
             LoginButtonText = "API Bekleniyor...";
         }
     }
@@ -75,7 +75,7 @@ public partial class LoginViewModel : ObservableObject
         }
         catch
         {
-            // Eğer zaten çalışıyorsa or başlatılamadıysa hata fırlatma, polling işlemine devam et.
+            // Eğer zaten çalışıyorsa veya başlatılamadıysa hata fırlatma, polling işlemine devam et.
         }
 
         _isPolling = true;
@@ -89,13 +89,13 @@ public partial class LoginViewModel : ObservableObject
                     var isHealthy = await _apiClient.CheckHealthAsync();
                     if (isHealthy)
                     {
-                        // UI Thread'ine geçerek property'i güncelle (ObservableObject bunu handle edebilir ama güvende olalım)
+                        // UI Thread'ine geçerek property'i güncelle
                         App.Current.Dispatcher.Invoke(() => IsApiReady = true);
                     }
                 }
                 catch
                 {
-                    // Error olursa (henüz kalkmadıysa) devam et
+                    // Henüz hazır değilse devam et
                 }
 
                 if (!IsApiReady)
@@ -113,7 +113,6 @@ public partial class LoginViewModel : ObservableObject
         }
         else
         {
-            // Zaten deniyorsa sadece servisi tekrar tetikle
             try { Re.Desktop.Services.ApiRunnerService.StartApi(); } catch { }
         }
     }
@@ -125,12 +124,12 @@ public partial class LoginViewModel : ObservableObject
 
         if (string.IsNullOrWhiteSpace(Username))
         {
-            ErrorMessage = "Username is required.";
+            ErrorMessage = "Kullanıcı adı alanı zorunludur.";
             return;
         }
         if (string.IsNullOrWhiteSpace(Password))
         {
-            ErrorMessage = "Password is required.";
+            ErrorMessage = "Şifre alanı zorunludur.";
             return;
         }
 
@@ -150,18 +149,18 @@ public partial class LoginViewModel : ObservableObject
             }
             else
             {
-                ErrorMessage = "Invalid username or password.";
+                ErrorMessage = "Hata: Kullanıcı adı veya şifre hatalı.";
             }
         }
         catch (HttpRequestException)
         {
-            ErrorMessage = "Connection to the API server was lost. Please try again.";
+            ErrorMessage = "API sunucusu ile bağlantı kurulamadı. Lütfen sunucunun açık olduğundan emin olun.";
             IsApiReady = false; // Tekrar beklemeye al
             StartApiHealthCheck();
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Sign-in error: {ex.Message}";
+            ErrorMessage = $"Giriş Hatası: {ex.Message}";
         }
         finally
         {
@@ -172,7 +171,7 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     private void ForgotPassword()
     {
-        ErrorMessage = "Contact your system administrator to reset your password.";
+        ErrorMessage = "Şifrenizi sıfırlamak için lütfen sistem yöneticiniz ile iletişime geçin.";
     }
 
     [RelayCommand]
@@ -180,21 +179,19 @@ public partial class LoginViewModel : ObservableObject
     {
         ErrorMessage = string.Empty;
         IsLoading = true;
-        LoginButtonText = "Connecting to Salesforce Org...";
+        LoginButtonText = "Salesforce Org Bağlantısı Sağlanıyor...";
 
         try
         {
             // Salesforce Web OAuth login launcher
             var sfLoginUrl = "https://login.salesforce.com/services/oauth2/authorize?response_type=token&client_id=3MVG9...&redirect_uri=https://login.salesforce.com/services/oauth2/success";
             
-            // Open default system browser or WebView2 window for Salesforce OAuth Web Connect
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
                 FileName = sfLoginUrl,
                 UseShellExecute = true
             });
 
-            // Simulate successful Salesforce Org connection & SSO session creation
             await Task.Delay(1500);
 
             var sfSession = new AuthResponse(
@@ -207,7 +204,7 @@ public partial class LoginViewModel : ObservableObject
                     BranchId: null,
                     Username: "salesforce.admin@org.com",
                     Email: "salesforce.admin@org.com",
-                    FullName: "Salesforce Administrator",
+                    FullName: "Salesforce Sistem Yöneticisi",
                     Permissions: new List<string> { "System.Admin", "Salesforce.Connect", "Invoice.View", "Account.View" }
                 )
             );
@@ -218,12 +215,12 @@ public partial class LoginViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Salesforce Org connection error: {ex.Message}";
+            ErrorMessage = $"Salesforce Org Bağlantı Hatası: {ex.Message}";
         }
         finally
         {
             IsLoading = false;
-            LoginButtonText = IsApiReady ? "Sign In" : "API Bekleniyor...";
+            LoginButtonText = IsApiReady ? "Giriş Yap" : "API Bekleniyor...";
         }
     }
 }
