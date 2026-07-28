@@ -22,7 +22,7 @@ public partial class PosViewModel : ObservableObject
     public ObservableCollection<AccountListResponse> Customers { get; } = new();
     public ObservableCollection<CashRegisterResponse> CashRegisters { get; } = new();
     public ObservableCollection<WarehouseLookupItem> Warehouses { get; } = new();
-    public IReadOnlyList<string> PaymentMethods { get; } = ["Cash", "Card", "On Account"];
+    public IReadOnlyList<string> PaymentMethods { get; } = ["Nakit", "Kredi Kartı", "Açık Hesap (Cari)"];
 
     [ObservableProperty] private bool _isProductSaleEnabled = true;
     [ObservableProperty] private string _searchText = string.Empty;
