@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+    <!-- Diyaloglar -->
     <sys:String x:Key="Dialog.Information">Bilgi</sys:String>
     <sys:String x:Key="Dialog.Success">Başarılı</sys:String>
     <sys:String x:Key="Dialog.Warning">Uyarı</sys:String>
@@ -10,22 +11,80 @@
     <sys:String x:Key="Dialog.Yes">Evet</sys:String>
     <sys:String x:Key="Dialog.No">Hayır</sys:String>
 
-    <sys:String x:Key="Settings.Language">Arayüz Dili</sys:String>
-    <sys:String x:Key="Settings.English">İngilizce (ABD)</sys:String>
-    <sys:String x:Key="Settings.Turkish">Türkçe (Türkiye)</sys:String>
-    <sys:String x:Key="Settings.LanguageApplied">Dil tercihi uygulandı.</sys:String>
+    <!-- Ayarlar Ana Başlıklar -->
+    <sys:String x:Key="Settings.Title">Sistem Ayarları</sys:String>
+    <sys:String x:Key="Settings.Subtitle">Firma, stok, finans, güvenlik, barkod ve Salesforce entegrasyon tercihlerini yönetin.</sys:String>
+    <sys:String x:Key="Settings.NoChanges">Değişiklik yok</sys:String>
+    <sys:String x:Key="Settings.SaveChanges">Değişiklikleri Kaydet</sys:String>
+    <sys:String x:Key="Settings.ResetDefaults">Varsayılanlara Sıfırla</sys:String>
+    <sys:String x:Key="Settings.LanguageApplied">Dil tercihi başarıyla uygulandı.</sys:String>
 
+    <!-- Ayarlar Tab Başlıkları -->
+    <sys:String x:Key="Settings.Tab.Company">Firma &amp; Şube</sys:String>
+    <sys:String x:Key="Settings.Tab.Inventory">Stok &amp; Depo</sys:String>
+    <sys:String x:Key="Settings.Tab.Documents">Evrak &amp; Finans</sys:String>
+    <sys:String x:Key="Settings.Tab.Security">Güvenlik &amp; Log</sys:String>
+    <sys:String x:Key="Settings.Tab.Barcode">Barkod &amp; Yazıcı</sys:String>
+    <sys:String x:Key="Settings.Tab.System">Sistem &amp; Yedek</sys:String>
+    <sys:String x:Key="Settings.Tab.Salesforce">Salesforce Entegrasyonu</sys:String>
+
+    <!-- Firma Ayarları -->
+    <sys:String x:Key="Settings.CompanyIdentity">Firma Kimlik Bilgileri</sys:String>
+    <sys:String x:Key="Settings.CompanyName">Firma Unvanı (Legal Name)</sys:String>
+    <sys:String x:Key="Settings.TaxNumber">Vergi Numarası / TCKN</sys:String>
+    <sys:String x:Key="Settings.TaxOffice">Vergi Dairesi</sys:String>
+    <sys:String x:Key="Settings.DefaultCurrency">Varsayılan Para Birimi</sys:String>
+    <sys:String x:Key="Settings.LanguageRegion">Dil &amp; Bölge Ayarları</sys:String>
+    <sys:String x:Key="Settings.Language">Arayüz Dili</sys:String>
+    <sys:String x:Key="Settings.English">İngilizce (English - US)</sys:String>
+    <sys:String x:Key="Settings.Turkish">Türkçe (Türkiye - TR)</sys:String>
+    <sys:String x:Key="Settings.DateFormat">Tarih &amp; Saat Formatı</sys:String>
+    <sys:String x:Key="Settings.BranchOps">Şube &amp; Operasyon Kuralları</sys:String>
+    <sys:String x:Key="Settings.RequireBranch">İşlemlerde şube seçimini zorunlu kıl</sys:String>
+    <sys:String x:Key="Settings.RestrictUserBranch">Kullanıcıları sadece yetkili oldukları şubelerle sınırla</sys:String>
+    <sys:String x:Key="Settings.BranchDocSeries">Şube bazında ayrı evrak serisi takibi yap</sys:String>
+
+    <!-- Stok Ayarları -->
+    <sys:String x:Key="Settings.StockRules">Stok Ticari İş Kuralları</sys:String>
+    <sys:String x:Key="Settings.AllowNegativeStock">Eksi stok seviyesine izin ver</sys:String>
+    <sys:String x:Key="Settings.ReserveStockOnOrder">Siparişlerde otomatik stok rezerve et</sys:String>
+    <sys:String x:Key="Settings.CostApproval">Maliyet altı satışlarda yönetici onayı iste</sys:String>
+    <sys:String x:Key="Settings.StockAdjustmentApproval">Manuel stok düzeltmelerini onaya gönder</sys:String>
+    <sys:String x:Key="Settings.StockDefaults">Varsayılan Depo &amp; Değerleme</sys:String>
+    <sys:String x:Key="Settings.PrimaryWarehouse">Birincil Depo</sys:String>
+    <sys:String x:Key="Settings.ValuationMethod">Stok Değerleme Yöntemi</sys:String>
+
+    <!-- Evrak & Finans Ayarları -->
+    <sys:String x:Key="Settings.DocNumbering">Evrak Numaralandırma</sys:String>
+    <sys:String x:Key="Settings.SalesInvoicePrefix">Satış Faturası Ön Eki</sys:String>
+    <sys:String x:Key="Settings.StockMovePrefix">Stok Hareketi Ön Eki</sys:String>
+    <sys:String x:Key="Settings.FinanceRules">Finans &amp; Risk Kuralları</sys:String>
+    <sys:String x:Key="Settings.RiskApproval">Risk limiti aşıldığında siparişleri onaya yönlendir</sys:String>
+    <sys:String x:Key="Settings.OverdueWarning">Vadesi geçmiş cari hesaplarda kullanıcıyı uyar</sys:String>
+    <sys:String x:Key="Settings.AutoReversal">Ödeme iptalinde otomatik ters kayıt oluştur</sys:String>
+
+    <!-- Güvenlik Ayarları -->
+    <sys:String x:Key="Settings.SessionPassword">Oturum &amp; Parola Güvenliği</sys:String>
+    <sys:String x:Key="Settings.SessionTimeout">Oturum Zaman Aşımı (dakika)</sys:String>
+    <sys:String x:Key="Settings.MinPasswordLength">Minimum Parola Uzunluğu</sys:String>
+    <sys:String x:Key="Settings.AuditLogging">Denetim &amp; Loglama</sys:String>
+    <sys:String x:Key="Settings.AuditLogCritical">Kritik işlemlerde denetim izi (Audit Log) oluştur</sys:String>
+    <sys:String x:Key="Settings.LogFailedLogins">Başarısız giriş denemelerini logla</sys:String>
+    <sys:String x:Key="Settings.LockoutAfterAttempts">3 başarısız denemeden sonra hesabı geçici kilitle</sys:String>
+
+    <!-- Barkod Ayarları -->
+    <sys:String x:Key="Settings.BarcodeSetup">Barkod Yazıcı Yapılandırması</sys:String>
+    <sys:String x:Key="Settings.PrinterName">Yazıcı Adı / Windows Kuyruğu</sys:String>
+    <sys:String x:Key="Settings.PrinterLang">Yazıcı Dili (ZPL/TSPL/EPL)</sys:String>
+    <sys:String x:Key="Settings.ResolutionDpi">Çözünürlük (DPI)</sys:String>
+
+    <!-- Salesforce Entegrasyon Ayarları -->
     <sys:String x:Key="Salesforce.Title">Salesforce Çalışma Alanı</sys:String>
     <sys:String x:Key="Salesforce.Subtitle">Güvenli gömülü Lightning masaüstü çalışma alanı</sys:String>
-    <sys:String x:Key="Salesforce.Gemini">Gemini AI Stüdyosu</sys:String>
-    <sys:String x:Key="Salesforce.Developer">Geliştirici Stüdyosu</sys:String>
-    <sys:String x:Key="Salesforce.NewProposal">Yeni Teklif</sys:String>
-    <sys:String x:Key="Salesforce.Refresh">Yenile</sys:String>
-    <sys:String x:Key="Salesforce.ResetSession">Oturumu Sıfırla</sys:String>
-    <sys:String x:Key="Salesforce.ConnectionReady">Salesforce Bağlantısı Hazır</sys:String>
-    <sys:String x:Key="Salesforce.ConnectionHelp">Lightning çalışma alanını açmak için bir kez giriş yapın. Güvenli tarayıcı profiliniz, çerezleriniz ve yerel önbelleğiniz bu Windows hesabında korunur.</sys:String>
-    <sys:String x:Key="Salesforce.Connect">Salesforce'a Bağlan</sys:String>
-    <sys:String x:Key="Salesforce.ResetPrompt">Kaydedilmiş Salesforce oturumu ve çerezleri temizlenecek. Devam edilsin mi?</sys:String>
-    <sys:String x:Key="Salesforce.SessionCleared">Salesforce oturumu temizlendi.</sys:String>
-    <sys:String x:Key="Salesforce.DesktopMode">Masaüstü modu</sys:String>
+    <sys:String x:Key="Salesforce.OAuthHeader">OAuth &amp; Connected App Yapılandırması</sys:String>
+    <sys:String x:Key="Salesforce.AutoSyncHeader">ERP → Salesforce Otomatik Senkronizasyon</sys:String>
+    <sys:String x:Key="Salesforce.SyncAccounts">Carileri Otomatik Senkronize Et</sys:String>
+    <sys:String x:Key="Salesforce.SyncProducts">Ürün &amp; Fiyat Listelerini Senkronize Et</sys:String>
+    <sys:String x:Key="Salesforce.SyncInvoices">Faturaları (Opportunity) Senkronize Et</sys:String>
+    <sys:String x:Key="Salesforce.SyncNow">Tüm Verileri Şimdi Senkronize Et</sys:String>
 </ResourceDictionary>

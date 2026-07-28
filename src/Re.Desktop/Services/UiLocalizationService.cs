@@ -22,7 +22,7 @@ public sealed class UiLocalizationService : IUiLocalizationService
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "ReSoft", "Re", "Settings", "ui-language.json");
 
-    public string CurrentCulture { get; private set; } = English;
+    public string CurrentCulture { get; private set; } = Turkish;
     public event EventHandler? CultureChanged;
 
     public UiLocalizationService()
@@ -31,11 +31,13 @@ public sealed class UiLocalizationService : IUiLocalizationService
         {
             if (File.Exists(_settingsPath))
                 CurrentCulture = JsonSerializer.Deserialize<LanguagePreference>(
-                    File.ReadAllText(_settingsPath))?.CultureCode is Turkish ? Turkish : English;
+                    File.ReadAllText(_settingsPath))?.CultureCode is English ? English : Turkish;
+            else
+                CurrentCulture = Turkish;
         }
         catch
         {
-            CurrentCulture = English;
+            CurrentCulture = Turkish;
         }
     }
 

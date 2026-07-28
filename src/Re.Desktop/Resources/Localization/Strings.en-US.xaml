@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+    <!-- Dialogs -->
     <sys:String x:Key="Dialog.Information">Information</sys:String>
     <sys:String x:Key="Dialog.Success">Success</sys:String>
     <sys:String x:Key="Dialog.Warning">Warning</sys:String>
@@ -10,22 +11,80 @@
     <sys:String x:Key="Dialog.Yes">Yes</sys:String>
     <sys:String x:Key="Dialog.No">No</sys:String>
 
+    <!-- Settings Titles -->
+    <sys:String x:Key="Settings.Title">System Settings</sys:String>
+    <sys:String x:Key="Settings.Subtitle">Manage company, inventory, finance, security, and integration preferences.</sys:String>
+    <sys:String x:Key="Settings.NoChanges">No changes</sys:String>
+    <sys:String x:Key="Settings.SaveChanges">Save Changes</sys:String>
+    <sys:String x:Key="Settings.ResetDefaults">Reset to Defaults</sys:String>
+    <sys:String x:Key="Settings.LanguageApplied">Language preference applied successfully.</sys:String>
+
+    <!-- Settings Tabs -->
+    <sys:String x:Key="Settings.Tab.Company">Company &amp; Branch</sys:String>
+    <sys:String x:Key="Settings.Tab.Inventory">Inventory &amp; Warehouse</sys:String>
+    <sys:String x:Key="Settings.Tab.Documents">Documents &amp; Finance</sys:String>
+    <sys:String x:Key="Settings.Tab.Security">Security &amp; Logging</sys:String>
+    <sys:String x:Key="Settings.Tab.Barcode">Barcode &amp; Printer</sys:String>
+    <sys:String x:Key="Settings.Tab.System">System &amp; Backup</sys:String>
+    <sys:String x:Key="Settings.Tab.Salesforce">Salesforce Integration</sys:String>
+
+    <!-- Company Settings -->
+    <sys:String x:Key="Settings.CompanyIdentity">Company Identity</sys:String>
+    <sys:String x:Key="Settings.CompanyName">Company Name (Legal Name)</sys:String>
+    <sys:String x:Key="Settings.TaxNumber">Tax Number / TCKN</sys:String>
+    <sys:String x:Key="Settings.TaxOffice">Tax Office</sys:String>
+    <sys:String x:Key="Settings.DefaultCurrency">Default Currency</sys:String>
+    <sys:String x:Key="Settings.LanguageRegion">Language &amp; Region Settings</sys:String>
     <sys:String x:Key="Settings.Language">Interface Language</sys:String>
     <sys:String x:Key="Settings.English">English (United States)</sys:String>
-    <sys:String x:Key="Settings.Turkish">Turkish (Türkiye)</sys:String>
-    <sys:String x:Key="Settings.LanguageApplied">Language preference applied.</sys:String>
+    <sys:String x:Key="Settings.Turkish">Turkish (Turkey)</sys:String>
+    <sys:String x:Key="Settings.DateFormat">Date &amp; Time Format</sys:String>
+    <sys:String x:Key="Settings.BranchOps">Branch &amp; Operation Rules</sys:String>
+    <sys:String x:Key="Settings.RequireBranch">Require branch selection on transactions</sys:String>
+    <sys:String x:Key="Settings.RestrictUserBranch">Restrict users to authorized branches only</sys:String>
+    <sys:String x:Key="Settings.BranchDocSeries">Track document numbers separately per branch</sys:String>
 
+    <!-- Inventory Settings -->
+    <sys:String x:Key="Settings.StockRules">Stock Business Rules</sys:String>
+    <sys:String x:Key="Settings.AllowNegativeStock">Allow negative stock levels</sys:String>
+    <sys:String x:Key="Settings.ReserveStockOnOrder">Create stock reservation on sales orders</sys:String>
+    <sys:String x:Key="Settings.CostApproval">Require manager approval for below-cost sales</sys:String>
+    <sys:String x:Key="Settings.StockAdjustmentApproval">Send manual stock adjustments for approval</sys:String>
+    <sys:String x:Key="Settings.StockDefaults">Defaults &amp; Valuation</sys:String>
+    <sys:String x:Key="Settings.PrimaryWarehouse">Primary Warehouse</sys:String>
+    <sys:String x:Key="Settings.ValuationMethod">Inventory Valuation Method</sys:String>
+
+    <!-- Document Settings -->
+    <sys:String x:Key="Settings.DocNumbering">Document Numbering</sys:String>
+    <sys:String x:Key="Settings.SalesInvoicePrefix">Sales Invoice Prefix</sys:String>
+    <sys:String x:Key="Settings.StockMovePrefix">Stock Movement Prefix</sys:String>
+    <sys:String x:Key="Settings.FinanceRules">Finance Rules</sys:String>
+    <sys:String x:Key="Settings.RiskApproval">Route orders for approval when risk limit is exceeded</sys:String>
+    <sys:String x:Key="Settings.OverdueWarning">Warn user on overdue accounts</sys:String>
+    <sys:String x:Key="Settings.AutoReversal">Auto-create reversal entry on payment cancellation</sys:String>
+
+    <!-- Security Settings -->
+    <sys:String x:Key="Settings.SessionPassword">Session &amp; Password</sys:String>
+    <sys:String x:Key="Settings.SessionTimeout">Session Timeout (minutes)</sys:String>
+    <sys:String x:Key="Settings.MinPasswordLength">Minimum Password Length</sys:String>
+    <sys:String x:Key="Settings.AuditLogging">Audit &amp; Logging</sys:String>
+    <sys:String x:Key="Settings.AuditLogCritical">Create audit log for critical operations</sys:String>
+    <sys:String x:Key="Settings.LogFailedLogins">Log failed login attempts</sys:String>
+    <sys:String x:Key="Settings.LockoutAfterAttempts">Temporarily lock account after 3 failed attempts</sys:String>
+
+    <!-- Barcode Settings -->
+    <sys:String x:Key="Settings.BarcodeSetup">Barcode Printer Setup</sys:String>
+    <sys:String x:Key="Settings.PrinterName">Printer Name / Windows Queue</sys:String>
+    <sys:String x:Key="Settings.PrinterLang">Printer Language (ZPL/TSPL/EPL)</sys:String>
+    <sys:String x:Key="Settings.ResolutionDpi">Resolution (DPI)</sys:String>
+
+    <!-- Salesforce Settings -->
     <sys:String x:Key="Salesforce.Title">Salesforce Workspace</sys:String>
     <sys:String x:Key="Salesforce.Subtitle">Secure embedded Lightning desktop workspace</sys:String>
-    <sys:String x:Key="Salesforce.Gemini">Gemini AI Studio</sys:String>
-    <sys:String x:Key="Salesforce.Developer">Developer Studio</sys:String>
-    <sys:String x:Key="Salesforce.NewProposal">New Proposal</sys:String>
-    <sys:String x:Key="Salesforce.Refresh">Refresh</sys:String>
-    <sys:String x:Key="Salesforce.ResetSession">Reset Session</sys:String>
-    <sys:String x:Key="Salesforce.ConnectionReady">Salesforce Connection Ready</sys:String>
-    <sys:String x:Key="Salesforce.ConnectionHelp">Sign in once to open your Lightning workspace. Your encrypted browser profile, cookies, and local cache remain available on this Windows account.</sys:String>
-    <sys:String x:Key="Salesforce.Connect">Connect to Salesforce</sys:String>
-    <sys:String x:Key="Salesforce.ResetPrompt">The saved Salesforce session and cookies will be cleared. Continue?</sys:String>
-    <sys:String x:Key="Salesforce.SessionCleared">Salesforce session cleared.</sys:String>
-    <sys:String x:Key="Salesforce.DesktopMode">Desktop mode</sys:String>
+    <sys:String x:Key="Salesforce.OAuthHeader">OAuth &amp; Connected App Configuration</sys:String>
+    <sys:String x:Key="Salesforce.AutoSyncHeader">ERP → Salesforce Auto Sync</sys:String>
+    <sys:String x:Key="Salesforce.SyncAccounts">Auto-sync Accounts to Salesforce</sys:String>
+    <sys:String x:Key="Salesforce.SyncProducts">Auto-sync Products &amp; Pricebooks to Salesforce</sys:String>
+    <sys:String x:Key="Salesforce.SyncInvoices">Auto-sync Invoices to Salesforce</sys:String>
+    <sys:String x:Key="Salesforce.SyncNow">Sync All Data Now</sys:String>
 </ResourceDictionary>
