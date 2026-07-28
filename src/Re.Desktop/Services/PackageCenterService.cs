@@ -64,7 +64,8 @@ public sealed class PackageCenterService : IPackageCenterService
             Optional("retail.pos", "Retail POS", "Fast checkout and cashier workspace.", "POS", installed),
             Optional("barcode.professional", "Barcode Professional", "Barcode lookup, label printing and scanner workflows.", null, installed),
             Optional("analytics.reports", "Advanced Reports", "Management reports and operational analytics.", "Reports", installed),
-            Optional("finance.funding", "Funding Intelligence", "AI-assisted funding and underwriting workspace.", "FundingIntelligence", installed)
+            Optional("finance.funding", "Funding Intelligence", "AI-assisted funding and underwriting workspace.", "FundingIntelligence", installed),
+            Optional("salesforce.managedpackage", "Re ERP for Salesforce 2GP", "Native Salesforce Managed 2GP Package with bi-directional sync (reerp namespace).", "SalesforceCloud", installed)
         ];
         Packages = new(_packages);
         Save();

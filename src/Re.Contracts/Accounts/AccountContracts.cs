@@ -83,7 +83,8 @@ public record AccountListResponse(
     string? Phone,
     string? TaxNumber,
     decimal CurrentBalance,
-    bool IsActive);
+    bool IsActive,
+    string Currency);
 
 public record AccountActivityResponse(
     Guid Id, DateTime Date, string Type, string Description, decimal Amount,

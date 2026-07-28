@@ -132,7 +132,7 @@ public partial class App : Application
             return nav;
         });
         services.AddSingleton<IDialogService, DialogService>();
-        services.AddSingleton<IChequeNoteService, ChequeNoteService>();
+        services.AddTransient<IChequeNoteService, ChequeNoteService>();
 
         services.AddHttpClient<ApiClient>(client =>
         {

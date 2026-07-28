@@ -1,68 +1,48 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
+using Re.Contracts.Finance;
 
 namespace Re.Desktop.Services;
 
-public enum ChequeNoteType
-{
-    CustomerCheque,   // Müşteri Çeki (Alacak)
-    CustomerNote,     // Müşteri Senedi (Alacak)
-    SupplierCheque,   // Kendi Çekimiz (Borç)
-    SupplierNote      // Borç Senedimiz (Borç)
-}
+public enum ChequeNoteType { CustomerCheque, CustomerNote, SupplierCheque, SupplierNote }
+public enum ChequeNoteStatus { Portfolio, Endorsed, Collected, Paid, Bounced, Cancelled }
 
-public enum ChequeNoteStatus
-{
-    Portfolio,        // Portföyde
-    Endorsed,         // Ciro Edildi
-    Collected,        // Tahsil Edildi
-    Paid,             // Ödendi
-    Bounced,          // Karşılıksız / Ödenmemiş
-    Cancelled         // İptal Edildi
-}
-
-public class ChequeNoteItem
+public sealed class ChequeNoteItem
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public string Number { get; set; } = string.Empty;
+    public string Number { get; set; } = "";
     public ChequeNoteType Type { get; set; }
     public Guid AccountId { get; set; }
-    public string AccountName { get; set; } = string.Empty;
+    public string AccountName { get; set; } = "";
     public decimal Amount { get; set; }
     public string Currency { get; set; } = "TRY";
+    public decimal ExchangeRate { get; set; } = 1;
     public DateTime DueDate { get; set; }
-    public DateTime IssueDate { get; set; } = DateTime.Now;
+    public DateTime IssueDate { get; set; } = DateTime.Today;
     public ChequeNoteStatus Status { get; set; } = ChequeNoteStatus.Portfolio;
-    public string BankName { get; set; } = string.Empty;
-    public string Drawer { get; set; } = string.Empty; // Keşideci
-    public string Description { get; set; } = string.Empty;
-    
-    // UI Helpers
+    public string BankName { get; set; } = "";
+    public string BranchName { get; set; } = "";
+    public string Drawer { get; set; } = "";
+    public string Description { get; set; } = "";
+    public Guid? SettlementAccountId { get; set; }
+    public DateTime? SettledAt { get; set; }
     public string TypeDisplay => Type switch
     {
         ChequeNoteType.CustomerCheque => "Customer Cheque",
         ChequeNoteType.CustomerNote => "Customer Promissory Note",
         ChequeNoteType.SupplierCheque => "Our Cheque",
-        ChequeNoteType.SupplierNote => "Our Promissory Note",
-        _ => Type.ToString()
+        _ => "Our Promissory Note"
     };
-
     public string StatusDisplay => Status switch
     {
         ChequeNoteStatus.Portfolio => "In Portfolio",
-        ChequeNoteStatus.Endorsed => "Endorsed (Ciro)",
+        ChequeNoteStatus.Endorsed => "Endorsed",
         ChequeNoteStatus.Collected => "Collected",
         ChequeNoteStatus.Paid => "Paid",
         ChequeNoteStatus.Bounced => "Bounced / Unpaid",
-        ChequeNoteStatus.Cancelled => "Cancelled",
-        _ => Status.ToString()
+        _ => "Cancelled"
     };
-
-    public bool IsReceivable => Type == ChequeNoteType.CustomerCheque || Type == ChequeNoteType.CustomerNote;
-    public bool IsPayable => Type == ChequeNoteType.SupplierCheque || Type == ChequeNoteType.SupplierNote;
+    public bool IsReceivable => Type is ChequeNoteType.CustomerCheque or ChequeNoteType.CustomerNote;
+    public bool IsPayable => !IsReceivable;
+    public bool IsOverdue => DueDate.Date < DateTime.Today && Status == ChequeNoteStatus.Portfolio;
 }
 
 public interface IChequeNoteService
@@ -72,161 +52,49 @@ public interface IChequeNoteService
     Task DeleteAsync(Guid id);
     Task<ChequeNoteItem?> GetByIdAsync(Guid id);
     Task SeedDefaultDataAsync();
+    Task<bool> ChangeStatusAsync(Guid id, ChequeNoteStatus status,
+        Guid? cashRegisterId = null, Guid? bankAccountId = null);
 }
 
-public class ChequeNoteService : IChequeNoteService
+public sealed class ChequeNoteService(ApiClient api) : IChequeNoteService
 {
-    private static readonly string FilePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "ReERP", "cheques-notes.json");
-
-    public ChequeNoteService()
-    {
-        Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-        if (!File.Exists(FilePath))
-        {
-            _ = SeedDefaultDataAsync();
-        }
-    }
-
     public async Task<List<ChequeNoteItem>> GetAllAsync()
     {
-        if (!File.Exists(FilePath)) return new List<ChequeNoteItem>();
-        try
-        {
-            var content = await File.ReadAllTextAsync(FilePath);
-            return JsonSerializer.Deserialize<List<ChequeNoteItem>>(content) ?? new List<ChequeNoteItem>();
-        }
-        catch
-        {
-            return new List<ChequeNoteItem>();
-        }
+        var rows = await api.GetAsync<IReadOnlyCollection<ChequeNoteResponse>>("api/finance/cheque-notes");
+        return rows?.Select(Map).ToList() ?? [];
     }
 
     public async Task SaveAsync(ChequeNoteItem item)
     {
-        var list = await GetAllAsync();
-        var index = list.FindIndex(x => x.Id == item.Id);
-        if (index >= 0)
+        var existing = (await GetAllAsync()).Any(x => x.Id == item.Id);
+        if (existing)
         {
-            list[index] = item;
+            await ChangeStatusAsync(item.Id, item.Status);
+            return;
         }
-        else
-        {
-            list.Add(item);
-        }
-        await WriteAllAsync(list);
+        var created = await api.PostAsync<ChequeNoteResponse>("api/finance/cheque-notes",
+            new SaveChequeNoteRequest(item.AccountId, item.Number, item.Type.ToString(),
+                item.Amount, item.Currency, item.ExchangeRate, item.IssueDate, item.DueDate,
+                item.BankName, item.BranchName, item.Drawer, item.Description));
+        if (created is not null) item.Id = created.Id;
     }
 
-    public async Task DeleteAsync(Guid id)
-    {
-        var list = await GetAllAsync();
-        list.RemoveAll(x => x.Id == id);
-        await WriteAllAsync(list);
-    }
+    public async Task DeleteAsync(Guid id) => await api.DeleteAsync($"api/finance/cheque-notes/{id}");
+    public async Task<ChequeNoteItem?> GetByIdAsync(Guid id) => (await GetAllAsync()).Find(x => x.Id == id);
+    public Task SeedDefaultDataAsync() => Task.CompletedTask;
 
-    public async Task<ChequeNoteItem?> GetByIdAsync(Guid id)
-    {
-        var list = await GetAllAsync();
-        return list.Find(x => x.Id == id);
-    }
+    public async Task<bool> ChangeStatusAsync(Guid id, ChequeNoteStatus status,
+        Guid? cashRegisterId = null, Guid? bankAccountId = null)
+        => await api.PostAsync<object>($"api/finance/cheque-notes/{id}/status",
+            new ChangeChequeNoteStatusRequest(status.ToString(), cashRegisterId, bankAccountId)) is not null;
 
-    public async Task SeedDefaultDataAsync()
+    private static ChequeNoteItem Map(ChequeNoteResponse x) => new()
     {
-        var defaultData = new List<ChequeNoteItem>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Number = "CK-10023",
-                Type = ChequeNoteType.CustomerCheque,
-                AccountId = Guid.Parse("d7f8d000-001a-2b3c-4d5e-6f7a8b9c0d1e"),
-                AccountName = "Global Ticaret A.Ş.",
-                Amount = 120000.00m,
-                Currency = "TRY",
-                DueDate = DateTime.Today.AddDays(30),
-                IssueDate = DateTime.Today.AddDays(-5),
-                Status = ChequeNoteStatus.Portfolio,
-                BankName = "Garanti BBVA - Levent",
-                Drawer = "Ahmet Yılmaz",
-                Description = "Sales agreement cheque installment #1"
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Number = "NT-40092",
-                Type = ChequeNoteType.CustomerNote,
-                AccountId = Guid.Parse("d7f8d000-001a-2b3c-4d5e-6f7a8b9c0d2f"),
-                AccountName = "Koç Holding Enerji Grubu",
-                Amount = 250000.00m,
-                Currency = "TRY",
-                DueDate = DateTime.Today.AddDays(45),
-                IssueDate = DateTime.Today.AddDays(-10),
-                Status = ChequeNoteStatus.Portfolio,
-                Drawer = "Mustafa Kemal",
-                Description = "Service contract promissory note"
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Number = "CK-50011",
-                Type = ChequeNoteType.SupplierCheque,
-                AccountId = Guid.Parse("d7f8d000-001a-2b3c-4d5e-6f7a8b9c0d3a"),
-                AccountName = "Anadolu Metal Çelik A.Ş.",
-                Amount = 85000.00m,
-                Currency = "TRY",
-                DueDate = DateTime.Today.AddDays(15),
-                IssueDate = DateTime.Today.AddDays(-12),
-                Status = ChequeNoteStatus.Portfolio,
-                BankName = "Akbank - Merkez",
-                Drawer = "Re ERP Business",
-                Description = "Raw material purchase payment"
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Number = "NT-80024",
-                Type = ChequeNoteType.SupplierNote,
-                AccountId = Guid.Parse("d7f8d000-001a-2b3c-4d5e-6f7a8b9c0d4b"),
-                AccountName = "Makina Sanayi Fabrikaları",
-                Amount = 300000.00m,
-                Currency = "TRY",
-                DueDate = DateTime.Today.AddDays(-5),
-                IssueDate = DateTime.Today.AddDays(-60),
-                Status = ChequeNoteStatus.Bounced,
-                Drawer = "Re ERP Business",
-                Description = "CNC machine installment note"
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Number = "CK-10024",
-                Type = ChequeNoteType.CustomerCheque,
-                AccountId = Guid.Parse("d7f8d000-001a-2b3c-4d5e-6f7a8b9c0d1e"),
-                AccountName = "Global Ticaret A.Ş.",
-                Amount = 90000.00m,
-                Currency = "TRY",
-                DueDate = DateTime.Today.AddDays(-2),
-                IssueDate = DateTime.Today.AddDays(-32),
-                Status = ChequeNoteStatus.Collected,
-                BankName = "QNB Finansbank - Maslak",
-                Drawer = "Ahmet Yılmaz",
-                Description = "Sales agreement cheque installment #2 (Collected)"
-            }
-        };
-        await WriteAllAsync(defaultData);
-    }
-
-    private async Task WriteAllAsync(List<ChequeNoteItem> list)
-    {
-        try
-        {
-            var content = JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync(FilePath, content);
-        }
-        catch
-        {
-            // Ignore errors
-        }
-    }
+        Id = x.Id, AccountId = x.AccountId, AccountName = x.AccountName, Number = x.Number,
+        Type = Enum.Parse<ChequeNoteType>(x.Type), Status = Enum.Parse<ChequeNoteStatus>(x.Status),
+        Amount = x.Amount, Currency = x.Currency, ExchangeRate = x.ExchangeRate,
+        IssueDate = x.IssueDate, DueDate = x.DueDate, BankName = x.BankName ?? "",
+        BranchName = x.BranchName ?? "", Drawer = x.Drawer ?? "", Description = x.Description ?? "",
+        SettlementAccountId = x.SettlementAccountId, SettledAt = x.SettledAt
+    };
 }

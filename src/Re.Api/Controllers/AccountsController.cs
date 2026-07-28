@@ -44,7 +44,7 @@ public class AccountsController : ControllerBase
             .Take(size)
             .Select(p => new AccountListResponse(
                 p.Id, p.Code, p.Name, p.AccountType.ToString(),
-                p.Phone, p.TaxNumber, p.CurrentBalance, p.IsActive))
+                p.Phone, p.TaxNumber, p.CurrentBalance, p.IsActive, p.Currency))
             .ToListAsync();
 
         return Ok(ApiResponse<PagedResponse<AccountListResponse>>.Ok(new PagedResponse<AccountListResponse>

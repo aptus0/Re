@@ -36,6 +36,9 @@ public partial class FinanceViewModel : ObservableObject
     public ObservableCollection<BankAccountItem> BankAccounts { get; } = new();
 
     [ObservableProperty] private decimal _amount;
+    [ObservableProperty] private string _currency = "TRY";
+    [ObservableProperty] private decimal _exchangeRate = 1m;
+    public ObservableCollection<string> Currencies { get; } = new() { "TRY", "USD", "EUR", "GBP" };
     [ObservableProperty] private string _description = string.Empty;
     [ObservableProperty] private DateTime _transactionDate = DateTime.Now;
 
@@ -70,6 +73,22 @@ public partial class FinanceViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(IsCashSelected));
         OnPropertyChanged(nameof(IsBankSelected));
+    }
+
+    partial void OnSelectedAccountChanged(AccountListResponse? value)
+    {
+        if (value is null) return;
+        Currency = value.Currency;
+        if (Currency == "TRY") ExchangeRate = 1m;
+        SelectCompatibleTreasuryAccount();
+    }
+
+    partial void OnCurrencyChanged(string value) => SelectCompatibleTreasuryAccount();
+
+    private void SelectCompatibleTreasuryAccount()
+    {
+        SelectedCashRegister = CashRegisters.FirstOrDefault(x => x.Currency.Equals(Currency, StringComparison.OrdinalIgnoreCase));
+        SelectedBankAccount = BankAccounts.FirstOrDefault(x => x.Currency.Equals(Currency, StringComparison.OrdinalIgnoreCase));
     }
 
     [RelayCommand]
@@ -125,6 +144,11 @@ public partial class FinanceViewModel : ObservableObject
             _dialog?.Error("Amount must be greater than zero.");
             return;
         }
+        if (ExchangeRate <= 0)
+        {
+            _dialog?.Error("Exchange rate must be greater than zero.");
+            return;
+        }
 
         if (IsCashSelected && SelectedCashRegister == null)
         {
@@ -153,8 +177,8 @@ public partial class FinanceViewModel : ObservableObject
                     cashId,
                     bankId,
                     Amount,
-                    "TRY",
-                    1m,
+                    Currency,
+                    ExchangeRate,
                     Description,
                     TransactionDate
                 );
@@ -164,6 +188,7 @@ public partial class FinanceViewModel : ObservableObject
                 {
                     _dialog?.Success("Collection saved successfully.", "Success");
                     ResetForm();
+                    await LoadInitialDataAsync();
                 }
                 else
                 {
@@ -177,8 +202,8 @@ public partial class FinanceViewModel : ObservableObject
                     cashId,
                     bankId,
                     Amount,
-                    "TRY",
-                    1m,
+                    Currency,
+                    ExchangeRate,
                     Description,
                     TransactionDate
                 );
@@ -188,6 +213,7 @@ public partial class FinanceViewModel : ObservableObject
                 {
                     _dialog?.Success("Payment saved successfully.", "Success");
                     ResetForm();
+                    await LoadInitialDataAsync();
                 }
                 else
                 {
@@ -257,10 +283,10 @@ public partial class FinanceViewModel : ObservableObject
 
     private void UpdateChequeSummaries()
     {
-        var customerCheques = _allCheques.Where(x => x.Type == ChequeNoteType.CustomerCheque && x.Status == ChequeNoteStatus.Portfolio).Sum(x => x.Amount);
-        var customerNotes = _allCheques.Where(x => x.Type == ChequeNoteType.CustomerNote && x.Status == ChequeNoteStatus.Portfolio).Sum(x => x.Amount);
-        var supplierCheques = _allCheques.Where(x => x.Type == ChequeNoteType.SupplierCheque && x.Status == ChequeNoteStatus.Portfolio).Sum(x => x.Amount);
-        var supplierNotes = _allCheques.Where(x => x.Type == ChequeNoteType.SupplierNote && x.Status == ChequeNoteStatus.Portfolio).Sum(x => x.Amount);
+        var customerCheques = _allCheques.Where(x => x.Type == ChequeNoteType.CustomerCheque && x.Status == ChequeNoteStatus.Portfolio).Sum(x => x.Amount * x.ExchangeRate);
+        var customerNotes = _allCheques.Where(x => x.Type == ChequeNoteType.CustomerNote && x.Status == ChequeNoteStatus.Portfolio).Sum(x => x.Amount * x.ExchangeRate);
+        var supplierCheques = _allCheques.Where(x => x.Type == ChequeNoteType.SupplierCheque && x.Status == ChequeNoteStatus.Portfolio).Sum(x => x.Amount * x.ExchangeRate);
+        var supplierNotes = _allCheques.Where(x => x.Type == ChequeNoteType.SupplierNote && x.Status == ChequeNoteStatus.Portfolio).Sum(x => x.Amount * x.ExchangeRate);
 
         TotalChequesReceivable = customerCheques.ToString("N2", TrCulture) + " ₺";
         TotalNotesReceivable   = customerNotes.ToString("N2", TrCulture) + " ₺";
@@ -302,10 +328,57 @@ public partial class FinanceViewModel : ObservableObject
             _dialog?.Error("Only documents in Portfolio status can be collected.");
             return;
         }
-        item.Status = ChequeNoteStatus.Collected;
-        await _chequeService.SaveAsync(item);
+        if (!item.IsReceivable)
+        {
+            _dialog?.Error("Supplier documents must be paid, not collected.");
+            return;
+        }
+        if (!PrepareSettlement(item, out var cashId, out var bankId)) return;
+        await _chequeService.ChangeStatusAsync(item.Id, ChequeNoteStatus.Collected, cashId, bankId);
         _dialog?.Success($"Cheque {item.Number} collected successfully.");
+        await LoadInitialDataAsync();
         await LoadChequesAndNotesAsync();
+    }
+
+    [RelayCommand]
+    private async Task PayCheque(ChequeNoteItem item)
+    {
+        if (item == null || _chequeService == null) return;
+        if (item.Status != ChequeNoteStatus.Portfolio || !item.IsPayable)
+        {
+            _dialog?.Error("Only supplier documents in Portfolio status can be paid.");
+            return;
+        }
+        if (!PrepareSettlement(item, out var cashId, out var bankId)) return;
+        await _chequeService.ChangeStatusAsync(item.Id, ChequeNoteStatus.Paid, cashId, bankId);
+        _dialog?.Success($"Document {item.Number} paid successfully.");
+        await LoadInitialDataAsync();
+        await LoadChequesAndNotesAsync();
+    }
+
+    private bool PrepareSettlement(ChequeNoteItem item, out Guid? cashId, out Guid? bankId)
+    {
+        cashId = null; bankId = null;
+        Currency = item.Currency;
+        if (IsCashSelected)
+        {
+            if (SelectedCashRegister is null || !SelectedCashRegister.Currency.Equals(item.Currency, StringComparison.OrdinalIgnoreCase))
+            {
+                _dialog?.Error($"Select an active {item.Currency} cash register.");
+                return false;
+            }
+            cashId = SelectedCashRegister.Id;
+        }
+        else
+        {
+            if (SelectedBankAccount is null || !SelectedBankAccount.Currency.Equals(item.Currency, StringComparison.OrdinalIgnoreCase))
+            {
+                _dialog?.Error($"Select an active {item.Currency} bank account.");
+                return false;
+            }
+            bankId = SelectedBankAccount.Id;
+        }
+        return true;
     }
 
     [RelayCommand]
@@ -317,8 +390,7 @@ public partial class FinanceViewModel : ObservableObject
             _dialog.Error("Only documents in Portfolio status can be endorsed.");
             return;
         }
-        item.Status = ChequeNoteStatus.Endorsed;
-        await _chequeService.SaveAsync(item);
+        await _chequeService.ChangeStatusAsync(item.Id, ChequeNoteStatus.Endorsed);
         _dialog.Success($"Cheque {item.Number} endorsed successfully.");
         await LoadChequesAndNotesAsync();
     }
@@ -327,8 +399,7 @@ public partial class FinanceViewModel : ObservableObject
     private async Task MarkAsBounced(ChequeNoteItem item)
     {
         if (item == null || _chequeService == null) return;
-        item.Status = ChequeNoteStatus.Bounced;
-        await _chequeService.SaveAsync(item);
+        await _chequeService.ChangeStatusAsync(item.Id, ChequeNoteStatus.Bounced);
         _dialog?.Warning($"Cheque {item.Number} marked as Bounced/Unpaid.");
         await LoadChequesAndNotesAsync();
     }

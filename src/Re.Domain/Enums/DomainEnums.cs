@@ -72,3 +72,21 @@ public enum OrderStatus
     Cancelled = 5
 }
 
+public enum ChequeNoteType
+{
+    CustomerCheque = 1,
+    CustomerNote = 2,
+    SupplierCheque = 3,
+    SupplierNote = 4
+}
+
+public enum ChequeNoteStatus
+{
+    Portfolio = 1,
+    Endorsed = 2,
+    Collected = 3,
+    Paid = 4,
+    Bounced = 5,
+    Cancelled = 6
+}
+
