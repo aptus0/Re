@@ -22,6 +22,9 @@ public static class DependencyInjection
 
         services.AddDbContext<ReDbContext>(options =>
         {
+            options.ConfigureWarnings(warnings =>
+                warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+
             options.UseSqlServer(connectionString, sql =>
             {
                 sql.MigrationsAssembly(typeof(DependencyInjection).Assembly.FullName);

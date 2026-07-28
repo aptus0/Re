@@ -27,6 +27,13 @@ public class ReDbContext : DbContext
         _currentTenantService = currentTenantService;
     }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.ConfigureWarnings(warnings =>
+            warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+    }
+
     // Company
     public DbSet<Company>    Companies  => Set<Company>();
     public DbSet<Branch>     Branches   => Set<Branch>();
@@ -68,9 +75,14 @@ public class ReDbContext : DbContext
     public DbSet<BankAccount>        BankAccounts        => Set<BankAccount>();
     public DbSet<BankAccountMovement> BankAccountMovements => Set<BankAccountMovement>();
     public DbSet<ChequeNote>          ChequeNotes          => Set<ChequeNote>();
+    public DbSet<ChequeNoteHistory>   ChequeNoteHistories   => Set<ChequeNoteHistory>();
     public DbSet<AccountMovementAllocation> AccountMovementAllocations => Set<AccountMovementAllocation>();
     public DbSet<DocumentApproval> DocumentApprovals => Set<DocumentApproval>();
     public DbSet<DocumentStatusHistory> DocumentStatusHistories => Set<DocumentStatusHistory>();
+    public DbSet<GeneralLedgerAccount> GeneralLedgerAccounts => Set<GeneralLedgerAccount>();
+    public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();
+    public DbSet<JournalEntryLine> JournalEntryLines => Set<JournalEntryLine>();
+    public DbSet<AccountingPostingRule> AccountingPostingRules => Set<AccountingPostingRule>();
 
     // Salesforce control plane
     public DbSet<SalesforceTenant> SalesforceTenants => Set<SalesforceTenant>();
@@ -674,6 +686,61 @@ public class ReDbContext : DbContext
             e.Property(x => x.Drawer).HasMaxLength(200);
             e.Property(x => x.Description).HasMaxLength(1000);
             e.HasIndex(x => new { x.CompanyId, x.Number }).IsUnique();
+        });
+        m.Entity<ChequeNoteHistory>(e =>
+        {
+            e.ToTable("ChequeNoteHistories");
+            e.Property(x => x.PreviousStatus).HasConversion<string>().HasMaxLength(30);
+            e.Property(x => x.NewStatus).HasConversion<string>().HasMaxLength(30);
+            e.Property(x => x.Description).HasMaxLength(1000);
+            e.HasIndex(x => new { x.CompanyId, x.ChequeNoteId, x.TransactionDate });
+        });
+        m.Entity<GeneralLedgerAccount>(e =>
+        {
+            e.ToTable("GeneralLedgerAccounts");
+            e.Property(x => x.Code).HasMaxLength(30).IsRequired();
+            e.Property(x => x.Name).HasMaxLength(250).IsRequired();
+            e.Property(x => x.AccountType).HasConversion<string>().HasMaxLength(20);
+            e.Property(x => x.Currency).HasMaxLength(3);
+            e.HasIndex(x => new { x.CompanyId, x.Code }).IsUnique();
+        });
+        m.Entity<JournalEntry>(e =>
+        {
+            if (supportsTemporalTables) e.ToTable("JournalEntries", t => t.IsTemporal());
+            else e.ToTable("JournalEntries");
+            e.Property(x => x.VoucherType).HasMaxLength(30);
+            e.Property(x => x.VoucherNumber).HasMaxLength(60);
+            e.Property(x => x.Description).HasMaxLength(1000);
+            e.Property(x => x.DocumentNumber).HasMaxLength(60);
+            e.Property(x => x.SourceModule).HasMaxLength(60);
+            e.Property(x => x.TotalDebit).HasPrecision(18, 4);
+            e.Property(x => x.TotalCredit).HasPrecision(18, 4);
+            e.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
+            e.HasIndex(x => new { x.CompanyId, x.BranchId, x.FiscalPeriodId, x.VoucherNumber }).IsUnique();
+        });
+        m.Entity<JournalEntryLine>(e =>
+        {
+            e.ToTable("JournalEntryLines");
+            e.Property(x => x.Description).HasMaxLength(500);
+            e.Property(x => x.Currency).HasMaxLength(3);
+            e.Property(x => x.DebitAmount).HasPrecision(18, 4);
+            e.Property(x => x.CreditAmount).HasPrecision(18, 4);
+            e.Property(x => x.ExchangeRate).HasPrecision(18, 6);
+            e.Property(x => x.ForeignDebit).HasPrecision(18, 4);
+            e.Property(x => x.ForeignCredit).HasPrecision(18, 4);
+            e.HasIndex(x => new { x.JournalEntryId, x.LineNumber }).IsUnique();
+            e.HasOne(x => x.JournalEntry).WithMany(x => x.Lines).HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+        m.Entity<AccountingPostingRule>(e =>
+        {
+            e.ToTable("AccountingPostingRules");
+            e.Property(x => x.DocumentType).HasMaxLength(60);
+            e.Property(x => x.TransactionDirection).HasMaxLength(30);
+            e.Property(x => x.ProductGroup).HasMaxLength(60);
+            e.Property(x => x.CurrentAccountGroup).HasMaxLength(60);
+            e.HasIndex(x => new { x.CompanyId, x.DocumentType, x.TransactionDirection,
+                x.ProductGroup, x.CurrentAccountGroup }).IsUnique();
         });
     }
 
